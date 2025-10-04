@@ -46,6 +46,10 @@
     stateDoorClosed: qm_door
   - type: AccessReader
     access: [["Quartermaster"]]
+  # Starlight Start: Maintenance panel
+  - type: WiresPanelSecurity
+    securityLevel: medSecurity
+  # Starlight End
 
 - type: entity
   id: LockerSalvageSpecialist
@@ -373,6 +377,10 @@
     stateDoorClosed: brigmedic_door
   - type: AccessReader
     access: [["Brigmedic"]]
+  # Starlight Start: Maintenance panel
+  - type: WiresPanelSecurity
+    securityLevel: medSecurity
+  # Starlight End
 
 # Security Officer
 - type: entity
@@ -387,6 +395,10 @@
     stateDoorClosed: sec_door
   - type: AccessReader
     access: [["Security"]]
+  # Starlight Start: Maintenance panel
+  - type: WiresPanelSecurity
+    securityLevel: medSecurity
+  # Starlight End
 
 - type: entity
   id: GunSafe
@@ -406,6 +418,10 @@
     - entity_storage
   - type: StaticPrice
     price: 660
+  # Starlight Start: Maintenance panel
+  - type: WiresPanelSecurity
+    securityLevel: medSecurity
+  # Starlight End
 
 - type: entity
   id: GunSafeBaseSecure
@@ -414,6 +430,10 @@
   components:
   - type: AccessReader
     access: [["Armory"]]
+  # Starlight Start: Maintenance panel
+  - type: WiresPanelSecurity
+    securityLevel: medSecurity
+  # Starlight End
 
 # Genpop Storage
 - type: entity
@@ -439,6 +459,10 @@
     removedMasks: 20
   - type: PlaceableSurface
     isPlaceable: True
+  # Starlight Start: Maintenance panel
+  - type: WiresPanelSecurity
+    securityLevel: medSecurity
+  # Starlight End
 
 - type: entity
   parent: [ GenpopBase , LockerBaseSecure ]
@@ -534,6 +558,10 @@
   components:
   - type: AccessReader
     access: [["Detective"]]
+  # Starlight Start: Maintenance panel
+  - type: WiresPanelSecurity
+    securityLevel: medSecurity
+  # Starlight End
 
 - type: entity
   id: LockerEvidence
@@ -543,6 +571,10 @@
   components:
   - type: AccessReader
     access: [["Security"]]
+  # Starlight Start: Maintenance panel
+  - type: WiresPanelSecurity
+    securityLevel: medSecurity
+  # Starlight End
 
 # Syndicate
 - type: entity
@@ -625,3 +657,7 @@
     stateBaseClosed: hop
     stateDoorOpen: hop_open
     stateDoorClosed: representative_door
+  # Starlight Start: Maintenance panel
+  - type: WiresPanelSecurity
+    securityLevel: medSecurity
+  # Starlight End

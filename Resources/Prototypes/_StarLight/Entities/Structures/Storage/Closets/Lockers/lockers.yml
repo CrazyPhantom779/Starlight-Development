@@ -23,6 +23,8 @@
     stateDoorClosed: sec_door
   - type: AccessReader
     access: [["Security"]]
+  - type: WiresPanelSecurity
+    securityLevel: medSecurity
 
 # Warden
 - type: entity
@@ -53,6 +55,8 @@
     stateDoorClosed: brigmedic_door
   - type: AccessReader
     access: [["Brigmedic"]]
+  - type: WiresPanelSecurity
+    securityLevel: medSecurity
 
 # NanoTrasen Representives
 - type: entity
@@ -87,6 +91,8 @@
       stateDoorClosed: salvagelead_door
     - type: AccessReader
       access: [["SalvageLead"]]
+    - type: WiresPanelSecurity
+      securityLevel: medSecurity
 
 # Salvage Specialist (regular) is in wizden files
 # Salvage Specialist (Large)
