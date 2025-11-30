@@ -39,7 +39,6 @@ public sealed class MHelpUIController : UIController, IOnSystemChanged<MentorSys
     [Dependency] private readonly IConfigurationManager _config = default!;
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IClyde _clyde = default!;
-    [Dependency] private readonly IUserInterfaceManager _uiManager = default!;
     [UISystemDependency] private readonly AudioSystem _audio = default!;
 
     private MentorSystem? _mentorSystem;

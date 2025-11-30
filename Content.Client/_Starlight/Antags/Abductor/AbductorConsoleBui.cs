@@ -12,7 +12,6 @@ namespace Content.Client._Starlight.Antags.Abductor;
 [UsedImplicitly]
 public sealed class AbductorConsoleBui : BoundUserInterface
 {
-    [Dependency] private readonly IEntityManager _entities = default!;
     [Dependency] private readonly IPrototypeManager _protoManager = default!;
 
     [ViewVariables]

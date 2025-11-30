@@ -22,10 +22,7 @@ namespace Content.Client._Starlight.Radio.Systems;
 /// </summary>
 public sealed class RadioChimeSystem : EntitySystem
 {
-    [Dependency] private readonly IPlayerManager _playerManager = default!;
-    [Dependency] private readonly IUserInterfaceManager _userInterfaceManager = default!;
     [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly EntityManager _entityManager = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
 
     public bool IsMuted = false;

@@ -22,7 +22,6 @@ namespace Content.Client._Starlight.Computers.Recruitment;
 [UsedImplicitly]
 public sealed class RecruitmentComputerBui(EntityUid owner, Enum uiKey) : BoundUserInterface(owner, uiKey)
 {
-    [Dependency] private readonly IEntityManager _entities = default!;
     [Dependency] private readonly IEntitySystemManager _entitySystem = default!;
     [Dependency] private readonly ILocalizationManager Loc = default!;
     [Dependency] private readonly IPrototypeManager _protos = default!;

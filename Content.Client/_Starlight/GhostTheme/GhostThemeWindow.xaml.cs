@@ -33,10 +33,7 @@ public sealed partial class GhostThemeWindow : DefaultWindow
 {
     private readonly IClientPreferencesManager _preferencesManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly IEntityManager _entManager = default!;
 
-    [Dependency] private readonly IClientConsoleHost _consoleHost = default!;
-    [Dependency] private readonly IConfigurationManager _configManager = default!;
     [Dependency] private readonly IEntitySystemManager _entitySystem = default!;
 
     private readonly ClientGameTicker _gameTicker;

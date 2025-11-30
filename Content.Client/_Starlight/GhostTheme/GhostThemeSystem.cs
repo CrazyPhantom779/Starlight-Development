@@ -11,7 +11,6 @@ namespace Content.Client.Starlight.GhostTheme;
 public sealed class GhostThemeSystem : EntitySystem
 {
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
-    [Dependency] private readonly ISharedPlayersRoleManager _playerManager = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
 
     public override void Initialize()
