@@ -5,7 +5,6 @@ using Content.Shared.Access;
 using Content.Shared.Access.Components;
 using Content.Shared.Access.Systems;
 using Content.Shared.Containers.ItemSlots;
-using Robust.Client.UserInterface;
 using Robust.Shared.Prototypes;
 using static Content.Shared.Access.Components.AccessOverriderComponent;
 using Content.Shared.Implants.Components;

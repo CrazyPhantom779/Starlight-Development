@@ -6,7 +6,6 @@ using Content.Shared.Damage;
 using Robust.Shared.Prototypes;
 using Content.Shared.Starlight.EntityEffects.Components;
 using Content.Shared.Starlight.EntityEffects.EntitySystems;
-using Content.Shared.Starlight.EntityEffects.Components;
 
 namespace Content.Shared.Starlight.EntityEffects.Effects;
 

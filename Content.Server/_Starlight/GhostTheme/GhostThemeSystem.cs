@@ -34,7 +34,6 @@ using Content.Server.Popups;
 using Content.Shared.Verbs;
 using Robust.Shared.Collections;
 using Content.Shared.Ghost.Roles.Components;
-using Robust.Shared.Prototypes;
 using Content.Shared.Starlight.GhostTheme;
 using Content.Shared.Starlight;
 using Robust.Shared.Network;
