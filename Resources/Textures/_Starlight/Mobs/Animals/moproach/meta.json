@@ -1,0 +1,47 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+  "copyright": "Taken from tgstation at commit https://github.com/tgstation/tgstation/commit/4f6190e2895e09116663ef282d3ce1d8b35c032e | Modified by Citrea, split body and feet layers",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "mothroach",
+      "directions": 4
+    },
+    {
+      "name": "mothroach_mops",
+      "directions": 4
+    },
+    {
+      "name": "mothroach-moving",
+      "directions": 4
+    },
+    {
+      "name": "mothroach-moving_mops",
+      "directions": 4
+    },
+    {
+      "name": "mothroach_dead",
+      "directions": 4
+    },
+    {
+      "name": "mothroach_dead_mops",
+      "directions": 4
+    },
+    {
+      "name": "mothroach_lazy",
+      "directions": 4
+    },
+    {
+      "name": "mothroach_lazy_mops",
+      "directions": 4
+    },
+    {
+      "name": "mothroach_sleep",
+      "directions": 4
+    }
+  ]
+}
