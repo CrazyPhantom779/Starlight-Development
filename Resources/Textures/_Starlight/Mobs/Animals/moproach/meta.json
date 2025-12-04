@@ -8,28 +8,67 @@
   },
   "states": [
     {
+      "name": "icon"
+    },
+    {
+      "name": "icon_mops",
+      "directions": 4
+    },
+    {
       "name": "mothroach",
       "directions": 4
     },
     {
-      "name": "mothroach_mops",
-      "directions": 4
-    },
-    {
       "name": "mothroach-moving",
-      "directions": 4
+      "directions": 4,
+      "delays": [
+        [
+          0.2,
+          0.2,
+          0.2
+        ],
+        [
+          0.2,
+          0.2,
+          0.2
+        ],
+        [
+          0.2,
+          0.2,
+          0.2
+        ],
+        [
+          0.2,
+          0.2,
+          0.2
+        ]
+      ]
     },
     {
       "name": "mothroach-moving_mops",
-      "directions": 4
-    },
-    {
-      "name": "mothroach_dead",
-      "directions": 4
-    },
-    {
-      "name": "mothroach_dead_mops",
-      "directions": 4
+      "directions": 4,
+      "delays": [
+        [
+          0.2,
+          0.2,
+          0.2
+        ],
+        [
+          0.2,
+          0.2,
+          0.2
+        ],
+        [
+          0.2,
+          0.2,
+          0.2
+        ],
+        [
+          0.2,
+          0.2,
+          0.2
+        ]
+      ]
     },
     {
       "name": "mothroach_lazy",
@@ -41,6 +80,30 @@
     },
     {
       "name": "mothroach_sleep",
+      "directions": 4
+    },
+    {
+      "name": "mothroach_sleep_mops",
+      "directions": 4
+    },
+    {
+      "name": "mothroach_dead",
+      "directions": 4
+    },
+    {
+      "name": "mothroach_dead_mops",
+      "directions": 4
+    },
+    {
+      "name": "inhand-left",
+      "directions": 4
+    },
+    {
+      "name": "inhand-right",
+      "directions": 4
+    },
+    {
+      "name": "0-equipped-HELMET",
       "directions": 4
     }
   ]
