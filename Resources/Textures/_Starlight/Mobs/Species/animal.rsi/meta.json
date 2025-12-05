@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+  "copyright": "Animal Brain By DocMoth, Inhands taken from human brain",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+    "states": [
+        {
+            "name": "animal-brain"
+        },
+        {
+            "name": "animal-brain-inhand-left"
+        },
+        {
+            "name": "animal-brain-inhand-right"
+        }
+    ]
+}
