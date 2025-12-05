@@ -1,4 +1,4 @@
-﻿#liver
+#liver
 - type: entity
   parent: SurgeryStepBase
   id: SurgeryStepLocateLiver
@@ -20,7 +20,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 - type: entity
@@ -33,7 +33,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
   - type: SurgeryStepEmoteEffect
   - type: SurgeryStepOrganExtract
@@ -63,7 +63,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 - type: entity
@@ -76,7 +76,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
   - type: SurgeryStepEmoteEffect
   - type: SurgeryStepOrganExtract
@@ -107,7 +107,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 - type: entity
@@ -120,7 +120,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
   - type: SurgeryStepEmoteEffect
   - type: SurgeryStepOrganExtract
@@ -149,7 +149,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 - type: entity
@@ -162,7 +162,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
   - type: SurgeryStepEmoteEffect
   - type: SurgeryStepOrganExtract
@@ -192,7 +192,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 - type: entity
@@ -205,7 +205,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
   - type: SurgeryStepEmoteEffect
   - type: SurgeryStepOrganExtract
@@ -235,7 +235,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 - type: entity
@@ -248,7 +248,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
   - type: SurgeryStepEmoteEffect
   - type: SurgeryStepOrganExtract
@@ -278,7 +278,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 - type: entity
@@ -295,7 +295,7 @@
     organ:
     - type: OrganEyes
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
 
 # eye implants
@@ -325,7 +325,7 @@
     organ:
     - type: EyeImplant
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
 
 # tongue
@@ -339,7 +339,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 - type: entity
@@ -356,7 +356,7 @@
     organ:
     - type: OrganTongue
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
 
 # brain
@@ -370,7 +370,7 @@
     tools:
     - type: Cautery
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/cautery.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: cautery
 
 - type: entity
@@ -383,7 +383,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
 
 - type: entity
@@ -396,7 +396,7 @@
     tools:
     - type: Cautery
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/cautery.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: cautery
   - type: SurgeryStepEmoteEffect
 
@@ -414,7 +414,7 @@
       types:
         Slash: 10
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
   - type: SurgeryStepEmoteEffect
 
@@ -428,7 +428,7 @@
     tools:
     - type: Retractor
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: retractor
   - type: SurgeryStepEmoteEffect
 
@@ -442,7 +442,7 @@
     tools:
     - type: SurgicalDrill
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/drill.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: drill
   - type: SurgeryStepEmoteEffect
 
@@ -460,7 +460,7 @@
       types:
         Slash: 10
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/saw.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: saw
   - type: SurgeryStepEmoteEffect
 
@@ -474,7 +474,7 @@
     tools:
     - type: Retractor
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: retractor
   - type: SurgeryStepEmoteEffect
 
@@ -488,7 +488,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
   - type: SurgeryStepEmoteEffect
 
@@ -506,7 +506,7 @@
       types:
         Slash: 10
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
   - type: SurgeryStepEmoteEffect
 
@@ -520,7 +520,7 @@
     tools:
     - type: Retractor
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: retractor
   - type: SurgeryStepEmoteEffect
 
@@ -538,7 +538,7 @@
       types:
         Slash: 10
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
   - type: SurgeryStepEmoteEffect
 
@@ -557,7 +557,7 @@
     organ:
     - type: OrganBrain
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: retractor
   - type: SurgeryStepEmoteEffect
 
@@ -574,7 +574,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
 
 - type: entity
@@ -602,7 +602,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 # kidneys
@@ -617,7 +617,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
 
 - type: entity
@@ -647,7 +647,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 # stomach
@@ -662,7 +662,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
 
 - type: entity
@@ -690,7 +690,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 # lungs
@@ -705,7 +705,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
 
 - type: entity
@@ -733,7 +733,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 # heart
@@ -748,7 +748,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
 
 - type: entity
@@ -776,7 +776,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 # eyes
@@ -791,7 +791,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
 
 - type: entity
@@ -821,7 +821,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 # eye implants
@@ -854,7 +854,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
 
 - type: entity
@@ -885,7 +885,7 @@
     - type: Hemostat
   - type: SurgeryStepEmoteEffect
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 # brain
@@ -900,7 +900,7 @@
     tools:
     - type: Cautery
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/cautery.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: cautery
 
 - type: entity
@@ -913,7 +913,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
 
 - type: entity
@@ -926,7 +926,7 @@
     tools:
     - type: Cautery
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/cautery.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: cautery
 
 - type: entity
@@ -956,7 +956,7 @@
     tools:
     - type: Hemostat
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: hemostat
 
 - type: entity
@@ -969,7 +969,7 @@
     tools:
     - type: Retractor
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: retractor
 
 - type: entity
@@ -982,7 +982,7 @@
     tools:
     - type: Cautery
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/cautery.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: cautery
 
 - type: entity
@@ -995,8 +995,8 @@
     tools:
     - type: BoneSetter
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
-    state: setter
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
+    state: bonesetter
 
 - type: entity
   parent: SurgeryStepBase
@@ -1021,7 +1021,7 @@
     tools:
     - type: Retractor
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: retractor
 
 - type: entity
@@ -1034,7 +1034,7 @@
     tools:
     - type: Cautery
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/cautery.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: cautery
   - type: SurgeryClearProgress
 
@@ -1051,7 +1051,7 @@
     - type: HasEggHolder
     - type: EggHolder
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
   - type: SurgeryStepEmoteEffect
 
@@ -1096,7 +1096,7 @@
     tools:
     - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
 
 - type: entity
@@ -1114,3 +1114,10 @@
   - type: SurgeryItemSizeCondition
   - type: SurgeryStepOrganInsert
     slot: cavity
+
+
+
+
+
+
+

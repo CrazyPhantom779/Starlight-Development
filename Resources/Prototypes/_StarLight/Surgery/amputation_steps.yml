@@ -8,7 +8,7 @@
     tools:
     - type: BoneSaw
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/saw.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: saw
   - type: SurgeryStepEmoteEffect
   - type: SurgeryStepBleedEffect
@@ -27,7 +27,7 @@
     tools:
     - type: BoneSaw
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/saw.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: saw
   - type: SurgeryStepBleedEffect
     damage:
@@ -45,7 +45,7 @@
       tools:
         - type: Hemostat
     - type: Sprite
-      sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+      sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
       state: hemostat
 
 - type: entity
@@ -58,7 +58,7 @@
       tools:
       - type: BoneSaw
     - type: Sprite
-      sprite: Objects/Specific/Medical/Surgery/saw.rsi
+      sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
       state: saw
     - type: SurgeryStepBleedEffect
       damage:
@@ -75,9 +75,8 @@
     tools:
       - type: Scalpel
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: scalpel
-
 
 - type: entity
   parent: SurgeryStepSawSkull

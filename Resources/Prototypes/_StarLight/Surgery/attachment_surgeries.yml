@@ -20,7 +20,7 @@
   - type: SurgeryLimbSlotCondition
     slot: head
   - type: Sprite
-    sprite: Objects/Specific/Medical/medical.rsi
+    sprite: _Starlight/Objects/Specific/Medical/medical.rsi
     state: medicated-suture
 
 - type: entity
@@ -113,8 +113,16 @@
   - type: SurgeryLimbSlotCondition
     slot: other
 
+- type: entity
+  parent: SurgeryLimbAttachmentHead
+  id: SurgeryLimbAttachmentMops
+  name: Limb Attachment Mops
+  description:  Surgical attachment of a limb.
+  components:
+  - type: SurgeryLimbSlotCondition
+    slot: mops
+
 #SlimePerson
-    
 - type: entity
   parent: SurgeryLimbAttachmentHead
   id: SurgeryLimbAttachmentSlimeHead
@@ -130,7 +138,6 @@
     speciesBlacklist: []
     speciesWhitelist:
     - SlimePerson
-
 
 - type: entity
   parent: SurgeryLimbAttachmentSlimeHead

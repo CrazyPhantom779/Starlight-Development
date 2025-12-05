@@ -23,7 +23,7 @@
     - Foot
     - Tail
   - type: Sprite
-    sprite: Objects/Specific/Medical/Surgery/saw.rsi
+    sprite: _Starlight/Objects/Specific/Medical/surgery.rsi
     state: saw
     
 - type: entity
