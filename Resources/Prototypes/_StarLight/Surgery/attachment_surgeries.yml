@@ -20,7 +20,7 @@
   - type: SurgeryLimbSlotCondition
     slot: head
   - type: Sprite
-    sprite: _Starlight/Objects/Specific/Medical/medical.rsi
+    sprite: Objects/Specific/Medical/medical.rsi
     state: medicated-suture
 
 - type: entity

@@ -1,0 +1,53 @@
+- type: entity
+  parent: SurgeryBase
+  id: SurgeryExtractAnimalBrain
+  name: Extract Animal Brain
+  description: Extract the brain from an animal.
+  components:
+  - type: Surgery
+    requirement:
+    - SurgeryOpenIncision
+    - SurgeryOpenIncisionSlime
+    steps:
+    - SurgeryStepPreparePatient
+    - SurgeryStepDisinfectScalp
+    - SurgeryStepMakeIncisionScalp
+    - SurgeryStepRetractScalp
+    - SurgeryStepExtractBrain
+  - type: SurgeryPartCondition
+    parts:
+    - Torso
+  - type: SurgeryOrganExistCondition
+    organ:
+    - type: OrganBrain
+  - type: Sprite
+    sprite: _Starlight/Mobs/Species/animal.rsi
+    state: animal-brain
+
+- type: entity
+  parent: SurgeryBase
+  id: SurgeryImplantAnimalBrain
+  name: Implant Animal Brain
+  description: Implant a brain into an animal.
+  components:
+  - type: Surgery
+    requirement:
+    - SurgeryOpenIncision
+    - SurgeryOpenIncisionSlime
+    steps:
+    - SurgeryStepCleanImplantSite
+    - SurgeryStepPrepareScalp
+    - SurgeryStepMakeIncisionScalp
+    - SurgeryStepRetractScalp
+    - SurgeryStepInsertBrain
+    - SurgeryStepReplaceScalp
+    - SurgeryStepSutureScalp
+  - type: SurgeryPartCondition
+    parts:
+    - Torso
+  - type: SurgeryOrganDontExistCondition
+    organ:
+    - type: OrganBrain
+  - type: Sprite
+    sprite: _Starlight/Mobs/Species/animal.rsi
+    state: animal-brain
