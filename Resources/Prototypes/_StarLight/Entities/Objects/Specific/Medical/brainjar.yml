@@ -1,0 +1,108 @@
+- type: entity
+  parent: BaseItem
+  id: BrainJar
+  name: brain jar
+  description: Brainjar
+  components:
+  - type: Sprite
+    sprite: _Starlight/Objects/Specific/Medical/brainjar.rsi
+    layers:
+      # Organ sprite
+      - state: brainjar-empty  # Placeholder, will be replaced when organ inserted
+        map: ["organLayer"]
+        visible: false
+      # Jar glass
+      - state: brainjar-empty
+  - type: Item
+    sprite: _Starlight/Objects/Specific/Medical/brainjar.rsi
+    size: Normal
+  - type: MeleeWeapon
+    soundNoDamage:
+      path: "/Audio/Effects/Fluids/splat.ogg"
+    damage:
+      types:
+        Blunt: 2
+  # Solution container # Haloperidol?
+  - type: SolutionContainerManager
+    solutions:
+      brainjar:
+        maxVol: 100
+  - type: MixableSolution
+    solution: brainjar
+  - type: RefillableSolution
+    solution: brainjar
+  - type: DrainableSolution
+    solution: brainjar
+  - type: ExaminableSolution
+    solution: brainjar
+    exactVolume: true
+  - type: DrawableSolution
+    solution: brainjar
+  - type: InjectableSolution
+    solution: brainjar
+  - type: SolutionTransfer
+    canChangeTransferAmount: true
+    maxTransferAmount: 50
+  - type: SolutionItemStatus
+    solution: brainjar
+  - type: ItemSlots
+    slots:
+      brainjar_slot:
+        name: Organ Slot
+        whitelist:
+          components:
+          - Organ
+        insertSound: /Audio/Effects/Fluids/slosh.ogg
+        ejectSound: /Audio/Effects/Fluids/splat.ogg
+  - type: UserInterface
+    interfaces:
+      enum.TransferAmountUiKey.Key:
+        type: TransferAmountBoundUserInterface
+  # Brain jar visual system
+  - type: BrainJar
+    slotId: brainjar_slot
+    organLayerMap: organLayer
+  - type: ContainerContainer
+    containers:
+      brainjar_slot: !type:ContainerSlot
+  - type: Appearance
+  - type: Damageable
+    damageContainer: Inorganic
+    damageModifierSet: Glass
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 10
+      behaviors:
+      - !type:PlaySoundBehavior
+        sound:
+          collection: GlassBreak
+      - !type:SpillBehavior
+        solution: brainjar
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          ShardGlass:
+            min: 1
+            max: 2
+      - !type:EmptyAllContainersBehaviour
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: Tag
+    tags:
+    - GlassBeaker
+
+- type: entity
+  parent: BrainJar
+  id: BrainVessel
+  name: brain vessel
+  description: Brainvessel
+  components:
+  - type: Sprite
+    sprite: _Starlight/Objects/Specific/Medical/brainjar.rsi
+    layers:
+      - state: brainvessel-empty  # Placeholder, will be replaced when organ inserted
+        map: ["organLayer"]
+        visible: false
+      # Jar glass
+      - state: brainvessel-empty

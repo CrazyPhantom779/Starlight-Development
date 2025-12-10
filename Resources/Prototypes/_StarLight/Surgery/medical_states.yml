@@ -1,0 +1,864 @@
+
+# CLEANLINESS STATES
+
+- type: medicalState
+  id: Clean
+  name: "Clean"
+  description: "Surgical field is clean and ready for incision."
+  visible: false
+
+- type: medicalState
+  id: Dirty
+  name: "Dirty"
+  description: "Surgical field is dirty and needs cleaning to reduce infection risk."
+  visible: false
+
+- type: medicalState
+  id: Bloodied
+  name: "Bloodied"
+  description: "Blood is present on the surface, obscuring visibility."
+  visible: true
+
+- type: medicalState
+  id: Sterile
+  name: "Sterile"
+  description: "Surgical field has been sterilized (better than clean)."
+  visible: false
+
+- type: medicalState
+  id: Contaminated
+  name: "Contaminated"
+  description: "Surface is contaminated with toxins or chemicals."
+  visible: true
+
+- type: medicalState
+  id: Decontaminated
+  name: "Decontaminated"
+  description: "Surgical site has been decontaminated after exposure."
+  visible: false
+
+# TISSUE/SKIN STATES
+
+- type: medicalState
+  id: Intact
+  name: "Intact"
+  description: "Skin/tissue is intact and unopened."
+  visible: false
+
+- type: medicalState
+  id: Incised
+  name: "Incised"
+  description: "Shallow incision has been made with scalpel."
+  visible: false
+
+- type: medicalState
+  id: CutOpen
+  name: "Cut Open"
+  description: "Deep incision, enough to access internal structures."
+  visible: false
+
+- type: medicalState
+  id: Retracted
+  name: "Retracted"
+  description: "Incision is being held open with retractors for easy access."
+  visible: false
+
+- type: medicalState
+  id: Torn
+  name: "Torn"
+  description: "Tissue has been roughly torn (traumatic, high infection risk)."
+  visible: true
+
+- type: medicalState
+  id: Lacerated
+  name: "Lacerated"
+  description: "Severe laceration requiring immediate attention."
+  visible: true
+
+- type: medicalState
+  id: Crushed
+  name: "Crushed"
+  description: "Tissue has been crushed from blunt trauma."
+  visible: true
+
+- type: medicalState
+  id: Bruised
+  name: "Bruised"
+  description: "Tissue shows signs of severe bruising (contusion)."
+  visible: true
+
+- type: medicalState
+  id: Swollen
+  name: "Swollen"
+  description: "Tissue is swollen from inflammation or fluid buildup."
+  visible: true
+
+- type: medicalState
+  id: Abraded
+  name: "Abraded"
+  description: "Skin has been abraded/scraped away."
+  visible: true
+
+- type: medicalState
+  id: Punctured
+  name: "Punctured"
+  description: "Puncture wound present (from stabbing or piercing)."
+  visible: true
+
+- type: medicalState
+  id: Mangled
+  name: "Mangled"
+  description: "Tissue has been shredded or mangled."
+  visible: true
+
+- type: medicalState
+  id: Scarred
+  name: "Scarred"
+  description: "Scarred from previous injury or surgery."
+  visible: true
+
+- type: medicalState
+  id: KeloidScarring
+  name: "Keloid Scarring"
+  description: "Keloid scarring (excessive scar tissue formation)."
+  visible: true
+
+# BURN STATES
+
+- type: medicalState
+  id: BurnFirstDegree
+  name: "First Degree Burn"
+  description: "First degree burn (superficial, red skin)."
+  visible: true
+
+- type: medicalState
+  id: BurnSecondDegree
+  name: "Second Degree Burn"
+  description: "Second degree burn (blistering, partial thickness)."
+  visible: true
+
+- type: medicalState
+  id: BurnThirdDegree
+  name: "Third Degree Burn"
+  description: "Third degree burn (full thickness, white/charred)."
+  visible: true
+
+- type: medicalState
+  id: BurnFourthDegree
+  name: "Fourth Degree Burn"
+  description: "Fourth degree burn (extends to muscle/bone)."
+  visible: true
+
+- type: medicalState
+  id: ChemicalBurn
+  name: "Chemical Burn"
+  description: "Chemical burn from acids or bases."
+  visible: true
+
+- type: medicalState
+  id: ElectricalBurn
+  name: "Electrical Burn"
+  description: "Electrical burn from electrical current."
+  visible: true
+
+- type: medicalState
+  id: RadiationBurn
+  name: "Radiation Burn"
+  description: "Radiation burn from exposure to ionizing radiation."
+  visible: true
+
+- type: medicalState
+  id: Frostbite
+  name: "Frostbite"
+  description: "Frostbite (cold-induced tissue damage)."
+  visible: true
+
+- type: medicalState
+  id: DeepFrostbite
+  name: "Deep Frostbite"
+  description: "Severe frostbite with tissue necrosis."
+  visible: true
+
+# BLEEDING CONTROL STATES
+
+- type: medicalState
+  id: Bleeding
+  name: "Bleeding"
+  description: "Active bleeding is occurring."
+  visible: true
+
+- type: medicalState
+  id: Clamped
+  name: "Clamped"
+  description: "Blood vessels are clamped with hemostat."
+  visible: false
+
+- type: medicalState
+  id: Cauterized
+  name: "Cauterized"
+  description: "Bleeding has been stopped via cauterization."
+  visible: false
+
+- type: medicalState
+  id: Hemorrhaging
+  name: "Hemorrhaging"
+  description: "Severe hemorrhaging (life-threatening blood loss)."
+  visible: false
+
+- type: medicalState
+  id: InternalBleeding
+  name: "Internal Bleeding"
+  description: "Internal bleeding present but not visible externally."
+  visible: false
+
+- type: medicalState
+  id: Hematoma
+  name: "Hematoma"
+  description: "Hematoma (blood pooling under skin)."
+  visible: true
+
+- type: medicalState
+  id: Tourniquet
+  name: "Tourniquet"
+  description: "Tourniquet applied to restrict blood flow."
+  visible: true
+
+# CLOSURE STATES
+
+- type: medicalState
+  id: Sutured
+  name: "Sutured"
+  description: "Incision has been sutured closed."
+  visible: false
+
+- type: medicalState
+  id: Bandaged
+  name: "Bandaged"
+  description: "Wound has been bandaged."
+  visible: True
+
+- type: medicalState
+  id: Sealed
+  name: "Sealed"
+  description: "Surgical glue applied for quick closure."
+  visible: false
+
+- type: medicalState
+  id: Stapled
+  name: "Stapled"
+  description: "Staples applied for quick closure."
+  visible: false
+
+- type: medicalState
+  id: Gaping
+  name: "Gaping"
+  description: "Wound is open and gaping."
+  visible: true
+
+# BONE STATES
+
+- type: medicalState
+  id: BoneExposed
+  name: "Bone Exposed"
+  description: "Bone is visible/accessible."
+  visible: true
+
+- type: medicalState
+  id: BoneSawed
+  name: "Bone Sawed"
+  description: "Bone has been cut with bone saw."
+  visible: false
+
+- type: medicalState
+  id: BoneDrilled
+  name: "Bone Drilled"
+  description: "Hole drilled in bone for access."
+  visible: false
+
+- type: medicalState
+  id: BoneSet
+  name: "Bone Set"
+  description: "Bone has been set/aligned for healing."
+  visible: false
+
+- type: medicalState
+  id: BoneFractured
+  name: "Bone Fractured"
+  description: "Simple bone fracture (clean break)."
+  visible: true
+
+- type: medicalState
+  id: CompoundFracture
+  name: "Compound Fracture"
+  description: "Compound fracture (bone pierces skin)."
+  visible: true
+
+- type: medicalState
+  id: HairlineFracture
+  name: "Hairline Fracture"
+  description: "Hairline fracture (small crack in bone)."
+  visible: true
+
+- type: medicalState
+  id: ComminutedFracture
+  name: "Comminuted Fracture"
+  description: "Comminuted fracture (bone shattered into pieces)."
+  visible: true
+
+- type: medicalState
+  id: GreenstickFracture
+  name: "Greenstick Fracture"
+  description: "Greenstick fracture (incomplete break, one side bent)."
+  visible: true
+
+- type: medicalState
+  id: Dislocated
+  name: "Dislocated"
+  description: "Bone is dislocated from joint."
+  visible: true
+
+- type: medicalState
+  id: Relocated
+  name: "Relocated"
+  description: "Joint has been relocated/reduced."
+  visible: false
+
+- type: medicalState
+  id: BonePinned
+  name: "Bone Pinned"
+  description: "Bone has metal pins inserted for stabilization."
+  visible: false
+
+- type: medicalState
+  id: BonePlated
+  name: "Bone Plated"
+  description: "Bone has been plated for structural support."
+  visible: false
+
+- type: medicalState
+  id: BoneWeakened
+  name: "Bone Weakened"
+  description: "Bone shows signs of osteoporosis/weakness."
+  visible: true
+
+- type: medicalState
+  id: BoneHealing
+  name: "Bone Healing"
+  description: "Bone is healing and forming callus."
+  visible: false
+
+- type: medicalState
+  id: BoneMalunion
+  name: "Bone Malunion"
+  description: "Bone has healed incorrectly (malunion)."
+  visible: true
+
+- type: medicalState
+  id: SkullOpen
+  name: "Skull Open"
+  description: "Skull has been opened to access brain."
+  visible: false
+
+- type: medicalState
+  id: SkullSealed
+  name: "Skull Sealed"
+  description: "Skull has been sealed after brain surgery."
+  visible: false
+
+- type: medicalState
+  id: SkullFractured
+  name: "Skull Fractured"
+  description: "Skull fracture present."
+  visible: true
+
+- type: medicalState
+  id: SkullDepressed
+  name: "Skull Depressed"
+  description: "Depressed skull fracture (bone pushed inward)."
+  visible: true
+
+- type: medicalState
+  id: RibcageOpen
+  name: "Ribcage Open"
+  description: "Ribcage has been opened to access chest cavity."
+  visible: false
+
+- type: medicalState
+  id: RibcageSealed
+  name: "Ribcage Sealed"
+  description: "Ribcage has been sealed after chest surgery."
+  visible: false
+
+- type: medicalState
+  id: RibFractured
+  name: "Rib Fractured"
+  description: "One or more ribs are fractured."
+  visible: true
+
+- type: medicalState
+  id: FlailChest
+  name: "Flail Chest"
+  description: "Flail chest (multiple rib fractures, unstable)."
+  visible: true
+
+- type: medicalState
+  id: SpinalFracture
+  name: "Spinal Fracture"
+  description: "Spinal fracture present."
+  visible: true
+
+- type: medicalState
+  id: VertebraeCompressed
+  name: "Vertebrae Compressed"
+  description: "Vertebrae are compressed."
+  visible: true
+
+# VASCULAR/NEURAL STATES
+
+- type: medicalState
+  id: VesselsSutured
+  name: "Vessels Sutured"
+  description: "Blood vessels have been sutured."
+  visible: false
+
+- type: medicalState
+  id: NervesSutured
+  name: "Nerves Sutured"
+  description: "Nerves have been sutured/reconnected."
+  visible: false
+
+- type: medicalState
+  id: VesselSevered
+  name: "Vessel Severed"
+  description: "Blood vessel is severed."
+  visible: true
+
+- type: medicalState
+  id: NerveDamaged
+  name: "Nerve Damaged"
+  description: "Nerve is severed/damaged."
+  visible: true
+
+- type: medicalState
+  id: ArterialDamage
+  name: "Arterial Damage"
+  description: "Major artery is damaged."
+  visible: true
+
+- type: medicalState
+  id: VenousDamage
+  name: "Venous Damage"
+  description: "Vein is damaged."
+  visible: true
+
+- type: medicalState
+  id: Thrombosis
+  name: "Thrombosis"
+  description: "Blood clot present in vessel."
+  visible: true
+
+- type: medicalState
+  id: Embolism
+  name: "Embolism"
+  description: "Traveling blood clot (life-threatening)."
+  visible: true
+
+- type: medicalState
+  id: Aneurysm
+  name: "Aneurysm"
+  description: "Blood vessel wall bulging (aneurysm)."
+  visible: true
+
+- type: medicalState
+  id: Ischemic
+  name: "Ischemic"
+  description: "Reduced blood flow to area (ischemia)."
+  visible: true
+
+- type: medicalState
+  id: Paralyzed
+  name: "Paralyzed"
+  description: "Complete loss of nerve function."
+  visible: true
+
+- type: medicalState
+  id: Paresthesia
+  name: "Paresthesia"
+  description: "Partial loss of nerve function."
+  visible: true
+
+# ORGAN/OBJECT STATES
+
+- type: medicalState
+  id: OrganRemoved
+  name: "Organ Removed"
+  description: "Organ has been removed from body."
+  visible: true
+
+- type: medicalState
+  id: OrganInstalled
+  name: "Organ Installed"
+  description: "Organ has been installed/transplanted."
+  visible: false
+
+- type: medicalState
+  id: ObjectRemoved
+  name: "Object Removed"
+  description: "Foreign object has been removed."
+  visible: false
+
+- type: medicalState
+  id: OrganRejection
+  name: "Organ Rejection"
+  description: "Transplanted organ is being rejected by the body."
+  visible: true
+
+- type: medicalState
+  id: OrganFailure
+  name: "Organ Failure"
+  description: "Organ is failing and needs immediate intervention."
+  visible: true
+
+- type: medicalState
+  id: OrganRuptured
+  name: "Organ Ruptured"
+  description: "Organ is ruptured/burst."
+  visible: true
+
+- type: medicalState
+  id: OrganHemorrhaging
+  name: "Organ Hemorrhaging"
+  description: "Organ shows internal hemorrhaging."
+  visible: true
+
+- type: medicalState
+  id: OrganCystic
+  name: "Organ Cystic"
+  description: "Organ has cyst or abscess."
+  visible: true
+
+- type: medicalState
+  id: OrganNecrotic
+  name: "Organ Necrotic"
+  description: "Organ tissue is dying."
+  visible: true
+
+- type: medicalState
+  id: OrganEnlarged
+  name: "Organ Enlarged"
+  description: "Organ is enlarged (hypertrophic)."
+  visible: true
+
+- type: medicalState
+  id: OrganAtrophied
+  name: "Organ Atrophied"
+  description: "Organ is atrophied/shrunken."
+  visible: true
+
+- type: medicalState
+  id: OrganTumor
+  name: "Organ Tumor"
+  description: "Organ has tumor or growth."
+  visible: true
+
+- type: medicalState
+  id: OrganCancerous
+  name: "Organ Cancerous"
+  description: "Organ shows signs of cancer."
+  visible: true
+
+- type: medicalState
+  id: OrganBiopsied
+  name: "Organ Biopsied"
+  description: "Organ has been biopsied."
+  visible: false
+
+# INFECTION/DISEASE STATES
+
+- type: medicalState
+  id: Infected
+  name: "Infected"
+  description: "Surgical site is infected."
+  visible: true
+
+- type: medicalState
+  id: Septic
+  name: "Septic"
+  description: "Severe systemic infection (sepsis risk)."
+  visible: true
+
+- type: medicalState
+  id: Necrotic
+  name: "Necrotic"
+  description: "Tissue is dying due to lack of blood flow."
+  visible: true
+
+- type: medicalState
+  id: Gangrenous
+  name: "Gangrenous"
+  description: "Gangrene present (dead tissue with infection)."
+  visible: true
+
+- type: medicalState
+  id: Abscessed
+  name: "Abscessed"
+  description: "Pus accumulation (abscess)."
+  visible: true
+
+- type: medicalState
+  id: ResistantInfection
+  name: "Resistant Infection"
+  description: "Antibiotic-resistant infection."
+  visible: true
+
+- type: medicalState
+  id: FungalInfection
+  name: "Fungal Infection"
+  description: "Fungal infection present."
+  visible: true
+
+- type: medicalState
+  id: ViralInfection
+  name: "Viral Infection"
+  description: "Viral infection present."
+  visible: true
+
+- type: medicalState
+  id: Parasitic
+  name: "Parasitic"
+  description: "Parasitic infestation."
+  visible: true
+
+- type: medicalState
+  id: Inflamed
+  name: "Inflamed"
+  description: "Inflammation present (red, hot, swollen)."
+  visible: true
+
+- type: medicalState
+  id: Febrile
+  name: "Febrile"
+  description: "Severe inflammation with fever."
+  visible: true
+
+# TRAUMA STATES
+
+- type: medicalState
+  id: Concussion
+  name: "Concussion"
+  description: "Concussion (mild traumatic brain injury)."
+  visible: true
+
+- type: medicalState
+  id: TraumaticBrainInjury
+  name: "Traumatic Brain Injury"
+  description: "Severe traumatic brain injury."
+  visible: true
+
+- type: medicalState
+  id: CerebralEdema
+  name: "Cerebral Edema"
+  description: "Cerebral edema (brain swelling)."
+  visible: true
+
+- type: medicalState
+  id: IncreasedICP
+  name: "Increased ICP"
+  description: "Intracranial pressure elevated."
+  visible: true
+
+- type: medicalState
+  id: SubduralHematoma
+  name: "Subdural Hematoma"
+  description: "Subdural hematoma (bleeding under skull)."
+  visible: true
+
+- type: medicalState
+  id: EpiduralHematoma
+  name: "Epidural Hematoma"
+  description: "Epidural hematoma (bleeding above dura)."
+  visible: true
+
+- type: medicalState
+  id: Pneumothorax
+  name: "Pneumothorax"
+  description: "Pneumothorax (collapsed lung)."
+  visible: true
+
+- type: medicalState
+  id: TensionPneumothorax
+  name: "Tension Pneumothorax"
+  description: "Tension pneumothorax (life-threatening)."
+  visible: true
+
+- type: medicalState
+  id: Hemothorax
+  name: "Hemothorax"
+  description: "Hemothorax (blood in chest cavity)."
+  visible: true
+
+- type: medicalState
+  id: CardiacTamponade
+  name: "Cardiac Tamponade"
+  description: "Cardiac tamponade (fluid around heart)."
+  visible: true
+
+- type: medicalState
+  id: Whiplash
+  name: "Whiplash"
+  description: "Whiplash injury to neck."
+  visible: true
+
+- type: medicalState
+  id: SpinalCordInjury
+  name: "Spinal Cord Injury"
+  description: "Spinal cord injury."
+  visible: true
+
+# HEALTH/CONDITION STATES
+
+- type: medicalState
+  id: Healthy
+  name: "Healthy"
+  description: "Part is healthy and undamaged."
+  visible: false
+
+- type: medicalState
+  id: Damaged
+  name: "Damaged"
+  description: "Part has internal damage that needs repair."
+  visible: true
+
+- type: medicalState
+  id: Shocked
+  name: "Shocked"
+  description: "Part is in shock from trauma."
+  visible: true
+
+- type: medicalState
+  id: Allergic
+  name: "Allergic"
+  description: "Part shows signs of allergic reaction."
+  visible: true
+
+- type: medicalState
+  id: Hypoxic
+  name: "Hypoxic"
+  description: "Tissue is hypoxic (oxygen-deprived)."
+  visible: true
+
+- type: medicalState
+  id: Edematous
+  name: "Edematous"
+  description: "Tissue is edematous (fluid retention)."
+  visible: true
+
+- type: medicalState
+  id: Amputated
+  name: "Amputated"
+  description: "Part has been amputated."
+  visible: true
+
+- type: medicalState
+  id: Reattached
+  name: "Reattached"
+  description: "Part has been reattached after amputation."
+  visible: false
+
+- type: medicalState
+  id: Regenerating
+  name: "Regenerating"
+  description: "Part is undergoing regeneration."
+  visible: false
+
+- type: medicalState
+  id: Augmented
+  name: "Augmented"
+  description: "Part has been augmented with cybernetics."
+  visible: false
+
+- type: medicalState
+  id: Prosthetic
+  name: "Prosthetic"
+  description: "Part is prosthetic/artificial."
+  visible: false
+
+- type: medicalState
+  id: GeneticDamage
+  name: "Genetic Damage"
+  description: "Genetic damage present."
+  visible: true
+
+- type: medicalState
+  id: Irradiated
+  name: "Irradiated"
+  description: "Radiation damage present."
+  visible: true
+
+- type: medicalState
+  id: Poisoned
+  name: "Poisoned"
+  description: "Toxin accumulation."
+  visible: true
+
+- type: medicalState
+  id: OxidativeStress
+  name: "Oxidative Stress"
+  description: "Cellular damage from oxidative stress."
+  visible: true
+
+# SPECIAL STATES
+
+- type: medicalState
+  id: Anesthetized
+  name: "Anesthetized"
+  description: "Anesthetic has been applied (reduces pain/movement)."
+  visible: false
+
+- type: medicalState
+  id: ForeignObject
+  name: "Foreign Object"
+  description: "Foreign object is embedded in tissue."
+  visible: true
+
+- type: medicalState
+  id: CavityCreated
+  name: "Cavity Created"
+  description: "Cavity created for implant placement."
+  visible: false
+
+- type: medicalState
+  id: Shrapnel
+  name: "Shrapnel"
+  description: "Shrapnel embedded in tissue."
+  visible: true
+
+- type: medicalState
+  id: BulletWound
+  name: "Bullet Wound"
+  description: "Bullet embedded in tissue."
+  visible: true
+
+- type: medicalState
+  id: GlassEmbedded
+  name: "Glass Embedded"
+  description: "Glass shards embedded in tissue."
+  visible: true
+
+- type: medicalState
+  id: Crystallized
+  name: "Crystallized"
+  description: "Part is crystallized (unusual material state)."
+  visible: true
+
+- type: medicalState
+  id: Petrified
+  name: "Petrified"
+  description: "Part is petrified/fossilized."
+  visible: true
+
+- type: medicalState
+  id: Anomalous
+  name: "Anomalous"
+  description: "Part shows anomalous properties."
+  visible: true

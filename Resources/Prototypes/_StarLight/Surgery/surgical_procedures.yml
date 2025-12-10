@@ -1,0 +1,575 @@
+- type: entity
+  id: ProcedureAmputateArm
+  name: "Arm Amputation"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SurgicalProcedure
+    description: "Safe removal of an arm at the shoulder joint."
+    targetBodyPartTypes:
+      - Arm
+    requiredEndStates:
+      - BoneSawed
+      - Cauterized
+      - Sutured
+      - Clean
+    forbiddenEndStates:
+      - Bleeding
+      - Infected
+      - Hemorrhaging
+      - Dirty
+    requiredIntermediateStates:
+      - Incised
+      - CutOpen
+      - Clamped
+    completionRewards:
+      healDamage:
+        groups:
+          Brute: -10
+      clearStates:
+        - BoneSawed
+        - Sutured
+      amputate: true
+    failureConsequences:
+      ifMissing:
+        Cauterized:
+          damage:
+            types:
+              Bloodloss: 50
+          addStates:
+            - Hemorrhaging
+        Sutured:
+          damage:
+            groups:
+              Brute: 20
+          infectionChanceIncrease: 0.4
+      ifPresent:
+        Dirty:
+          infectionChanceIncrease: 0.6
+        Torn:
+          damage:
+            groups:
+              Brute: 15
+    priority: 50
+
+- type: entity
+  id: ProcedureAmputateLeg
+  name: "Leg Amputation"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SurgicalProcedure
+    description: "Safe removal of a leg at the hip joint."
+    targetBodyPartTypes:
+      - Leg
+    requiredEndStates:
+      - BoneSawed
+      - Cauterized
+      - Sutured
+      - Clean
+    forbiddenEndStates:
+      - Bleeding
+      - Infected
+      - Hemorrhaging
+    requiredIntermediateStates:
+      - Incised
+      - CutOpen
+      - Retracted
+      - Clamped
+    completionRewards:
+      healDamage:
+        groups:
+          Brute: -10
+      amputate: true
+    failureConsequences:
+      ifMissing:
+        Retracted:
+          damage:
+            groups:
+              Brute: 25
+        Cauterized:
+          damage:
+            types:
+              Bloodloss: 60
+          addStates:
+            - Hemorrhaging
+    priority: 50
+
+- type: entity
+  id: ProcedureAmputateHand
+  name: "Hand Amputation"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SurgicalProcedure
+    description: "Removal of hand at the wrist."
+    targetBodyPartTypes:
+      - Hand
+    requiredEndStates:
+      - BoneSawed
+      - Cauterized
+      - Bandaged
+    forbiddenEndStates:
+      - Bleeding
+      - Infected
+    requiredIntermediateStates:
+      - Incised
+      - Clamped
+    completionRewards:
+      healDamage:
+        groups:
+          Brute: -5
+      amputate: true
+    failureConsequences:
+      ifMissing:
+        Cauterized:
+          damage:
+            types:
+              Bloodloss: 30
+    priority: 50
+
+- type: entity
+  id: ProcedureReattachArm
+  name: "Arm Reattachment"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SurgicalProcedure
+    description: "Surgical reattachment of a severed arm."
+    targetBodyPartTypes:
+      - Arm
+    requiredEndStates:
+      - BoneSet
+      - VesselsSutured
+      - NervesSutured
+      - Sutured
+      - Sterile
+    forbiddenEndStates:
+      - Bleeding
+      - Infected
+      - Necrotic
+    requiredIntermediateStates:
+      - BoneDrilled
+      - Retracted
+      - Clamped
+    completionRewards:
+      restoreLimb: true
+      healDamage:
+        groups:
+          Brute: -20
+    failureConsequences:
+      ifMissing:
+        BoneSet:
+          damage:
+            groups:
+              Brute: 30
+          message: "The limb is reattached incorrectly and will need to be re-amputated!"
+          permanent: true
+        VesselsSutured:
+          addStates:
+            - Necrotic
+          message: "Without blood flow, the limb begins to necrotize!"
+        NervesSutured:
+          debuff: "LimbNumbness"
+          message: "The limb is reattached but has no sensation."
+      ifPresent:
+        Infected:
+          addStates:
+            - Necrotic
+          damage:
+            groups:
+              Toxin: 15
+    priority: 40
+
+- type: entity
+  id: ProcedureReattachLeg
+  name: "Leg Reattachment"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SurgicalProcedure
+    description: "Surgical reattachment of a severed leg."
+    targetBodyPartTypes:
+      - Leg
+    requiredEndStates:
+      - BoneSet
+      - VesselsSutured
+      - NervesSutured
+      - Sutured
+      - Sterile
+    forbiddenEndStates:
+      - Bleeding
+      - Infected
+      - Necrotic
+    requiredIntermediateStates:
+      - BoneDrilled
+      - Retracted
+      - Clamped
+    completionRewards:
+      restoreLimb: true
+      healDamage:
+        groups:
+          Brute: -20
+    failureConsequences:
+      ifMissing:
+        BoneSet:
+          damage:
+            groups:
+              Brute: 30
+          permanent: true
+        VesselsSutured:
+          addStates:
+            - Necrotic
+    priority: 40
+
+- type: entity
+  id: ProcedureExtractBrain
+  name: "Brain Extraction"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SurgicalProcedure
+    description: "Careful removal of the brain from the skull."
+    targetBodyPartTypes:
+      - Head
+    targetOrganTypes:
+      - brain
+    requiredEndStates:
+      - SkullOpen
+      - OrganRemoved
+      - Bandaged
+    forbiddenEndStates:
+      - Bleeding
+    requiredIntermediateStates:
+      - BoneSawed
+      - Retracted
+      - Incised
+    completionRewards:
+      extractOrgan:
+        organ: "brain"
+        condition: 1.0
+    failureConsequences:
+      ifMissing:
+        Retracted:
+          extractOrgan:
+            organ: "brain"
+            condition: 0.5
+          damage:
+            groups:
+              Brute: 30
+      ifPresent:
+        Torn:
+          extractOrgan:
+            organ: "brain"
+            condition: 0.2
+          message: "The brain is mangled and barely recognizable."
+    priority: 30
+
+- type: entity
+  id: ProcedureExtractHeart
+  name: "Heart Extraction"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SurgicalProcedure
+    description: "Removal of the heart from the chest cavity."
+    targetBodyPartTypes:
+      - Chest
+    targetOrganTypes:
+      - heart
+    requiredEndStates:
+      - OrganRemoved
+      - RibcageOpen
+      - Clamped
+      - Cauterized
+      - Sutured
+    forbiddenEndStates:
+      - Bleeding
+      - Hemorrhaging
+    requiredIntermediateStates:
+      - Incised
+      - CutOpen
+      - BoneSawed
+      - Retracted
+    completionRewards:
+      extractOrgan:
+        organ: "heart"
+        condition: 1.0
+    failureConsequences:
+      ifMissing:
+        Clamped:
+          damage:
+            types:
+              Bloodloss: 100
+          message: "Blood sprays everywhere as the heart is torn free!"
+        RibcageOpen:
+          extractOrgan:
+            organ: "heart"
+            condition: 0.3
+          damage:
+            groups:
+              Brute: 50
+    priority: 30
+
+- type: entity
+  id: ProcedureExtractLungs
+  name: "Lung Extraction"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SurgicalProcedure
+    description: "Removal of lungs from chest cavity."
+    targetBodyPartTypes:
+      - Chest
+    targetOrganTypes:
+      - lungs
+    requiredEndStates:
+      - OrganRemoved
+      - RibcageOpen
+      - Clamped
+      - Cauterized
+      - Sutured
+    forbiddenEndStates:
+      - Bleeding
+    requiredIntermediateStates:
+      - Incised
+      - CutOpen
+      - BoneSawed
+      - Retracted
+    completionRewards:
+      extractOrgan:
+        organ: "lungs"
+        condition: 1.0
+    priority: 30
+
+- type: entity
+  id: ProcedureExtractLiver
+  name: "Liver Extraction"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SurgicalProcedure
+    description: "Removal of liver from abdomen."
+    targetBodyPartTypes:
+      - Groin
+    targetOrganTypes:
+      - liver
+    requiredEndStates:
+      - OrganRemoved
+      - Clamped
+      - Cauterized
+      - Sutured
+    forbiddenEndStates:
+      - Bleeding
+      - Infected
+    requiredIntermediateStates:
+      - Incised
+      - CutOpen
+      - Retracted
+    completionRewards:
+      extractOrgan:
+        organ: "liver"
+        condition: 1.0
+    failureConsequences:
+      ifPresent:
+        Dirty:
+          extractOrgan:
+            organ: "liver"
+            condition: 0.6
+          infectionChanceIncrease: 0.8
+    priority: 30
+
+- type: entity
+  id: ProcedureTransplantHeart
+  name: "Heart Transplant"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SurgicalProcedure
+    description: "Implantation of heart into chest cavity."
+    targetBodyPartTypes:
+      - Chest
+    requiredEndStates:
+      - OrganInstalled
+      - VesselsSutured
+      - RibcageSealed
+      - Sutured
+      - Sterile
+    forbiddenEndStates:
+      - Bleeding
+      - Infected
+    requiredIntermediateStates:
+      - RibcageOpen
+      - Retracted
+      - Clamped
+      - Sterile
+    completionRewards:
+      installOrgan:
+        organ: "heart"
+      healDamage:
+        groups:
+          Brute: -20
+    failureConsequences:
+      ifMissing:
+        VesselsSutured:
+          damage:
+            types:
+              Bloodloss: 150
+          message: "Blood pours from the disconnected vessels!"
+        Sterile:
+          infectionChanceIncrease: 0.95
+          addStates:
+            - OrganRejection
+    priority: 20
+
+- type: entity
+  id: ProcedureTransplantBrain
+  name: "Brain Transplant"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SurgicalProcedure
+    description: "Insertion of brain into empty skull."
+    targetBodyPartTypes:
+      - Head
+    requiredEndStates:
+      - OrganInstalled
+      - SkullSealed
+      - Sutured
+      - Clean
+    forbiddenEndStates:
+      - Dirty
+      - Infected
+    requiredIntermediateStates:
+      - SkullOpen
+      - Retracted
+      - Clean
+    completionRewards:
+      installOrgan:
+        organ: "brain"
+      healDamage:
+        groups:
+          Brute: -15
+    failureConsequences:
+      ifPresent:
+        Dirty:
+          infectionChanceIncrease: 0.9
+          message: "The brain is contaminated! Infection is almost certain."
+        Damaged:
+          debuff: "BrainDamage"
+          message: "The brain was damaged during installation."
+    priority: 20
+
+- type: entity
+  id: ProcedureRepairLimbFracture
+  name: "Limb Fracture Repair"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SurgicalProcedure
+    description: "Repair of fractured arm or leg bones."
+    targetBodyPartTypes:
+      - Arm
+      - Leg
+    requiredConditions:
+      - BoneFractured
+    requiredEndStates:
+      - BoneSet
+      - BoneDrilled
+      - Sutured
+      - Bandaged
+    forbiddenEndStates:
+      - BoneFractured
+      - Bleeding
+    requiredIntermediateStates:
+      - Incised
+      - BoneExposed
+    completionRewards:
+      healDamage:
+        groups:
+          Brute: -20
+      clearStates:
+        - BoneFractured
+    priority: 40
+
+- type: entity
+  id: ProcedureEmergencyThoracotomy
+  name: "Emergency Thoracotomy"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SurgicalProcedure
+    description: "Emergency opening of chest to access heart/lungs in trauma."
+    targetBodyPartTypes:
+      - Chest
+    minimumStates:
+      - RibcageOpen
+      - Clamped
+    allowedEndStates:
+      - Bleeding
+      - Torn
+    completionRewards:
+      immediateAccess: true
+      message: "The chest is opened, giving access to vital organs!"
+    failureConsequences:
+      certainConsequences:
+        damage:
+          types:
+            Bloodloss: 40
+        infectionChanceIncrease: 0.7
+        message: "Emergency procedure complete, but infection risk is high."
+    timeLimit: 30
+    priority: 10
+
+- type: entity
+  id: ProcedureFieldAmputation
+  name: "Field Amputation"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SurgicalProcedure
+    description: "Rapid amputation without proper surgical environment."
+    targetBodyPartTypes:
+      - Arm
+      - Leg
+    minimumStates:
+      - BoneSawed
+    allowedEndStates:
+      - Bleeding
+      - Torn
+      - Dirty
+    completionRewards:
+      amputate: true
+      message: "The limb is severed, but the patient needs immediate medical attention!"
+    failureConsequences:
+      certainConsequences:
+        damage:
+          types:
+            Bloodloss: 40
+        infectionChanceIncrease: 0.7
+        message: "The crude amputation is successful, but infection is almost certain."
+    priority: 15
+
+- type: entity
+  id: ProcedureRemoveBullet
+  name: "Bullet Removal"
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: SurgicalProcedure
+    description: "Extraction of embedded projectile."
+    requiredConditions:
+      - ForeignObject
+    requiredEndStates:
+      - ObjectRemoved
+      - Sutured
+      - Clean
+    forbiddenEndStates:
+      - ForeignObject
+      - Infected
+    requiredIntermediateStates:
+      - Incised
+      - Retracted
+    completionRewards:
+      removeForeignObject: true
+      healDamage:
+        groups:
+          Brute: -15
+      clearStates:
+        - ForeignObject
+    failureConsequences:
+      ifPresent:
+        Damaged:
+          message: "The extraction caused additional tissue damage."
+          damage:
+            groups:
+              Brute: 10
+    priority: 35
+
+
+
