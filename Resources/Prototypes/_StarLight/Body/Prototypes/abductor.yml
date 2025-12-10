@@ -1,30 +1,36 @@
 ﻿- type: body
   id: Abductor
   name: Abductor
-  root: torso
+  root: chest
   slots:
     head:
       part: HeadAbductor
       connections:
-      - torso
+      - chest
       organs:
         brain: OrganAbductorBrain
         eyes: OrganAbductorEyes
         eye_implant: null
-    torso:
-      part: TorsoAbductor
+    chest:
+      part: ChestAbductor
       connections:
       - right arm
       - left arm
-      - right leg
-      - left leg
+      - groin
       organs:
         heart: OrganAbductorHeart
         lungs: OrganAbductorLungs
+        cavity: null
+    groin:
+      part: GroinAbductor
+      connections:
+      - right leg
+      - left leg
+      - tail
+      organs:
         stomach: OrganAbductorStomach
         liver: OrganAbductorLiver
         kidneys: OrganAbductorKidneys
-        cavity: null
     right arm:
       part: RightArmAbductor
       connections:
@@ -49,3 +55,5 @@
       part: RightFootAbductor
     left foot:
       part: LeftFootAbductor
+    tail:
+      part: null

@@ -59,6 +59,377 @@
     speed: 1
     startSound:
       path: /Audio/_Starlight/Medical/Surgery/bone_setter.ogg
+    transitions:
+    # Set simple fracture
+    - requiredStates: [BoneFractured, BoneExposed]
+      removeStates: [BoneFractured]
+      addStates: [BoneSet, BoneHealing]
+      duration: 6.0
+      successChance: 0.90
+      successMessage: "You set and stabilize the fractured bone."
+      priority: 100
+    
+    # Repair compound fracture
+    - requiredStates: [CompoundFracture, BoneExposed]
+      removeStates: [CompoundFracture]
+      addStates: [BoneSet, BoneHealing]
+      duration: 8.0
+      successChance: 0.75
+      successMessage: "You carefully set the compound fracture."
+      priority: 95
+    
+    # Fix hairline fracture
+    - requiredStates: [HairlineFracture, BoneExposed]
+      removeStates: [HairlineFracture]
+      addStates: [BoneHealing]
+      duration: 4.0
+      successChance: 0.95
+      successMessage: "You repair the hairline fracture."
+      priority: 90
+    
+    # Repair comminuted (shattered) fracture
+    - requiredStates: [ComminutedFracture, BoneExposed]
+      removeStates: [ComminutedFracture]
+      addStates: [BoneSet, BonePinned]
+      duration: 10.0
+      successChance: 0.65
+      successMessage: "You painstakingly reconstruct the shattered bone."
+      priority: 85
+    
+    # Fix bone malunion (improperly healed)
+    - requiredStates: [BoneMalunion, BoneExposed]
+      removeStates: [BoneMalunion]
+      addStates: [BoneSet, BoneHealing]
+      duration: 9.0
+      successChance: 0.70
+      damage:
+        types:
+          Blunt: 8
+      successMessage: "You break and reset the malunited bone."
+      priority: 80
+    
+    # Relocate dislocated joint
+    - requiredStates: [Dislocated]
+      removeStates: [Dislocated]
+      addStates: [Relocated]
+      duration: 4.0
+      successChance: 0.85
+      damage:
+        types:
+          Blunt: 5
+      successMessage: "You relocate the dislocated joint."
+      priority: 95
   - type: HeldSpeedModifier
     walkModifier: 1
     sprintModifier: 0.9
+
+# Sutures
+- type: entity
+  name: suture
+  id: Suture
+  parent: BaseToolSurgery
+  description: Sterile thread used to close surgical incisions and wounds.
+  components:
+  - type: Sprite
+    sprite: Objects/Specific/Medical/medical.rsi
+    state: medicated-suture
+  - type: Item
+    sprite: Objects/Specific/Medical/medical.rsi
+  - type: SurgeryTool
+    toolName: "suture"
+    startSound:
+      path: /Audio/_Starlight/Medical/Surgery/suture.ogg
+    transitions:
+    # Suture clean incision
+    - requiredStates: [Incised]
+      forbiddenStates: [Bleeding, Infected]
+      addStates: [Sutured]
+      removeStates: [Incised, CutOpen, Retracted]
+      duration: 4.0
+      successChance: 0.95
+      successMessage: "You carefully suture the incision closed."
+      priority: 100
+    
+    # Suture deep cut
+    - requiredStates: [CutOpen]
+      forbiddenStates: [Bleeding, Infected, Retracted]
+      addStates: [Sutured]
+      removeStates: [CutOpen]
+      duration: 5.0
+      successChance: 0.90
+      successMessage: "You suture the deep incision."
+      priority: 95
+    
+    # Emergency suture with bleeding (risky)
+    - requiredStates: [CutOpen, Bleeding]
+      forbiddenStates: [Hemorrhaging]
+      addStates: [Sutured]
+      removeStates: [CutOpen, Bleeding]
+      duration: 6.0
+      successChance: 0.70
+      infectionChanceIncrease: 0.20
+      successMessage: "You hastily suture despite the bleeding!"
+      priority: 80
+    
+    # Suture laceration
+    - requiredStates: [Lacerated]
+      forbiddenStates: [Bleeding]
+      addStates: [Sutured]
+      removeStates: [Lacerated]
+      duration: 5.5
+      successChance: 0.85
+      successMessage: "You suture the laceration."
+      priority: 90
+    
+    # Suture vessels (vascular repair)
+    - requiredStates: [VesselSevered, CutOpen]
+      addStates: [VesselsSutured]
+      removeStates: [VesselSevered]
+      duration: 8.0
+      successChance: 0.75
+      successMessage: "You meticulously suture the severed vessel."
+      requiresOperatingTable: true
+      priority: 105
+    
+    # Suture nerves (neural repair)
+    - requiredStates: [NerveDamaged, CutOpen]
+      addStates: [NervesSutured]
+      removeStates: [NerveDamaged]
+      duration: 10.0
+      successChance: 0.65
+      successMessage: "You carefully suture the damaged nerve."
+      requiresOperatingTable: true
+      priority: 100
+    
+    # Close gaping wound
+    - requiredStates: [Gaping]
+      addStates: [Sutured]
+      removeStates: [Gaping]
+      duration: 7.0
+      successChance: 0.75
+      successMessage: "You close the gaping wound."
+      priority: 85
+
+# Disinfectant
+
+- type: entity
+  name: disinfectant spray
+  id: Disinfectant
+  parent: BaseToolSurgery
+  description: Antimicrobial spray for cleaning and sterilizing surgical sites.
+  components:
+  - type: Sprite
+    sprite: Objects/Specific/Medical/medical.rsi
+    state: brutepack
+  - type: Item
+    sprite: Objects/Specific/Medical/medical.rsi
+  - type: SurgeryTool
+    toolName: "disinfectant"
+    startSound:
+      path: /Audio/_Starlight/Medical/Surgery/spray.ogg
+    transitions:
+    # Clean dirty surface
+    - requiredStates: [Dirty]
+      addStates: [Clean]
+      removeStates: [Dirty, Bloodied]
+      duration: 2.0
+      successChance: 0.95
+      infectionChanceIncrease: -0.10
+      successMessage: "You clean the surgical site."
+      priority: 100
+    
+    # Sterilize clean surface
+    - requiredStates: [Clean]
+      forbiddenStates: [Sterile]
+      addStates: [Sterile]
+      removeStates: [Clean]
+      duration: 3.0
+      successChance: 0.90
+      infectionChanceIncrease: -0.15
+      successMessage: "You sterilize the surgical field."
+      priority: 95
+    
+    # Treat infection
+    - requiredStates: [Infected, CutOpen]
+      removeStates: [Infected]
+      addStates: [Clean]
+      duration: 5.0
+      successChance: 0.80
+      infectionChanceIncrease: -0.30
+      successMessage: "You treat the infected tissue."
+      priority: 105
+    
+    # Combat resistant infection
+    - requiredStates: [ResistantInfection, CutOpen]
+      removeStates: [ResistantInfection]
+      addStates: [Infected, Clean]
+      duration: 8.0
+      successChance: 0.60
+      infectionChanceIncrease: -0.20
+      successMessage: "You aggressively treat the resistant infection."
+      priority: 110
+    
+    # Treat fungal infection
+    - requiredStates: [FungalInfection, CutOpen]
+      removeStates: [FungalInfection]
+      addStates: [Clean]
+      duration: 6.0
+      successChance: 0.75
+      successMessage: "You treat the fungal infection."
+      priority: 100
+    
+    # Decontaminate contaminated tissue
+    - requiredStates: [Contaminated]
+      addStates: [Decontaminated, Clean]
+      removeStates: [Contaminated]
+      duration: 4.0
+      successChance: 0.85
+      infectionChanceIncrease: -0.25
+      successMessage: "You decontaminate the exposed tissue."
+      priority: 105
+    
+    # Clean bloodied surface
+    - requiredStates: [Bloodied]
+      addStates: [Clean]
+      removeStates: [Bloodied]
+      duration: 1.5
+      successChance: 0.98
+      successMessage: "You wipe away the blood."
+      priority: 90
+
+# Organ Manipulator
+
+- type: entity
+  name: organ manipulator
+  id: OrganManipulator
+  parent: BaseToolSurgery
+  description: Specialized surgical tool for safely handling and transplanting organs.
+  components:
+  - type: Sprite
+    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+    state: scalpel
+  - type: Item
+    sprite: Objects/Specific/Medical/Surgery/scalpel.rsi
+  - type: SurgeryTool
+    toolName: "organ manipulator"
+    startSound:
+      path: /Audio/_Starlight/Medical/Surgery/organ_manipulator.ogg
+    transitions:
+    # Remove damaged organ
+    - requiredStates: [CutOpen, Retracted]
+      forbiddenStates: [OrganRemoved]
+      addStates: [OrganRemoved, Bleeding]
+      duration: 6.0
+      successChance: 0.85
+      bleedingRateIncrease: 0.8
+      successMessage: "You carefully remove the organ."
+      requiresOperatingTable: true
+      priority: 100
+    
+    # Install new organ
+    - requiredStates: [OrganRemoved, CutOpen]
+      addStates: [OrganInstalled]
+      removeStates: [OrganRemoved]
+      duration: 8.0
+      successChance: 0.80
+      successMessage: "You install the replacement organ."
+      requiresOperatingTable: true
+      priority: 95
+    
+    # Repair ruptured organ
+    - requiredStates: [OrganRuptured, CutOpen, Retracted]
+      removeStates: [OrganRuptured]
+      addStates: [Damaged]
+      duration: 10.0
+      successChance: 0.70
+      successMessage: "You repair the ruptured organ."
+      requiresOperatingTable: true
+      priority: 105
+    
+    # Drain organ cyst
+    - requiredStates: [OrganCystic, CutOpen]
+      removeStates: [OrganCystic]
+      duration: 5.0
+      successChance: 0.85
+      successMessage: "You drain the cyst."
+      requiresOperatingTable: true
+      priority: 90
+    
+    # Perform biopsy
+    - requiredStates: [OrganTumor, CutOpen]
+      addStates: [OrganBiopsied, Bleeding]
+      duration: 4.0
+      successChance: 0.90
+      bleedingRateIncrease: 0.3
+      successMessage: "You perform a biopsy of the growth."
+      requiresOperatingTable: true
+      priority: 85
+    
+    # Remove tumor
+    - requiredStates: [OrganTumor, CutOpen, Retracted]
+      removeStates: [OrganTumor]
+      addStates: [Damaged, Bleeding]
+      duration: 12.0
+      successChance: 0.65
+      bleedingRateIncrease: 1.0
+      successMessage: "You excise the tumor."
+      requiresOperatingTable: true
+      priority: 95
+
+# Forceps
+
+- type: entity
+  name: surgical forceps
+  id: Forceps
+  parent: BaseToolSurgery
+  description: Precision tool for extracting foreign objects from wounds.
+  components:
+  - type: Sprite
+    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+    state: hemostat
+  - type: Item
+    sprite: Objects/Specific/Medical/Surgery/scissors.rsi
+  - type: SurgeryTool
+    toolName: "forceps"
+    startSound:
+      path: /Audio/_Starlight/Medical/Surgery/forceps.ogg
+    transitions:
+    # Remove shrapnel
+    - requiredStates: [Shrapnel, CutOpen]
+      addStates: [ObjectRemoved, Bleeding]
+      removeStates: [Shrapnel, ForeignObject]
+      duration: 4.0
+      successChance: 0.85
+      bleedingRateIncrease: 0.4
+      successMessage: "You extract the shrapnel."
+      priority: 100
+    
+    # Remove bullet
+    - requiredStates: [BulletWound, CutOpen]
+      addStates: [ObjectRemoved, Bleeding]
+      removeStates: [BulletWound, ForeignObject]
+      duration: 5.0
+      successChance: 0.80
+      bleedingRateIncrease: 0.5
+      successMessage: "You extract the bullet."
+      priority: 100
+    
+    # Remove glass
+    - requiredStates: [GlassEmbedded, CutOpen]
+      addStates: [ObjectRemoved, Bleeding]
+      removeStates: [GlassEmbedded, ForeignObject]
+      duration: 4.5
+      successChance: 0.82
+      bleedingRateIncrease: 0.4
+      successMessage: "You carefully remove the glass shards."
+      priority: 100
+    
+    # Remove generic foreign object
+    - requiredStates: [ForeignObject, CutOpen]
+      addStates: [ObjectRemoved, Bleeding]
+      removeStates: [ForeignObject]
+      duration: 5.0
+      successChance: 0.80
+      bleedingRateIncrease: 0.5
+      successMessage: "You remove the foreign object."
+      priority: 95

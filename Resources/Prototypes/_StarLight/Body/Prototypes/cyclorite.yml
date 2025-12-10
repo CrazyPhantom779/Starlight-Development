@@ -1,31 +1,36 @@
 - type: body
   id: Cyclorite
   name: "cyclorite"
-  root: torso
+  root: chest
   slots:
     head:
       part: HeadCyclorite
       connections:
-      - torso
+      - chest
       organs:
         brain: OrganCycloriteBrain
         eyes: OrganCycloriteEye
         tongue: OrganCycloriteTongue
         eye_implant: null
-    torso:
-      part: TorsoCyclorite
+    chest:
+      part: ChestCyclorite
       connections:
       - right arm
       - left arm
-      - right leg
-      - left leg
+      - groin
       organs:
         heart: OrganCycloriteHeart
         lungs: OrganCycloriteLungs
+        cavity: null
+    groin:
+      part: GroinCyclorite
+      connections:
+      - right leg
+      - left leg
+      organs:
         stomach: OrganCycloriteStomach
         liver:  OrganCycloriteLiver
         kidneys: OrganCycloriteKidneys
-        cavity: null
     right arm:
       part: RightArmCyclorite
       connections:
@@ -50,3 +55,5 @@
       part: RightFootCyclorite
     left foot:
       part: LeftFootCyclorite
+    tail:
+      part: null

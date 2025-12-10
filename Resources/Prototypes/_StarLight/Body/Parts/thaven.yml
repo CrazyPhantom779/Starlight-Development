@@ -1,9 +1,13 @@
 - type: entity
   id: PartThaven
-  parent: [BaseItem, BasePart]
+  parent: BasePart
   name: "thaven body part"
   abstract: true
   components:
+  - type: Sprite
+    sprite: _Starlight/Mobs/Species/Thaven/parts.rsi
+  - type: Icon
+    sprite: _Starlight/Mobs/Species/Thaven/parts.rsi
   - type: Extractable
     juiceSolution:
       reagents:
@@ -14,27 +18,60 @@
 
 - type: entity
   id: TorsoThaven
-  name: "thaven torso"
+  name: thaven torso
+  description: thaven torso.
   parent: [PartThaven, BaseTorso]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Thaven/parts.rsi
     state: "torso"
+  - type: Icon
+    state: "torso"
+
+- type: entity
+  id: ChestThaven
+  name: "thaven chest"
+  description: thaven chest.
+  parent: [PartThaven, BaseChest]
+  components:
+  - type: Sprite
+    state: "chest"
+  - type: Icon
+    state: "chest"
   - type: Extractable
     juiceSolution:
       reagents:
       - ReagentId: Fat
-        Quantity: 10
+        Quantity: 5
       - ReagentId: Blood
-        Quantity: 20
+        Quantity: 10
+
+- type: entity
+  id: GroinThaven
+  name: "thaven groin"
+  description: thaven groin.
+  parent: [PartThaven, BaseGroin]
+  components:
+  - type: Sprite
+    state: "groin"
+  - type: Icon
+    state: "groin"
+  - type: Extractable
+    juiceSolution:
+      reagents:
+      - ReagentId: Fat
+        Quantity: 5
+      - ReagentId: Blood
+        Quantity: 10
 
 - type: entity
   id: HeadThaven
   name: "thaven head"
+  description: thaven head.
   parent: [PartThaven, BaseHead]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Thaven/parts.rsi
+    state: "head"
+  - type: Icon
     state: "head"
   - type: Extractable
     juiceSolution:
@@ -47,71 +84,87 @@
 - type: entity
   id: LeftArmThaven
   name: "left thaven arm"
+  description: left thaven arm.
   parent: [PartThaven, BaseLeftArm]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Thaven/parts.rsi
+    state: "l_arm"
+  - type: Icon
     state: "l_arm"
 
 - type: entity
   id: RightArmThaven
   name: "right thaven arm"
+  description: right thaven arm.
   parent: [PartThaven, BaseRightArm]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Thaven/parts.rsi
+    state: "r_arm"
+  - type: Icon
     state: "r_arm"
 
 - type: entity
   id: LeftHandThaven
   name: "left thaven hand"
+  description: left thaven hand.
   parent: [PartThaven, BaseLeftHand]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Thaven/parts.rsi
+    state: "l_hand"
+  - type: Icon
     state: "l_hand"
 
 - type: entity
   id: RightHandThaven
   name: "right thaven hand"
+  description: right thaven hand.
   parent: [PartThaven, BaseRightHand]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Thaven/parts.rsi
+    state: "r_hand"
+  - type: Icon
     state: "r_hand"
 
 - type: entity
   id: LeftLegThaven
   name: "left thaven leg"
+  description: left thaven leg.
   parent: [PartThaven, BaseLeftLeg]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Thaven/parts.rsi
+    state: "l_leg"
+  - type: Icon
     state: "l_leg"
 
 - type: entity
   id: RightLegThaven
   name: "right thaven leg"
+  description: right thaven leg.
   parent: [PartThaven, BaseRightLeg]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Thaven/parts.rsi
+    state: "r_leg"
+  - type: Icon
     state: "r_leg"
 
 - type: entity
   id: LeftFootThaven
   name: "left thaven foot"
+  description: left thaven foot.
   parent: [PartThaven, BaseLeftFoot]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Thaven/parts.rsi
+    state: "l_foot"
+  - type: Icon
     state: "l_foot"
 
 - type: entity
   id: RightFootThaven
   name: "right thaven foot"
+  description: right thaven foot.
   parent: [PartThaven, BaseRightFoot]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Thaven/parts.rsi
+    state: "r_foot"
+  - type: Icon
     state: "r_foot"

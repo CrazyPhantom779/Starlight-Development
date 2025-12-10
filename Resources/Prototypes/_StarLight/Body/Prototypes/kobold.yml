@@ -1,29 +1,27 @@
 - type: body
-  id: Avali
-  name: avali
+  id: Kobold
+  name: "kobold body"
   root: chest
   slots:
     head:
-      part: HeadAvali
+      part: HeadKobold
       connections:
       - chest
       organs:
-        brain: OrganHumanBrain
-        eyes: OrganHumanEyes
-        tongue: OrganHumanTongue
-        eye_implant: null
+        brain: OrganAnimalBrain
+        eyes: OrganAnimalEyes
     chest:
-      part: ChestAvali
+      part: ChestKobold
       connections:
       - right arm
       - left arm
       - groin
       organs:
         heart: OrganAnimalHeart
-        lungs: OrganHumanLungs
+        lungs: OrganAnimalLungs
         cavity: null
     groin:
-      part: GroinAvali
+      part: GroinKobold
       connections:
       - right leg
       - left leg
@@ -31,30 +29,30 @@
       organs:
         stomach: OrganAnimalStomach
         liver: OrganAnimalLiver
-        kidneys: OrganHumanKidneys
+        kidneys: null
     right arm:
-      part: RightArmAvali
+      part: RightArmKobold
       connections:
       - right hand
     left arm:
-      part: LeftArmAvali
+      part: LeftArmKobold
       connections:
       - left hand
     right hand:
-      part: RightHandAvali
+      part: RightHandKobold
     left hand:
-      part: LeftHandAvali
+      part: LeftHandKobold
     right leg:
-      part: RightLegAvali
+      part: RightLegKobold
       connections:
       - right foot
     left leg:
-      part: LeftLegAvali
+      part: LeftLegKobold
       connections:
       - left foot
     right foot:
-      part: RightFootAvali
+      part: RightFootKobold
     left foot:
-      part: LeftFootAvali
+      part: LeftFootKobold
     tail:
-      part: TailAvali
+      part: TailKobold

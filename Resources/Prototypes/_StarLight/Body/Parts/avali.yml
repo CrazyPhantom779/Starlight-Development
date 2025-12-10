@@ -1,12 +1,13 @@
-# TODO: Add descriptions (many)
-# TODO BODY: Part damage
 - type: entity
   abstract: true
   parent: BasePart
   id: PartAvali
   name: avali body part
+  description: avali body part.
   components:
   - type: Sprite
+    sprite: _Starlight/Mobs/Species/Avali/parts.rsi
+  - type: Icon
     sprite: _Starlight/Mobs/Species/Avali/parts.rsi
   - type: Extractable
     juiceSolution:
@@ -17,26 +18,61 @@
         Quantity: 5
 
 - type: entity
-  parent: [ PartAvali, BaseTorso ]
   id: TorsoAvali
   name: avali torso
+  description: avali torso.
+  parent: [PartAvali, BaseTorso]
+  components:
+    - type: Sprite
+      state: "torso_m"
+    - type: Icon
+      state: "torso_m"
+
+- type: entity
+  parent: [ PartAvali, BaseChest ]
+  id: ChestAvali
+  name: avali chest
+  description: avali chest.
   components:
   - type: Sprite
-    state: "torso_m"
+    state: "chest_m"
+  - type: Icon
+    state: "chest_m"
   - type: Extractable
     juiceSolution:
       reagents:
       - ReagentId: Fat
-        Quantity: 5
+        Quantity: 2.5
       - ReagentId: AmmoniaBlood
-        Quantity: 10
+        Quantity: 5
+
+- type: entity
+  parent: [ PartAvali, BaseGroin ]
+  id: GroinAvali
+  name: avali groin
+  description: avali groin.
+  components:
+  - type: Sprite
+    state: "groin_m"
+  - type: Icon
+    state: "groin_m"
+  - type: Extractable
+    juiceSolution:
+      reagents:
+      - ReagentId: Fat
+        Quantity: 2.5
+      - ReagentId: AmmoniaBlood
+        Quantity: 5
 
 - type: entity
   parent: [ PartAvali, BaseHead ]
   id: HeadAvali
   name: avali head
+  description: avali head.
   components:
   - type: Sprite
+    state: "head_m"
+  - type: Icon
     state: "head_m"
   - type: Extractable
     juiceSolution:
@@ -50,40 +86,55 @@
   parent: [ PartAvali, BaseLeftArm ]
   id: LeftArmAvali
   name: left avali arm
+  description: left avali arm.
   components:
   - type: Sprite
+    state: "l_arm"
+  - type: Icon
     state: "l_arm"
 
 - type: entity
   parent: [ PartAvali, BaseRightArm ]
   id: RightArmAvali
   name: right avali arm
+  description: right avali arm.
   components:
   - type: Sprite
+    state: "r_arm"
+  - type: Icon
     state: "r_arm"
 
 - type: entity
   parent: [ PartAvali, BaseLeftHand ]
   id: LeftHandAvali
   name: left avali hand
+  description: left avali hand.
   components:
   - type: Sprite
+    state: "l_hand"
+  - type: Icon
     state: "l_hand"
 
 - type: entity
   parent: [ PartAvali, BaseRightHand ]
   id: RightHandAvali
   name: right avali hand
+  description: right avali hand.
   components:
   - type: Sprite
+    state: "r_hand"
+  - type: Icon
     state: "r_hand"
 
 - type: entity
   parent: [ PartAvali, BaseLeftLeg ]
   id: LeftLegAvali
   name: left avali leg
+  description: left avali leg.
   components:
   - type: Sprite
+    state: "l_leg"
+  - type: Icon
     state: "l_leg"
   - type: MovementBodyPart
     sprintSpeed : 4.77
@@ -93,8 +144,11 @@
   parent: [ PartAvali, BaseRightLeg ]
   id: RightLegAvali
   name: right avali leg
+  description: right avali leg.
   components:
   - type: Sprite
+    state: "r_leg"
+  - type: Icon
     state: "r_leg"
   - type: MovementBodyPart
     sprintSpeed : 4.77
@@ -104,14 +158,36 @@
   parent: [ PartAvali, BaseLeftFoot ]
   id: LeftFootAvali
   name: left avali foot
+  description: left avali foot.
   components:
   - type: Sprite
+    state: "l_foot"
+  - type: Icon
     state: "l_foot"
 
 - type: entity
   parent: [ PartAvali, BaseRightFoot ]
   id: RightFootAvali
   name: right avali foot
+  description: right avali foot.
   components:
   - type: Sprite
     state: "r_foot"
+  - type: Icon
+    state: "r_foot"
+
+- type: entity
+  parent: [ PartAvali, BaseTail ]
+  id: TailAvali
+  name: avali tail
+  description: avali tail.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Mobs/Customization/Avali/avali_parts.rsi
+    state: "tail_avalibase"
+  - type: Icon
+    sprite: _Starlight/Mobs/Customization/Avali/avali_parts.rsi
+    state: "tail_avalibase"
+  - type: BodyPart
+    partType: Tail
+    symmetry: None

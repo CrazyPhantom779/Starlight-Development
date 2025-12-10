@@ -1,31 +1,36 @@
 - type: body
   id: Shadekin
   name: "shadekin"
-  root: torso
+  root: chest
   slots:
     head:
       part: HeadShadekin
       connections:
-      - torso
+      - chest
       organs:
         brain: OrganShadekinBrain
         eyes: OrganShadekinEyes
         tongue: OrganShadekinTongue
         eye_implant: null
-    torso:
-      part: TorsoShadekin
+    chest:
+      part: ChestShadekin
       connections:
       - right arm
       - left arm
+      - groin
+      organs:
+        heart: OrganShadekinHeart
+        cavity: null
+    groin:
+      part: GroinShadekin
+      connections:
       - right leg
       - left leg
+      - tail
       organs:
-        core: OrganShadekinCore
-        heart: OrganShadekinHeart
         stomach: OrganShadekinStomach
         liver: OrganShadekinLiver
         kidneys: OrganShadekinKidneys
-        cavity: null
     right arm:
       part: RightArmShadekin
       connections:
@@ -50,3 +55,5 @@
       part: RightFootShadekin
     left foot:
       part: LeftFootShadekin
+    tail:
+      part: TailShadekin

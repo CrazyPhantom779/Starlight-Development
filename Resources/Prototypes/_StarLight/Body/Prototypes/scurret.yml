@@ -1,0 +1,43 @@
+- type: body
+  id: Scurret
+  name: "scurret body"
+  root: chest
+  slots:
+    head:
+      part: HeadScurret
+      connections:
+      - chest
+      organs:
+        brain: OrganAnimalBrain
+        eyes: OrganAnimalEyes
+    chest:
+      part: ChestScurret
+      connections:
+      - groin
+      organs:
+        heart: OrganAnimalHeart
+        lungs: OrganAnimalLungs
+    groin:
+      part: GroinScurret
+      connections:
+      - right leg
+      - left leg
+      - tail
+      organs:
+        stomach: OrganAnimalStomach
+        liver: OrganAnimalLiver
+        kidneys: OrganAnimalKidneys
+    right leg:
+      part: RightLegScurret
+      connections:
+      - right foot
+    left leg:
+      part: LeftLegScurret
+      connections:
+      - left foot
+    right foot:
+      part: RightFootScurret
+    left foot:
+      part: LeftFootScurret
+    tail:
+      part: TailScurret

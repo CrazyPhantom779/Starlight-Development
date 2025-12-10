@@ -1,0 +1,173 @@
+- type: entity
+  id: PartKobold
+  parent: BasePart
+  name: "kobold body part"
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+  - type: Icon
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+  - type: Extractable
+    juiceSolution:
+      reagents:
+      - ReagentId: Fat
+        Quantity: 2
+      - ReagentId: Blood
+        Quantity: 8
+
+- type: entity
+  id: ChestKobold
+  name: "kobold chest"
+  description: kobold chest.
+  parent: [PartKobold, BaseChest]
+  components:
+  - type: Sprite
+    state: "torso_m"
+  - type: Icon
+    state: "torso_m"
+  - type: Extractable
+    juiceSolution:
+      reagents:
+      - ReagentId: Fat
+        Quantity: 4
+      - ReagentId: Blood
+        Quantity: 7.5
+
+- type: entity
+  id: GroinKobold
+  name: "kobold groin"
+  description: kobold groin.
+  parent: [PartKobold, BaseGroin]
+  components:
+  - type: Sprite
+    state: "torso_m"
+  - type: Icon
+    state: "torso_m"
+  - type: Extractable
+    juiceSolution:
+      reagents:
+      - ReagentId: Fat
+        Quantity: 4
+      - ReagentId: Blood
+        Quantity: 7.5
+
+- type: entity
+  id: HeadKobold
+  name: "kobold head"
+  description: kobold head.
+  parent: [PartKobold, BaseHead]
+  components:
+  - type: Sprite
+    state: "head_m"
+  - type: Icon
+    state: "head_m"
+  - type: Extractable
+    juiceSolution:
+      reagents:
+      - ReagentId: Fat
+        Quantity: 3
+      - ReagentId: Blood
+        Quantity: 8
+
+- type: entity
+  id: LeftArmKobold
+  name: "left kobold arm"
+  description: left kobold arm.
+  parent: [PartKobold, BaseLeftArm]
+  components:
+  - type: Sprite
+    state: "l_arm"
+  - type: Icon
+    state: "l_arm"
+
+- type: entity
+  id: RightArmKobold
+  name: "right kobold arm"
+  description: right kobold arm.
+  parent: [PartKobold, BaseRightArm]
+  components:
+  - type: Sprite
+    state: "r_arm"
+  - type: Icon
+    state: "r_arm"
+
+- type: entity
+  id: LeftHandKobold
+  name: "left kobold hand"
+  description: left kobold hand.
+  parent: [PartKobold, BaseLeftHand]
+  components:
+  - type: Sprite
+    state: "l_hand"
+  - type: Icon
+    state: "l_hand"
+
+- type: entity
+  id: RightHandKobold
+  name: "right kobold hand"
+  description: right kobold hand.
+  parent: [PartKobold, BaseRightHand]
+  components:
+  - type: Sprite
+    state: "r_hand"
+  - type: Icon
+    state: "r_hand"
+
+- type: entity
+  id: LeftLegKobold
+  name: "left kobold leg"
+  description: left kobold leg.
+  parent: [PartKobold, BaseLeftLeg]
+  components:
+  - type: Sprite
+    state: "l_leg"
+  - type: Icon
+    state: "l_leg"
+
+- type: entity
+  id: RightLegKobold
+  name: "right kobold leg"
+  description: right kobold leg.
+  parent: [PartKobold, BaseRightLeg]
+  components:
+  - type: Sprite
+    state: "r_leg"
+  - type: Icon
+    state: "r_leg"
+
+- type: entity
+  id: LeftFootKobold
+  name: "left kobold foot"
+  description: left kobold foot.
+  parent: [PartKobold, BaseLeftFoot]
+  components:
+  - type: Sprite
+    state: "l_foot"
+  - type: Icon
+    state: "l_foot"
+
+- type: entity
+  id: RightFootKobold
+  name: "right kobold foot"
+  description: right kobold foot.
+  parent: [PartKobold, BaseRightFoot]
+  components:
+  - type: Sprite
+    state: "r_foot"
+  - type: Icon
+    state: "r_foot"
+
+- type: entity
+  id: TailKobold
+  name: "kobold tail"
+  description: kobold tail.
+  parent: [PartKobold, BaseTail]
+  components:
+  - type: Sprite
+    state: "tail"
+  - type: Icon
+    state: "tail"
+  - type: BodyPart
+    partType: Tail
+    symmetry: None

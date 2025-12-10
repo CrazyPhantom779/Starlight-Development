@@ -1,0 +1,15 @@
+- type: entity
+  parent: [ PartVox, BaseTail ]
+  id: TailVox
+  name: "vox tail"
+  description: vox tail.
+  components:
+  - type: Sprite
+    sprite: Mobs/Customization/vox_parts.rsi
+    state: "tail"
+  - type: Icon
+    sprite: Mobs/Customization/vox_parts.rsi
+    state: "tail"
+  - type: BodyPart
+    partType: Tail
+    symmetry: None

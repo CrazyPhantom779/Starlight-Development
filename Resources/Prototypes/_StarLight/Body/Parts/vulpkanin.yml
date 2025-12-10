@@ -1,11 +1,13 @@
-# TODO: Add descriptions (many)
-# TODO BODY: Part damage
 - type: entity
   id: PartVulpkanin
-  parent: [BaseItem, BasePart]
+  parent: BasePart
   name: "vulpkanin body part"
   abstract: true
   components:
+    - type: Sprite
+      sprite: _Starlight/Mobs/Species/Vulpkanin/parts.rsi
+    - type: Icon
+      sprite: _Starlight/Mobs/Species/Vulpkanin/parts.rsi
     - type: Extractable
       juiceSolution:
         reagents:
@@ -16,27 +18,60 @@
 
 - type: entity
   id: TorsoVulpkanin
-  name: "vulpkanin torso"
+  name: vulpkanin torso
+  description: vulpkanin torso.
   parent: [PartVulpkanin, BaseTorso]
   components:
     - type: Sprite
-      sprite: _Starlight/Mobs/Species/Vulpkanin/parts.rsi
       state: "torso_m"
+    - type: Icon
+      state: "torso_m"
+
+- type: entity
+  id: ChestVulpkanin
+  name: "vulpkanin chest"
+  description: vulpkanin chest.
+  parent: [PartVulpkanin, BaseChest]
+  components:
+    - type: Sprite
+      state: "chest_m"
+    - type: Icon
+      state: "chest_m"
     - type: Extractable
       juiceSolution:
         reagents:
           - ReagentId: Fat
-            Quantity: 10
+            Quantity: 5
           - ReagentId: Blood
-            Quantity: 20
+            Quantity: 10
+
+- type: entity
+  id: GroinVulpkanin
+  name: "vulpkanin groin"
+  description: vulpkanin groin.
+  parent: [PartVulpkanin, BaseGroin]
+  components:
+    - type: Sprite
+      state: "groin_m"
+    - type: Icon
+      state: "groin_m"
+    - type: Extractable
+      juiceSolution:
+        reagents:
+          - ReagentId: Fat
+            Quantity: 5
+          - ReagentId: Blood
+            Quantity: 10
 
 - type: entity
   id: HeadVulpkanin
   name: "vulpkanin head"
+  description: vulpkanin head.
   parent: [PartVulpkanin, BaseHead]
   components:
     - type: Sprite
-      sprite: _Starlight/Mobs/Species/Vulpkanin/parts.rsi
+      state: "head_m"
+    - type: Icon
       state: "head_m"
     - type: Extractable
       juiceSolution:
@@ -49,46 +84,56 @@
 - type: entity
   id: LeftArmVulpkanin
   name: "left vulpkanin arm"
+  description: left vulpkanin arm.
   parent: [PartVulpkanin, BaseLeftArm]
   components:
     - type: Sprite
-      sprite: _Starlight/Mobs/Species/Vulpkanin/parts.rsi
+      state: "l_arm"
+    - type: Icon
       state: "l_arm"
 
 - type: entity
   id: RightArmVulpkanin
   name: "right vulpkanin arm"
+  description: right vulpkanin arm.
   parent: [PartVulpkanin, BaseRightArm]
   components:
     - type: Sprite
-      sprite: _Starlight/Mobs/Species/Vulpkanin/parts.rsi
+      state: "r_arm"
+    - type: Icon
       state: "r_arm"
 
 - type: entity
   id: LeftHandVulpkanin
   name: "left vulpkanin hand"
+  description: left vulpkanin hand.
   parent: [PartVulpkanin, BaseLeftHand]
   components:
     - type: Sprite
-      sprite: _Starlight/Mobs/Species/Vulpkanin/parts.rsi
+      state: "l_hand"
+    - type: Icon
       state: "l_hand"
 
 - type: entity
   id: RightHandVulpkanin
   name: "right vulpkanin hand"
+  description: right vulpkanin hand.
   parent: [PartVulpkanin, BaseRightHand]
   components:
     - type: Sprite
-      sprite: _Starlight/Mobs/Species/Vulpkanin/parts.rsi
+      state: "r_hand"
+    - type: Icon
       state: "r_hand"
 
 - type: entity
   id: LeftLegVulpkanin
   name: "left vulpkanin leg"
+  description: left vulpkanin leg.
   parent: [PartVulpkanin, BaseLeftLeg]
   components:
     - type: Sprite
-      sprite: _Starlight/Mobs/Species/Vulpkanin/parts.rsi
+      state: "l_leg"
+    - type: Icon
       state: "l_leg"
     - type: MovementBodyPart
       walkSpeed : 2.7
@@ -97,10 +142,12 @@
 - type: entity
   id: RightLegVulpkanin
   name: "right vulpkanin leg"
+  description: right vulpkanin leg.
   parent: [PartVulpkanin, BaseRightLeg]
   components:
     - type: Sprite
-      sprite: _Starlight/Mobs/Species/Vulpkanin/parts.rsi
+      state: "r_leg"
+    - type: Icon
       state: "r_leg"
     - type: MovementBodyPart
       walkSpeed : 2.7
@@ -109,17 +156,37 @@
 - type: entity
   id: LeftFootVulpkanin
   name: "left vulpkanin foot"
+  description: left vulpkanin foot.
   parent: [PartVulpkanin, BaseLeftFoot]
   components:
     - type: Sprite
-      sprite: _Starlight/Mobs/Species/Vulpkanin/parts.rsi
+      state: "l_foot"
+    - type: Icon
       state: "l_foot"
 
 - type: entity
   id: RightFootVulpkanin
   name: "right vulpkanin foot"
+  description: right vulpkanin foot.
   parent: [PartVulpkanin, BaseRightFoot]
   components:
     - type: Sprite
-      sprite: _Starlight/Mobs/Species/Vulpkanin/parts.rsi
       state: "r_foot"
+    - type: Icon
+      state: "r_foot"
+
+- type: entity
+  id: TailVulpkanin
+  name: "vulpkanin tail"
+  description: vulpkanin tail.
+  parent: [PartVulpkanin, BaseTail]
+  components:
+    - type: Sprite
+      sprite: _Starlight/Mobs/Customization/vulpkanin/vulpkanin.rsi
+      state: "vulp_tail"
+    - type: Icon
+      sprite: _Starlight/Mobs/Customization/vulpkanin/vulpkanin.rsi
+      state: "vulp_tail"
+    - type: BodyPart
+      partType: Tail
+      symmetry: None

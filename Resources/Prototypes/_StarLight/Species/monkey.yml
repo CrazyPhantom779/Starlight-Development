@@ -1,0 +1,136 @@
+# Monkey Species
+- type: species
+  id: Monkey
+  name: species-name-monkey
+  roundStart: false
+  prototype: MobMonkey
+  sprites: MobMonkeySprites
+  markingLimits: MobMonkeyMarkingLimits
+  dollPrototype: MobMonkeyDummy
+  skinColoration: HumanToned
+
+- type: speciesBaseSprites
+  id: MobMonkeySprites
+  sprites:
+    Head: MobMonkeyHead
+    Chest: MobMonkeyTorso
+    Eyes: MobMonkeyEyes
+    LArm: MobMonkeyLArm
+    RArm: MobMonkeyRArm
+    LHand: MobMonkeyLHand
+    RHand: MobMonkeyRHand
+    LLeg: MobMonkeyLLeg
+    RLeg: MobMonkeyRLeg
+    LFoot: MobMonkeyLFoot
+    RFoot: MobMonkeyRFoot
+    Tail: MobMonkeyTail
+
+- type: markingPoints
+  id: MobMonkeyMarkingLimits
+  points: {}
+
+# Sprite Layers
+- type: humanoidBaseSprite
+  id: MobMonkeyHead
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: head_m
+
+- type: humanoidBaseSprite
+  id: MobMonkeyHeadMale
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: head_m
+
+- type: humanoidBaseSprite
+  id: MobMonkeyHeadFemale
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: head_f
+
+- type: humanoidBaseSprite
+  id: MobMonkeyTorso
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: torso_m
+
+- type: humanoidBaseSprite
+  id: MobMonkeyTorsoMale
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: torso_m
+
+- type: humanoidBaseSprite
+  id: MobMonkeyTorsoFemale
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: torso_f
+
+- type: humanoidBaseSprite
+  id: MobMonkeyEyes
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: eyes
+
+- type: humanoidBaseSprite
+  id: MobMonkeyLArm
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: l_arm
+
+- type: humanoidBaseSprite
+  id: MobMonkeyRArm
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: r_arm
+
+- type: humanoidBaseSprite
+  id: MobMonkeyLHand
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: l_hand
+
+- type: humanoidBaseSprite
+  id: MobMonkeyRHand
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: r_hand
+
+- type: humanoidBaseSprite
+  id: MobMonkeyLLeg
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: l_leg
+
+- type: humanoidBaseSprite
+  id: MobMonkeyRLeg
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: r_leg
+
+- type: humanoidBaseSprite
+  id: MobMonkeyLFoot
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: l_foot
+
+- type: humanoidBaseSprite
+  id: MobMonkeyRFoot
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: r_foot
+
+- type: humanoidBaseSprite
+  id: MobMonkeyTail
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+    state: tail
+
+# Dummy Entity for Character Editor
+- type: entity
+  id: MobMonkeyDummy
+  parent: MobHumanDummy
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: HumanoidAppearance
+    species: Monkey

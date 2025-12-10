@@ -1,0 +1,184 @@
+- type: entity
+  id: PartMonkey
+  parent: BasePart
+  name: "monkey body part"
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+  - type: Icon
+    sprite: _Starlight/Mobs/Animals/Monkey/parts.rsi
+  - type: Extractable
+    juiceSolution:
+      reagents:
+      - ReagentId: Fat
+        Quantity: 2
+      - ReagentId: Blood
+        Quantity: 8
+
+- type: entity
+  id: TorsoMonkey
+  name: monkey torso
+  description: monkey torso.
+  parent: [PartMonkey, BaseTorso]
+  components:
+    - type: Sprite
+      state: "torso"
+    - type: Icon
+      state: "torso"
+
+- type: entity
+  id: ChestMonkey
+  name: "monkey chest"
+  description: monkey chest.
+  parent: [PartMonkey, BaseChest]
+  components:
+  - type: Sprite
+    state: "chest"
+  - type: Icon
+    state: "chest"
+  - type: Extractable
+    juiceSolution:
+      reagents:
+      - ReagentId: Fat
+        Quantity: 4
+      - ReagentId: Blood
+        Quantity: 7.5
+
+- type: entity
+  id: GroinMonkey
+  name: "monkey groin"
+  description: monkey groin.
+  parent: [PartMonkey, BaseGroin]
+  components:
+  - type: Sprite
+    state: "groin"
+  - type: Icon
+    state: "groin"
+  - type: Extractable
+    juiceSolution:
+      reagents:
+      - ReagentId: Fat
+        Quantity: 4
+      - ReagentId: Blood
+        Quantity: 7.5
+
+- type: entity
+  id: HeadMonkey
+  name: "monkey head"
+  description: monkey head.
+  parent: [PartMonkey, BaseHead]
+  components:
+  - type: Sprite
+    state: "head"
+  - type: Icon
+    state: "head"
+  - type: Extractable
+    juiceSolution:
+      reagents:
+      - ReagentId: Fat
+        Quantity: 3
+      - ReagentId: Blood
+        Quantity: 8
+
+- type: entity
+  id: LeftArmMonkey
+  name: "left monkey arm"
+  description: left monkey arm.
+  parent: [PartMonkey, BaseLeftArm]
+  components:
+  - type: Sprite
+    state: "l_arm"
+  - type: Icon
+    state: "l_arm"
+
+- type: entity
+  id: RightArmMonkey
+  name: "right monkey arm"
+  description: right monkey arm.
+  parent: [PartMonkey, BaseRightArm]
+  components:
+  - type: Sprite
+    state: "r_arm"
+  - type: Icon
+    state: "r_arm"
+
+- type: entity
+  id: LeftHandMonkey
+  name: "left monkey hand"
+  description: left monkey hand.
+  parent: [PartMonkey, BaseLeftHand]
+  components:
+  - type: Sprite
+    state: "l_hand"
+  - type: Icon
+    state: "l_hand"
+
+- type: entity
+  id: RightHandMonkey
+  name: "right monkey hand"
+  description: right monkey hand.
+  parent: [PartMonkey, BaseRightHand]
+  components:
+  - type: Sprite
+    state: "r_hand"
+  - type: Icon
+    state: "r_hand"
+
+- type: entity
+  id: LeftLegMonkey
+  name: "left monkey leg"
+  description: left monkey leg.
+  parent: [PartMonkey, BaseLeftLeg]
+  components:
+  - type: Sprite
+    state: "l_leg"
+  - type: Icon
+    state: "l_leg"
+
+- type: entity
+  id: RightLegMonkey
+  name: "right monkey leg"
+  description: right monkey leg.
+  parent: [PartMonkey, BaseRightLeg]
+  components:
+  - type: Sprite
+    state: "r_leg"
+  - type: Icon
+    state: "r_leg"
+
+- type: entity
+  id: LeftFootMonkey
+  name: "left monkey foot"
+  description: left monkey foot.
+  parent: [PartMonkey, BaseLeftFoot]
+  components:
+  - type: Sprite
+    state: "l_foot"
+  - type: Icon
+    state: "l_foot"
+
+- type: entity
+  id: RightFootMonkey
+  name: "right monkey foot"
+  description: right monkey foot.
+  parent: [PartMonkey, BaseRightFoot]
+  components:
+  - type: Sprite
+    state: "r_foot"
+  - type: Icon
+    state: "r_foot"
+
+- type: entity
+  id: TailMonkey
+  name: "monkey tail"
+  description: monkey tail.
+  parent: [PartMonkey, BaseTail]
+  components:
+  - type: Sprite
+    state: "tail"
+  - type: Icon
+    state: "tail"
+  - type: BodyPart
+    partType: Tail
+    symmetry: None

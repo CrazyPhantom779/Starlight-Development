@@ -1,0 +1,15 @@
+- type: entity
+  id: TailReptilian
+  name: "reptilian tail"
+  description: reptilian tail.
+  parent: [PartReptilian, BaseTail]
+  components:
+  - type: Sprite
+    sprite: Mobs/Customization/reptilian_parts.rsi
+    state: "tail_large"
+  - type: Icon
+    sprite: Mobs/Customization/reptilian_parts.rsi
+    state: "tail_large"
+  - type: BodyPart
+    partType: Tail
+    symmetry: None

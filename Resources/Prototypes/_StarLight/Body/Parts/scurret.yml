@@ -1,0 +1,208 @@
+- type: entity
+  id: PartScurret
+  parent: BasePart
+  name: "scurret body part"
+  abstract: true
+  components:
+  - type: Sprite
+    sprite: _Starlight/Mobs/Animals/scurret/parts.rsi
+  - type: Icon
+    sprite: _Starlight/Mobs/Animals/scurret/parts.rsi
+  - type: Damageable
+    damageContainer: Biological
+  - type: BodyPart
+  - type: ContainerContainer
+    containers:
+      bodypart: !type:Container
+        ents: []
+
+- type: entity
+  id: TorsoScurret
+  name: "scurret torso"
+  description: scurret torso.
+  parent: PartScurret
+  components:
+  - type: Sprite
+    state: torso
+  - type: Icon
+    state: torso
+
+- type: entity
+  id: ChestScurret
+  name: "scurret chest"
+  description: scurret chest.
+  parent: PartScurret
+  components:
+  - type: Sprite
+    state: chest
+  - type: Icon
+    state: chest
+  - type: BodyPart
+    partType: Chest
+  - type: ContainerContainer
+    containers:
+      bodypart: !type:Container
+        ents: []
+
+- type: entity
+  id: GroinScurret
+  name: "scurret groin"
+  description: scurret groin.
+  parent: PartScurret
+  components:
+  - type: Sprite
+    state: groin
+  - type: Icon
+    state: groin
+  - type: BodyPart
+    partType: Groin
+  - type: ContainerContainer
+    containers:
+      bodypart: !type:Container
+        ents: []
+
+- type: entity
+  id: HeadScurret
+  name: "scurret head"
+  description: scurret head.
+  parent: PartScurret
+  components:
+  - type: Sprite
+    state: head
+  - type: Icon
+    state: head
+  - type: BodyPart
+    partType: Head
+  - type: ContainerContainer
+    containers:
+      bodypart: !type:Container
+        ents: []
+  - type: Input
+    context: "ghost"
+  - type: InputMover
+  - type: GhostOnMove
+
+- type: entity
+  id: LeftArmScurret
+  name: "left scurret arm"
+  description: left scurret arm.
+  parent: PartScurret
+  components:
+  - type: Sprite
+    state: l_arm
+  - type: Icon
+    state: l_arm
+  - type: BodyPart
+    partType: Arm
+    symmetry: Left
+
+- type: entity
+  id: RightArmScurret
+  name: "right scurret arm"
+  description: right scurret arm.
+  parent: PartScurret
+  components:
+  - type: Sprite
+    state: r_arm
+  - type: Icon
+    state: r_arm
+  - type: BodyPart
+    partType: Arm
+    symmetry: Right
+
+- type: entity
+  id: LeftHandScurret
+  name: "left scurret hand"
+  description: left scurret hand.
+  parent: PartScurret
+  components:
+  - type: Sprite
+    state: l_hand
+  - type: Icon
+    state: l_hand
+  - type: BodyPart
+    partType: Hand
+    symmetry: Left
+
+- type: entity
+  id: RightHandScurret
+  name: "right scurret hand"
+  description: right scurret hand.
+  parent: PartScurret
+  components:
+  - type: Sprite
+    state: r_hand
+  - type: Icon
+    state: r_hand
+  - type: BodyPart
+    partType: Hand
+    symmetry: Right
+
+- type: entity
+  id: LeftLegScurret
+  name: "left scurret leg"
+  description: left scurret leg.
+  parent: PartScurret
+  components:
+  - type: Sprite
+    state: l_leg
+  - type: Icon
+    state: l_leg
+  - type: BodyPart
+    partType: Leg
+    symmetry: Left
+
+- type: entity
+  id: RightLegScurret
+  name: "right scurret leg"
+  description: right scurret leg.
+  parent: PartScurret
+  components:
+  - type: Sprite
+    state: r_leg
+  - type: Icon
+    state: r_leg
+  - type: BodyPart
+    partType: Leg
+    symmetry: Right
+
+- type: entity
+  id: LeftFootScurret
+  name: "left scurret foot"
+  description: left scurret foot.
+  parent: PartScurret
+  components:
+  - type: Sprite
+    state: l_foot
+  - type: Icon
+    state: l_foot
+  - type: BodyPart
+    partType: Foot
+    symmetry: Left
+
+- type: entity
+  id: RightFootScurret
+  name: "right scurret foot"
+  description: right scurret foot.
+  parent: PartScurret
+  components:
+  - type: Sprite
+    state: r_foot
+  - type: Icon
+    state: r_foot
+  - type: BodyPart
+    partType: Foot
+    symmetry: Right
+
+- type: entity
+  id: TailScurret
+  name: "scurret tail"
+  description: scurret tail.
+  parent: PartScurret
+  components:
+  - type: Sprite
+    state: tail
+  - type: Icon
+    state: tail
+  - type: BodyPart
+    partType: Tail

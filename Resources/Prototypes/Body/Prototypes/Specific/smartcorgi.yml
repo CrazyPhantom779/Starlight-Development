@@ -10,7 +10,7 @@
       - lefthand
       - legs
       organs:
-        brain: OrganHumanBrain # feels strange but it is what it is
+        brain: OrganAnimalBrain # Starlight edit
         lungs: OrganAnimalLungs
         stomach: OrganAnimalStomach
         liver: OrganAnimalLiver

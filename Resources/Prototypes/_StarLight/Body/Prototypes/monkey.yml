@@ -1,29 +1,27 @@
 - type: body
-  id: Avali
-  name: avali
+  id: Monkey
+  name: "monkey body"
   root: chest
   slots:
     head:
-      part: HeadAvali
+      part: HeadMonkey
       connections:
       - chest
       organs:
-        brain: OrganHumanBrain
-        eyes: OrganHumanEyes
-        tongue: OrganHumanTongue
-        eye_implant: null
+        brain: OrganAnimalBrain
+        eyes: OrganAnimalEyes
     chest:
-      part: ChestAvali
+      part: ChestMonkey
       connections:
       - right arm
       - left arm
       - groin
       organs:
         heart: OrganAnimalHeart
-        lungs: OrganHumanLungs
+        lungs: OrganAnimalLungs
         cavity: null
     groin:
-      part: GroinAvali
+      part: GroinMonkey
       connections:
       - right leg
       - left leg
@@ -31,30 +29,30 @@
       organs:
         stomach: OrganAnimalStomach
         liver: OrganAnimalLiver
-        kidneys: OrganHumanKidneys
+        kidneys: null
     right arm:
-      part: RightArmAvali
+      part: RightArmMonkey
       connections:
       - right hand
     left arm:
-      part: LeftArmAvali
+      part: LeftArmMonkey
       connections:
       - left hand
     right hand:
-      part: RightHandAvali
+      part: RightHandMonkey
     left hand:
-      part: LeftHandAvali
+      part: LeftHandMonkey
     right leg:
-      part: RightLegAvali
+      part: RightLegMonkey
       connections:
       - right foot
     left leg:
-      part: LeftLegAvali
+      part: LeftLegMonkey
       connections:
       - left foot
     right foot:
-      part: RightFootAvali
+      part: RightFootMonkey
     left foot:
-      part: LeftFootAvali
+      part: LeftFootMonkey
     tail:
-      part: TailAvali
+      part: TailMonkey

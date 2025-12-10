@@ -1,0 +1,136 @@
+# Kobold Species
+- type: species
+  id: Kobold
+  name: species-name-kobold
+  roundStart: false
+  prototype: MobKobold
+  sprites: MobKoboldSprites
+  markingLimits: MobKoboldMarkingLimits
+  dollPrototype: MobKoboldDummy
+  skinColoration: HumanToned
+
+- type: speciesBaseSprites
+  id: MobKoboldSprites
+  sprites:
+    Head: MobKoboldHead
+    Chest: MobKoboldTorso
+    Eyes: MobKoboldEyes
+    LArm: MobKoboldLArm
+    RArm: MobKoboldRArm
+    LHand: MobKoboldLHand
+    RHand: MobKoboldRHand
+    LLeg: MobKoboldLLeg
+    RLeg: MobKoboldRLeg
+    LFoot: MobKoboldLFoot
+    RFoot: MobKoboldRFoot
+    Tail: MobKoboldTail
+
+- type: markingPoints
+  id: MobKoboldMarkingLimits
+  points: {}
+
+# Sprite Layers
+- type: humanoidBaseSprite
+  id: MobKoboldHead
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: head_m
+
+- type: humanoidBaseSprite
+  id: MobKoboldHeadMale
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: head_m
+
+- type: humanoidBaseSprite
+  id: MobKoboldHeadFemale
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: head_f
+
+- type: humanoidBaseSprite
+  id: MobKoboldTorso
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: torso_m
+
+- type: humanoidBaseSprite
+  id: MobKoboldTorsoMale
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: torso_m
+
+- type: humanoidBaseSprite
+  id: MobKoboldTorsoFemale
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: torso_f
+
+- type: humanoidBaseSprite
+  id: MobKoboldEyes
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: eyes
+
+- type: humanoidBaseSprite
+  id: MobKoboldLArm
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: l_arm
+
+- type: humanoidBaseSprite
+  id: MobKoboldRArm
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: r_arm
+
+- type: humanoidBaseSprite
+  id: MobKoboldLHand
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: l_hand
+
+- type: humanoidBaseSprite
+  id: MobKoboldRHand
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: r_hand
+
+- type: humanoidBaseSprite
+  id: MobKoboldLLeg
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: l_leg
+
+- type: humanoidBaseSprite
+  id: MobKoboldRLeg
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: r_leg
+
+- type: humanoidBaseSprite
+  id: MobKoboldLFoot
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: l_foot
+
+- type: humanoidBaseSprite
+  id: MobKoboldRFoot
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: r_foot
+
+- type: humanoidBaseSprite
+  id: MobKoboldTail
+  baseSprite:
+    sprite: _Starlight/Mobs/Animals/Kobold/parts.rsi
+    state: tail
+
+# Dummy Entity for Character Editor
+- type: entity
+  id: MobKoboldDummy
+  parent: MobHumanDummy
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: HumanoidAppearance
+    species: Kobold

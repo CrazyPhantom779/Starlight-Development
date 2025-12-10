@@ -1,9 +1,13 @@
 - type: entity
   id: PartAbductor
-  parent: [BaseItem, BasePart]
+  parent: BasePart
   name: "Abductor body part"
   abstract: true
   components:
+  - type: Sprite
+    sprite: _Starlight/Mobs/Species/Abductor/parts.rsi
+  - type: Icon
+    sprite: _Starlight/Mobs/Species/Abductor/parts.rsi
   - type: Extractable
     juiceSolution:
       reagents:
@@ -15,26 +19,61 @@
 - type: entity
   id: TorsoAbductor
   name: "Abductor torso"
+  description: abductor torso.
   parent: [PartAbductor, BaseTorso]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Abductor/parts.rsi
     state: "torso"
+  - type: Icon
+    state: "torso"
+
+- type: entity
+  id: ChestAbductor
+  name: "Abductor chest"
+  description: abductor chest.
+  parent: [PartAbductor, BaseChest]
+  components:
+  - type: Sprite
+    state: "chest"
+  - type: Icon
+    state: "chest"
   - type: Extractable
     juiceSolution:
       reagents:
       - ReagentId: Nutriment
-        Quantity: 10
+        Quantity: 5
       - ReagentId: Sugar
-        Quantity: 20
+        Quantity: 10
+
+- type: entity
+  id: GroinAbductor
+  name: "Abductor groin"
+  description: abductor groin.
+  parent:
+  - PartAbductor
+  - BaseGroin
+  components:
+  - type: Sprite
+    state: "groin"
+  - type: Icon
+    state: "groin"
+  - type: Extractable
+    juiceSolution:
+      reagents:
+      - ReagentId: Nutriment
+        Quantity: 5
+      - ReagentId: Sugar
+        Quantity: 10
 
 - type: entity
   id: HeadAbductor
   name: "Abductor head"
+  description: abductor head.
   parent: [PartAbductor, BaseHead]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Abductor/parts.rsi
+    state: "head"
+  - type: Icon
     state: "head"
   - type: Extractable
     juiceSolution:
@@ -47,71 +86,87 @@
 - type: entity
   id: LeftArmAbductor
   name: "left Abductor arm"
+  description: left abductor arm.
   parent: [PartAbductor, BaseLeftArm]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Abductor/parts.rsi
+    state: "l_arm"
+  - type: Icon
     state: "l_arm"
 
 - type: entity
   id: RightArmAbductor
   name: "right Abductor arm"
+  description: right abductor arm.
   parent: [PartAbductor, BaseRightArm]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Abductor/parts.rsi
+    state: "r_arm"
+  - type: Icon
     state: "r_arm"
 
 - type: entity
   id: LeftHandAbductor
   name: "left Abductor hand"
+  description: left abductor hand.
   parent: [PartAbductor, BaseLeftHand]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Abductor/parts.rsi
+    state: "l_hand"
+  - type: Icon
     state: "l_hand"
 
 - type: entity
   id: RightHandAbductor
   name: "right Abductor hand"
+  description: right abductor hand.
   parent: [PartAbductor, BaseRightHand]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Abductor/parts.rsi
+    state: "r_hand"
+  - type: Icon
     state: "r_hand"
 
 - type: entity
   id: LeftLegAbductor
   name: "left Abductor leg"
+  description: left abductor leg.
   parent: [PartAbductor, BaseLeftLeg]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Abductor/parts.rsi
+    state: "l_leg"
+  - type: Icon
     state: "l_leg"
 
 - type: entity
   id: RightLegAbductor
   name: "right Abductor leg"
+  description: right abductor leg.
   parent: [PartAbductor, BaseRightLeg]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Abductor/parts.rsi
+    state: "r_leg"
+  - type: Icon
     state: "r_leg"
 
 - type: entity
   id: LeftFootAbductor
   name: "left Abductor foot"
+  description: left abductor foot.
   parent: [PartAbductor, BaseLeftFoot]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Abductor/parts.rsi
+    state: "l_foot"
+  - type: Icon
     state: "l_foot"
 
 - type: entity
   id: RightFootAbductor
   name: "right Abductor foot"
+  description: right abductor foot.
   parent: [PartAbductor, BaseRightFoot]
   components:
   - type: Sprite
-    sprite: _Starlight/Mobs/Species/Abductor/parts.rsi
+    state: "r_foot"
+  - type: Icon
     state: "r_foot"
