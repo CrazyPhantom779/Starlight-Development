@@ -1,5 +1,20 @@
+# Starlight Start
+- type: entity
+  id: BaseOrgan
+  abstract: true
+  components:
+  - type: Organ
+  - type: MedicalState
+    states:
+      - Healthy
+  - type: Damageable
+    damageContainer: Biological
+    damageModifierSet: Scale
+# Starlight End
+
 - type: entity
   id: BaseOrganBrain
+  parent: BaseOrgan # Starlight
   abstract: true
   components:
   - type: Item
@@ -39,6 +54,7 @@
 
 - type: entity
   id: BaseOrganEyes
+  parent: BaseOrgan # Starlight
   abstract: true
   components:
   - type: OrganEyes
@@ -58,6 +74,7 @@
 
 - type: entity
   id: BaseOrganTongue
+  parent: BaseOrgan # Starlight
   abstract: true
   components:
   - type: OrganTongue
@@ -74,6 +91,7 @@
 
 - type: entity
   id: BaseOrganAppendix
+  parent: BaseOrgan # Starlight
   abstract: true
   components:
   - type: OrganAppendix
@@ -89,6 +107,7 @@
 
 - type: entity
   id: BaseOrganEars
+  parent: BaseOrgan # Starlight
   abstract: true
   components:
   - type: OrganEars
@@ -98,6 +117,7 @@
 
 - type: entity
   id: BaseOrganLungs
+  parent: BaseOrgan # Starlight
   abstract: true
   components:
   - type: OrganLungs
@@ -113,6 +133,7 @@
 
 - type: entity
   id: BaseOrganHeart
+  parent: BaseOrgan # Starlight
   abstract: true
   components:
   - type: OrganHeart
@@ -129,6 +150,7 @@
 
 - type: entity
   id: BaseOrganStomach
+  parent: BaseOrgan # Starlight
   abstract: true
   components:
   - type: OrganStomach
@@ -145,6 +167,7 @@
 
 - type: entity
   id: BaseOrganLiver
+  parent: BaseOrgan # Starlight
   abstract: true
   components:
   - type: OrganLiver
@@ -161,6 +184,7 @@
 
 - type: entity
   id: BaseOrganKidneys
+  parent: BaseOrgan # Starlight
   abstract: true
   components:
   - type: OrganKidneys
