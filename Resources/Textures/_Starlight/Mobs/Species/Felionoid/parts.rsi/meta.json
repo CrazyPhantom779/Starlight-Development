@@ -63,6 +63,14 @@
       "directions": 4
     },
     {
+      "name": "chest",
+      "directions": 4
+    },
+    {
+      "name": "groin_m",
+      "directions": 4
+    },
+    {
       "name": "felionoid",
       "directions": 4
     }

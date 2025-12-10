@@ -5,7 +5,7 @@
     "y": 32
   },
   "license": "CC-BY-SA-3.0",
-  "copyright": "Drawn by Ubaser, modified by Bhijn and Myr, parts splitted up by Roudenn (GitHub), Torso and groin combined by CrazyPhantom",
+  "copyright": "Drawn by Ubaser, modified by Bhijn and Myr, parts splitted up by Roudenn (GitHub)",
   "states": [
     {
       "name": "kobold",
@@ -60,6 +60,22 @@
     },
     {
       "name": "torso_m",
+      "directions": 4
+    },
+    {
+      "name": "chest_m",
+      "directions": 4
+    },
+    {
+      "name": "chest_f",
+      "directions": 4
+    },
+    {
+      "name": "groin_m",
+      "directions": 4
+    },
+    {
+      "name": "groin_f",
       "directions": 4
     },
     {
