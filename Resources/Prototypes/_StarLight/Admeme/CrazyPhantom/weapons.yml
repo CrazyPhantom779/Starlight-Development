@@ -93,3 +93,16 @@
       - SyringeGunAmmo
       - PlushieLizard
       - Trash
+
+- type: entity
+  id: WeaponMinigunSoap
+  name: Soapy Minigun
+  parent: WeaponMinigun
+  suffix: Admeme
+  description: A minigun that shoots soap instead of bullets. For maximum cleanliness.
+  components:
+  - type: Gun
+    fireRate: 10
+  - type: BallisticAmmoProvider
+    proto: SoapOmega
+    capacity: 1000
