@@ -106,3 +106,54 @@
   - type: BallisticAmmoProvider
     proto: SoapOmega
     capacity: 1000
+
+- type: entity
+  id: WeaponMinigunBullet
+  name: Bullet Minigun
+  parent: WeaponMinigun
+  suffix: Admeme
+  description: A minigun that shoots 100% more bullet per bullet!
+  components:
+  - type: BallisticAmmoProvider
+    proto: MoreBulletPerBullet
+    capacity: 10000
+
+- type: entity
+  id: MoreBulletPerBullet
+  name: Bullet
+  parent: BaseItem
+  suffix: Admeme
+  components:
+  - type: Sprite
+    sprite: _Starlight/Objects/Weapons/Guns/Ammunition/bullet.rsi
+    layers:
+      - state: base
+  - type: Item
+    size: Tiny
+  - type: EmbeddableProjectile
+    minimumSpeed: 3
+    removalTime: 0.25
+    embedOnThrow: false
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape: !type:PhysShapeCircle
+          radius: 0.1
+        density: 5
+        mask:
+        - ItemMask
+        restitution: 0.3
+        friction: 0.2
+      projectile:
+        shape: !type:PhysShapeAabb
+          bounds: "-0.05,-0.15,0.05,0.15"
+        hard: false
+        mask:
+        - Impassable
+        - BulletImpassable
+  - type: Projectile
+    deleteOnCollide: false
+    onlyCollideWhenShot: true
+    damage:
+      types:
+        Piercing: 1
