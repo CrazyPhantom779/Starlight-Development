@@ -1,0 +1,95 @@
+- type: entity
+  id: BangWeh
+  name: Bang Weh
+  suffix: Admeme
+  parent: BaseItem
+  description: bang, ded. weh.
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Pistols/debug.rsi
+    state: icon
+  - type: Item
+    size: Small
+    shape:
+      - 0,0,2,1
+  - type: Gun
+    fireRate: 5
+    soundGunshot:
+      path: /Audio/Weapons/Guns/Gunshots/syringe_gun.ogg
+    soundEmpty: null
+    clumsyProof: true
+  - type: BallisticAmmoProvider
+    proto: WehPlushieSyringe
+    capacity: 1000
+  - type: ContainerContainer
+    containers:
+      ballistic-ammo: !type:Container
+        ents: []
+
+- type: entity
+  id: WehPlushieSyringe
+  name: weh plushie
+  parent: PlushieLizard
+  suffix: Admeme
+  description: An adorable plushie that delivers weh at high velocity.
+  components:
+  - type: Sprite
+    sprite: Objects/Fun/Plushies/lizard.rsi
+    layers:
+      - state: icon
+  - type: Item
+    size: Tiny
+    sprite: Objects/Fun/Plushies/lizard.rsi
+  - type: Projectile
+    deleteOnCollide: false
+    onlyCollideWhenShot: true
+    damage:
+      types:
+        Piercing: 1
+  - type: EmbeddableProjectile
+    offset: "0,-0.1"
+    minimumSpeed: 3
+    removalTime: 0.25
+    embedOnThrow: false
+  - type: SolutionContainerManager
+    solutions:
+      injector:
+        maxVol: 5
+        reagents:
+          - ReagentId: JuiceThatMakesYouWeh
+            Quantity: 5
+  - type: Injector
+    injectOnly: true
+    transferAmounts:
+      - 1
+    currentTransferAmount: 1
+  - type: SolutionInjectOnEmbed
+    transferAmount: 1
+    solution: injector
+  - type: SolutionInjectWhileEmbedded
+    transferAmount: 1
+    solution: injector
+    updateInterval: 2
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape: !type:PhysShapeCircle
+          radius: 0.2
+        density: 5
+        mask:
+          - ItemMask
+        restitution: 0.3
+        friction: 0.2
+      projectile:
+        shape: !type:PhysShapeAabb
+          bounds: "-0.1,-0.3,0.1,0.3"
+        hard: false
+        mask:
+          - Impassable
+          - BulletImpassable
+  - type: Tag
+    tags:
+      - Syringe
+      - SyringeGunAmmo
+      - PlushieLizard
+      - Trash
