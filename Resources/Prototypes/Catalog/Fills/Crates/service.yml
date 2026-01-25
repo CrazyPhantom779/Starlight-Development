@@ -200,6 +200,7 @@
         - id: NewtonCradle
         - id: BoxEnvelope
         - id: BrbSign
+        - id: DeskBell # Starlight
 
 - type: entity
   parent: CrateGenericSteel

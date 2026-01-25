@@ -1,50 +1,89 @@
 - type: entity
-  parent: BaseItem
+  parent: EmptyDeskBell # Starlight Edit: BaseItem -> EmptyDeskBell
   id: DeskBell
   name: desk bell
   description: The cornerstone of any customer service job. You feel an unending urge to ring it.
   components:
   - type: Sprite
-    sprite: Objects/Misc/desk_bell.rsi
-    state: "normal"
+    # sprite: Objects/Misc/desk_bell.rsi # Starlight Edit: Commented Out
+    state: icon-bell # Starlight Edit: "normal" -> "icon-bell"
   - type: Tag
-    tags:
+    tags: &PayloadTag # Starlight Edit: Added &PayloadTag
       - Payload
   - type: InteractionPopup
     successChance: 1
-    interactSuccessSound:
-      collection: DeskBell
-      params:
-        variation: 0.03
-        volume: 3
+    # Starlight edit Start: Commented Out
+    # interactSuccessSound:
+    #   collection: DeskBell
+    #   params:
+    #     variation: 0.03
+    #     volume: 3
+    # Starlight edit End: Commented Out
     onActivate: true
   - type: EmitSoundOnUse
-    sound:
-      collection: DeskBell
-      params:
-          variation: 0.03
-          volume: 3
+    sound: *BellSound # Starlight Edit: Added *BellSound
+  # Starlight edit Start: Commented Out
+  #     collection: DeskBell
+  #     params:
+  #         variation: 0.03
+  #         volume: 3
+  # - type: EmitSoundOnUse
+  #   sound: 
+  #     collection: DeskBell
+  #     params:
+  #         variation: 0.03
+  #         volume: 3
+  # Starlight edit End: Commented Out
   - type: EmitSoundOnTrigger
-    sound:
-      collection: DeskBell
-      params:
-          variation: 0.03
-          volume: 3
-  - type: EmitSoundOnLand
-    sound:
-      collection: DeskBell
-      params:
-          variation: 0.03
-          volume: 3
+    sound: *BellSound # Starlight Edit: Added *BellSound
+  # Starlight edit Start: Commented Out
+  #     collection: DeskBell
+  #     params:
+  #         variation: 0.03
+  #         volume: 3
+  # - type: EmitSoundOnLand
+  #   sound:
+  #     collection: DeskBell
+  #     params:
+  #         variation: 0.03
+  #         volume: 3
+  # Starlight edit End: Commented Out
+    interactSuccessSound: *BellSound # Starlight Edit: Added *BellSound
   - type: UseDelay
     delay: 0.5
-  - type: MeleeWeapon
-    wideAnimationRotation: 180
-    soundHit:
-      collection: DeskBell
-      params:
-          variation: 0.03
-          volume: 3
-    damage:
-      types:
-        Blunt: 4
+  # Starlight edit Start: Commented Out
+  # - type: MeleeWeapon
+  #   wideAnimationRotation: 180
+  #   soundHit:
+  #     collection: DeskBell
+  #     params:
+  #         variation: 0.03
+  #         volume: 3
+  #   damage:
+  #     types:
+  #       Blunt: 4
+  # Starlight edit End: Commented Out
+
+  # Starlight Start
+  - type: Construction
+    graph: *BellGraph
+    node: deskBellNode
+  - type: Destructible
+    thresholds:
+    - trigger: *DamageTrigger50
+      behaviors: *OverkillBehavior
+    - trigger: *DamageTrigger20
+      behaviors:
+        - !type:PlaySoundBehavior
+          sound:
+            collection: MetalBreak
+        - !type:SpawnEntitiesBehavior
+          spawn:
+            PartRodMetal1:
+              min: 0
+              max: 1
+        - !type:ChangeConstructionNodeBehavior
+          node: start
+        - !type:DoActsBehavior
+          acts: ["Destruction"]
+  # Starlight End
