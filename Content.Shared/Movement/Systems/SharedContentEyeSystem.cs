@@ -1,5 +1,4 @@
 using System.Numerics;
-using Content.Shared.Starlight;
 using Content.Shared.Administration;
 using Content.Shared.Administration.Managers;
 using Content.Shared.Camera;
@@ -9,6 +8,9 @@ using Content.Shared.Movement.Components;
 using Robust.Shared.Input.Binding;
 using Robust.Shared.Player;
 using Robust.Shared.Serialization;
+// Starlight Start
+using Content.Shared._Starlight.Eye.NightVision;
+// Starlight End
 
 namespace Content.Shared.Movement.Systems;
 

@@ -1,6 +1,7 @@
+using Content.Shared._Starlight.Playtime;
 using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Localizations;
-using Content.Shared.Starlight;
+
 using Content.Shared.Players.PlayTimeTracking;
 using Content.Shared.Preferences;
 using JetBrains.Annotations;

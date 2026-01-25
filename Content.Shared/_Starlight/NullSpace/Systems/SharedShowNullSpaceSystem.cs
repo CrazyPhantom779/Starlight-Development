@@ -1,3 +1,4 @@
+using Content.Shared._Starlight.NullSpace.Components;
 using Content.Shared.Interaction.Events;
 
 namespace Content.Shared._Starlight.NullSpace.Systems;

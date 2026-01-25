@@ -22,7 +22,7 @@ using Content.Shared._Starlight.Radio;
 using Content.Shared.Radio.Components;
 using Content.Shared._Starlight.Language;
 using Content.Shared._Starlight.Language.Systems;
-using Content.Shared.CollectiveMind;
+using Content.Shared._Starlight.CollectiveMind;
 using Robust.Shared.Serialization;
 #endregion Starlight
 

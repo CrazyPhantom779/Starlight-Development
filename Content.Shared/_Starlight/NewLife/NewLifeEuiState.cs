@@ -1,6 +1,6 @@
 using Content.Shared.Eui;
 using Content.Shared.Roles;
-using Content.Shared.Starlight.TextToSpeech;
+using Content.Shared._Starlight.TextToSpeech;
 using Robust.Shared.Player;
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;

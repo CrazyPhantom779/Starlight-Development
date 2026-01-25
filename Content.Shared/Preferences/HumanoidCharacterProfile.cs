@@ -1,7 +1,8 @@
+using Content.Shared._Starlight.Preferences.Loadouts;
 using System.Linq;
 using System.Text.RegularExpressions;
 using Content.Shared.CCVar;
-using Content.Shared.Starlight.CCVar; // Starlight
+using Content.Shared._Starlight.CCVar; // Starlight
 using Content.Shared.GameTicking;
 using Content.Shared._CD.Records; // Cosmatic Drift Record System
 using Content.Shared.Humanoid;
@@ -200,7 +201,7 @@ namespace Content.Shared.Preferences
         }
 
         /// <summary>
-        ///     Get the default humanoid character profile, using internal constant values.
+        ///     Get the default humanoid character profile, using internal constant values.;
         ///     Defaults to <see cref="SharedHumanoidAppearanceSystem.DefaultSpecies"/> for the species.
         /// </summary>
         /// <returns></returns>

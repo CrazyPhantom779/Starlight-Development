@@ -1,4 +1,4 @@
-using Content.Shared._Starlight.Scaling.Components;
+using Content.Shared._Starlight.Scaling;
 using Content.Shared.FixedPoint;
 using Content.Shared.Mobs.Components;
 

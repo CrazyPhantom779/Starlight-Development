@@ -1,4 +1,4 @@
-﻿using Content.Shared.Starlight.Clothing;
+using Content.Shared._Starlight.Clothing;
 using Robust.Shared.GameStates;
 
 namespace Content.Shared._Starlight.Clothing;

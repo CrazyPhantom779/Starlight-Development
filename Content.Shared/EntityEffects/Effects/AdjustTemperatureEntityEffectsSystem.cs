@@ -1,4 +1,4 @@
-﻿using Content.Shared.Temperature.Components;
+using Content.Shared.Temperature.Components;
 using Content.Shared.Temperature.Systems;
 
 namespace Content.Shared.EntityEffects.Effects;

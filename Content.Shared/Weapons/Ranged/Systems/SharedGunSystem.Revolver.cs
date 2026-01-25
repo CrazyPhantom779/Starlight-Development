@@ -1,4 +1,4 @@
-﻿using Content.Shared.Interaction;
+using Content.Shared.Interaction;
 using Content.Shared.Verbs;
 using Content.Shared.Weapons.Ranged.Components;
 using Content.Shared.Weapons.Ranged.Events;
@@ -12,7 +12,7 @@ using Content.Shared.Interaction.Events;
 using Content.Shared.Wieldable;
 using Content.Shared.Wieldable.Components;
 using JetBrains.Annotations;
-using Content.Shared._Starlight.Weapon.Components;
+using Content.Shared._Starlight.Weapons.Components;
 
 namespace Content.Shared.Weapons.Ranged.Systems;
 

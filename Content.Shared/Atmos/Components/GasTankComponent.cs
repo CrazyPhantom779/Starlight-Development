@@ -1,4 +1,4 @@
-﻿using System.Runtime.CompilerServices;
+using System.Runtime.CompilerServices;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
@@ -36,8 +36,8 @@ public sealed partial class GasTankComponent : Component, IGasMixtureHolder
     [DataField]
     public GasMixture Air { get; set; } = new();
 
-    // 🌟Starlight🌟
-    // It’s minimal mol count synchronization
+    // ??Starlight??
+    // It�s minimal mol count synchronization
     // just enough so the client can predict a jetpack jump
     [DataField, AutoNetworkedField]
     public float TotalMoles;

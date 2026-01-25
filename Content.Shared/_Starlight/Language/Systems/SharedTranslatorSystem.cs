@@ -1,7 +1,7 @@
 using System.Linq;
 using Content.Shared.Examine;
 using Content.Shared.Toggleable;
-using Content.Shared._Starlight.Language.Components.Translators;
+using Content.Shared._Starlight.Language.Components;
 
 namespace Content.Shared._Starlight.Language.Systems;
 

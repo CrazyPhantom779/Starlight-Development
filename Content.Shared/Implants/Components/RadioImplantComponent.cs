@@ -1,4 +1,4 @@
-﻿using Content.Shared._Starlight.Radio;
+using Content.Shared._Starlight.Radio;
 using Content.Shared.Radio;
 using Robust.Shared.Prototypes;
 

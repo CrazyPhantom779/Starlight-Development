@@ -1,4 +1,4 @@
-﻿using Content.Shared.Interaction;
+using Content.Shared.Interaction;
 using Content.Shared.Mech.Components;
 
 namespace Content.Shared.MouseRotator;

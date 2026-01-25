@@ -1,3 +1,4 @@
+using Content.Shared._Starlight.Antags.Abductor.Components;
 using System.Linq;
 using Content.Shared._Starlight.Access;
 using Content.Shared.Bed.Cryostorage;

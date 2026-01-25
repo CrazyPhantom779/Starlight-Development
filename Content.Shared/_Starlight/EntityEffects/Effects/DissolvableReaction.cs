@@ -4,8 +4,8 @@ using Content.Shared.Database;
 using Content.Shared.Tag;
 using Content.Shared.Damage;
 using Robust.Shared.Prototypes;
-using Content.Shared.Starlight.EntityEffects.Components;
-using Content.Shared.Starlight.EntityEffects.EntitySystems;
+using Content.Shared._Starlight.EntityEffects.Components;
+using Content.Shared._Starlight.EntityEffects.EntitySystems;
 
 namespace Content.Shared._Starlight.EntityEffects.Effects;
 

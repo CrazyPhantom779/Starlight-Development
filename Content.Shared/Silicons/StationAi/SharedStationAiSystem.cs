@@ -1,3 +1,5 @@
+using Content.Shared._Starlight.Ghosting;
+using Content.Shared._Starlight.StationAi;
 using Content.Shared.Access.Systems;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Actions;
@@ -37,8 +39,8 @@ using Robust.Shared.Utility;
 #region Starlight
 using Content.Shared._Starlight.Computers.RemoteEye;
 using Content.Shared._Starlight.Silicons.Borgs;
-using Content.Shared.Starlight;
-using Content.Shared.Starlight.TextToSpeech;
+
+using Content.Shared._Starlight.TextToSpeech;
 using Robust.Shared.Player;
 using System.Linq;
 using Content.Shared.Silicons.Borgs.Components;

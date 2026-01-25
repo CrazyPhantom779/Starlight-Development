@@ -1,5 +1,5 @@
 using System.Numerics;
-using Content.Shared._Starlight.Weapon.Components;
+using Content.Shared._Starlight.Weapons.Components;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Inventory;

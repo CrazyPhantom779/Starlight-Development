@@ -1,10 +1,11 @@
-﻿using Content.Shared.Body.Part;
+using Content.Shared._Starlight.Medical.Surgery.Components;
+using Content.Shared.Body.Part;
 using Content.Shared.Humanoid.Prototypes;
 using Content.Shared.Humanoid;
 using System.Linq;
-using Content.Shared.Starlight.Medical.Surgery.Steps.Parts;
-using Content.Shared.Starlight.Medical.Surgery.Events;
-using Content.Shared.Starlight.Medical.Surgery.Effects.Step;
+using Content.Shared._Starlight.Medical.Surgery.Steps.Parts;
+using Content.Shared._Starlight.Medical.Surgery.Events;
+using Content.Shared._Starlight.Medical.Surgery.Effects.Step;
 using Content.Shared.Body.Systems;
 
 namespace Content.Shared._Starlight.Medical.Surgery;

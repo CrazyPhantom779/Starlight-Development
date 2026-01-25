@@ -1,3 +1,5 @@
+using Content.Shared._Starlight.Weapons.Hitscan;
+using Content.Shared._Starlight.Weapons.Hitscan.Utility;
 using System.Numerics;
 using Content.Shared.Damage;
 using Robust.Shared.Map;

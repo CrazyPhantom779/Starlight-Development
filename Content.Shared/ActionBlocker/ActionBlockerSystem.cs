@@ -1,4 +1,4 @@
-﻿using Content.Shared.Starlight.Antags.Abductor;
+using Content.Shared._Starlight.Antags.Abductor;
 using Content.Shared.Silicons.StationAi;
 using Content.Shared.Body.Events;
 using Content.Shared._Starlight.Body.Events; // Starlight edit
@@ -101,7 +101,7 @@ namespace Content.Shared.ActionBlocker
             return !targetEv.Cancelled;
         }
 
-        //🌟Starlight🌟
+        //??Starlight??
         public bool CanInstrumentInteract(EntityUid user, EntityUid used, EntityUid? target)
         {
             var ev = new InteractionAttemptEvent(user, target);

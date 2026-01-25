@@ -1,3 +1,4 @@
+using Content.Shared._Starlight.Medical.Surgery.Components;
 using System;
 using System.Linq;
 using Content.Server.Administration.Systems;
@@ -15,9 +16,9 @@ using Content.Shared.Inventory;
 using Content.Shared.Item;
 using Content.Shared.Popups;
 using Content.Shared.Standing;
-using Content.Shared.Starlight.Medical.Surgery.Effects.Step;
-using Content.Shared.Starlight.Medical.Surgery.Events;
-using Content.Shared.Starlight.Medical.Surgery.Steps.Parts;
+using Content.Shared._Starlight.Medical.Surgery.Effects.Step;
+using Content.Shared._Starlight.Medical.Surgery.Events;
+using Content.Shared._Starlight.Medical.Surgery.Steps.Parts;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;

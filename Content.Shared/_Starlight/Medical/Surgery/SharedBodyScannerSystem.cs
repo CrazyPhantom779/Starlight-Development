@@ -1,5 +1,5 @@
 using Content.Shared.DeviceLinking.Events;
-using Content.Shared.Starlight.Medical.Surgery.Effects.Step;
+using Content.Shared._Starlight.Medical.Surgery.Effects.Step;
 
 namespace Content.Shared._Starlight.Medical.Surgery;
 

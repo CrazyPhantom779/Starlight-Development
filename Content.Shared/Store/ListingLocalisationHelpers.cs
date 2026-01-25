@@ -1,4 +1,4 @@
-﻿using Content.Shared.Store.Conditions;
+﻿using Content.Shared._Starlight.Store.Conditions;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Store;

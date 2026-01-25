@@ -1,10 +1,19 @@
-﻿using System;
+using Content.Shared._Starlight.Overlay.Components;
+using Content.Shared._Starlight.Overlay.Events;
+using System;
+using Content.Shared._Starlight.Overlay.Events;
 using Content.Shared.Actions;
+using Content.Shared._Starlight.Overlay.Events;
 using Content.Shared.Clothing.Components;
+using Content.Shared._Starlight.Overlay.Events;
 using Content.Shared.Clothing.EntitySystems;
-using Content.Shared.Starlight.Overlay;
+using Content.Shared._Starlight.Overlay.Events;
+using Content.Shared._Starlight.Overlay;
+using Content.Shared._Starlight.Overlay.Events;
 using Robust.Shared.Prototypes;
+using Content.Shared._Starlight.Overlay.Events;
 using static Content.Shared.Weapons.Ranged.Systems.SharedGunSystem;
+using Content.Shared._Starlight.Overlay.Events;
 
 namespace Content.Shared._Starlight.Overlay.Systems;
 

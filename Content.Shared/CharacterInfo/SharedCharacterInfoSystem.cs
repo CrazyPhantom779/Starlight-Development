@@ -1,4 +1,4 @@
-﻿using Content.Shared.CollectiveMind;
+using Content.Shared._Starlight.CollectiveMind;
 using Content.Shared.Objectives;
 using Robust.Shared.Serialization;
 

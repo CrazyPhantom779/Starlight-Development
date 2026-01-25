@@ -1,3 +1,4 @@
+using Content.Shared.Roles;
 using System.Diagnostics.CodeAnalysis;
 using Content.Shared.Preferences;
 using JetBrains.Annotations;

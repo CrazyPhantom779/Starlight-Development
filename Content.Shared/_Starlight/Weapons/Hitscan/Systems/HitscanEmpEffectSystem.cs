@@ -1,3 +1,4 @@
+using Content.Shared._Starlight.Weapons.Hitscan.Components;
 using Robust.Shared.GameObjects;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Emp;

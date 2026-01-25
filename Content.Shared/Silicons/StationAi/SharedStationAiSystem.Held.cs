@@ -3,6 +3,7 @@ using Content.Shared.IdentityManagement;
 using Content.Shared.Interaction.Events;
 using Content.Shared.Popups;
 using Content.Shared.Verbs;
+using Content.Shared._Starlight.StationAi;
 using Robust.Shared.Localization; // Starlight
 using Robust.Shared.Serialization;
 using Robust.Shared.Utility;

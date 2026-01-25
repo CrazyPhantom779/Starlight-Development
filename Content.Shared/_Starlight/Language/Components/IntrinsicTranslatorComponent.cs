@@ -5,6 +5,6 @@ namespace Content.Shared._Starlight.Language.Components;
 ///   An example is a translator implant that allows the speaker to speak another Language.
 /// </summary>
 [RegisterComponent, Virtual]
-public partial class IntrinsicTranslatorComponent : Translators.BaseTranslatorComponent
+public partial class IntrinsicTranslatorComponent : BaseTranslatorComponent
 {
 }

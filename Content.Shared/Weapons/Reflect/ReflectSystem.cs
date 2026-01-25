@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Content.Shared._Starlight.Weapon;
 using Content.Shared.Administration.Logs;
@@ -110,7 +110,7 @@ public sealed class ReflectSystem : EntitySystem
             return false;
         }
 
-        // 🌟Starlight🌟 start
+        // ??Starlight?? start
         var reflectionChance = reflector.Comp.ReflectProb;
 
         // Check for enhanced reflection against specific projectile types
@@ -159,7 +159,7 @@ public sealed class ReflectSystem : EntitySystem
             var newRot = rotation.RotateVec(locRot.ToVec());
             _transform.SetLocalRotation(projectile, newRot.ToAngle());
         }
-        // 🌟Starlight🌟 end
+        // ??Starlight?? end
 
         PlayAudioAndPopup(reflector.Comp, user);
 
@@ -185,7 +185,7 @@ public sealed class ReflectSystem : EntitySystem
         EntityUid shotSource,
         Vector2 direction,
         ReflectType hitscanReflectType,
-        // 🌟Starlight🌟 start
+        // ??Starlight?? start
         string? hitscanId,
         [NotNullWhen(true)] out Vector2? newDirection)
     {
@@ -224,7 +224,7 @@ public sealed class ReflectSystem : EntitySystem
             var spread = _random.NextAngle(-reflector.Comp.Spread / 2, reflector.Comp.Spread / 2);
             newDirection = -spread.RotateVec(direction);
         }
-        // 🌟Starlight🌟 end
+        // ??Starlight?? end
 
         if (shooter != null)
             _adminLogger.Add(LogType.HitScanHit, LogImpact.Medium, $"{ToPrettyString(user)} reflected hitscan from {ToPrettyString(shotSource)} shot by {ToPrettyString(shooter.Value)}");

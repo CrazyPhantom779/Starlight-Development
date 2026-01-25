@@ -2,7 +2,7 @@ using Content.Shared.Administration.Logs;
 using Content.Shared.Atmos;
 using Content.Shared.Database;
 using Content.Shared.IgnitionSource;
-using Content.Shared.Starlight.EntityEffects.Components;
+using Content.Shared._Starlight.EntityEffects.Components;
 
 namespace Content.Shared._Starlight.EntityEffects.EntitySystems;
 

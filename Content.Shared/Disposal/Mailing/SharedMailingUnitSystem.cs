@@ -1,4 +1,4 @@
-﻿using Content.Shared.Configurable;
+using Content.Shared.Configurable;
 using Content.Shared.DeviceNetwork;
 using Content.Shared.DeviceNetwork.Components;
 using Content.Shared.DeviceNetwork.Events;
@@ -92,7 +92,7 @@ public abstract class SharedMailingUnitSystem : EntitySystem
             return;
         }
 
-        //🌟Starlight🌟
+        //??Starlight??
         //check if args have been cancelled
         if (args.Cancelled)
             return;
@@ -106,7 +106,7 @@ public abstract class SharedMailingUnitSystem : EntitySystem
             args.Cancel();
             return;
         }
-        //🌟Starlight🌟 end
+        //??Starlight?? end
 
         Dirty(uid, component);
         args.Tags.Add(MailTag);

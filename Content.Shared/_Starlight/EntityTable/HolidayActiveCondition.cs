@@ -1,7 +1,13 @@
 using Content.Shared._Starlight.EntityTable;
+using Content.Shared.EntityTable.Conditions;
+using Content.Shared.EntityTable;
+using Content.Shared.EntityTable.Conditions;
 using Content.Shared.EntityTable.EntitySelectors;
+using Content.Shared.EntityTable.Conditions;
 using Robust.Shared.Prototypes;
+using Content.Shared.EntityTable.Conditions;
 using Robust.Shared.Serialization;
+using Content.Shared.EntityTable.Conditions;
 
 namespace Content.Shared._Starlight.EntityTable;
 

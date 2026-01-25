@@ -1,3 +1,4 @@
+using Content.Shared._Starlight.Weapons.Hitscan;
 using System.Numerics;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Damage.Components;
@@ -14,6 +15,7 @@ using Robust.Shared.Utility;
 
 #region Starlight
 using System.Linq;
+using Content.Shared._Starlight.Weapons.Hitscan.Utility;
 using Content.Shared.Body.Components;
 using Content.Shared.Mech.Components;
 using Content.Shared.Weapons.Reflect;

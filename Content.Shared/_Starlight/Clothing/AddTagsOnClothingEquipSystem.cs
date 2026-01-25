@@ -1,3 +1,4 @@
+using Content.Shared.Clothing;
 using Content.Shared.Clothing.Components;
 using Content.Shared.Tag;
 

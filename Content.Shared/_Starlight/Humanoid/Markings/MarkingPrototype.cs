@@ -6,7 +6,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 
 namespace Content.Shared._Starlight.Humanoid.Markings;
 
-public sealed partial class MarkingPrototype : IInheritingPrototype
+public sealed partial class MarkingPrototype : IPrototype, IInheritingPrototype
 {
     [ParentDataField(typeof(AbstractPrototypeIdArraySerializer<MarkingPrototype>))]
     public string[]? Parents { get; private set; }
@@ -14,6 +14,9 @@ public sealed partial class MarkingPrototype : IInheritingPrototype
     [AbstractDataField]
     [NeverPushInheritance]
     public bool Abstract { get; private set; }
+
+    [IdDataField]
+    public string ID { get; private set; } = default!;
 
     [DataField]
     public string? WaggingId;

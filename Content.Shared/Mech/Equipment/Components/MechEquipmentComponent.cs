@@ -1,4 +1,4 @@
-﻿using Content.Shared.DoAfter;
+using Content.Shared.DoAfter;
 using Content.Shared.Mech.Components;
 using Content.Shared.Mech;
 using Robust.Shared.Prototypes;

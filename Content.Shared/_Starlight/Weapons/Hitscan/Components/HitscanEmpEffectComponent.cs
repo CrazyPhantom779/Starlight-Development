@@ -1,5 +1,5 @@
 using Robust.Shared.GameStates;
-using Content.Shared.Starlight.Utility;
+using Content.Shared._Starlight.Utility;
 
 namespace Content.Shared._Starlight.Weapons.Hitscan.Components;
 

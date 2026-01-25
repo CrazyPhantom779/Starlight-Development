@@ -1,8 +1,9 @@
 // Starlight
 
+using Content.Shared._Starlight.Medical.Surgery.Components;
 using System.Linq;
 using Content.Shared.Body.Part;
-using Content.Shared.Starlight;
+
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 

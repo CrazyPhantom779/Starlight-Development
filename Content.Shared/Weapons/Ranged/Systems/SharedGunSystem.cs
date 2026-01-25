@@ -1,6 +1,10 @@
+using Content.Shared._Starlight.Input;
+using Content.Shared._Starlight.Weapons.Hitscan.Utility;
+using Content.Shared._Starlight.Weapons.Hitscan;
+using Content.Shared._Starlight.Utility;
 using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
-using Content.Shared._Starlight.Weapon.Components;
+using Content.Shared._Starlight.Weapons.Components;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Actions;
 using Content.Shared.Administration.Logs;
@@ -40,7 +44,7 @@ using Content.Shared.VentCraw;
 
 #region Starlight
 using Content.Shared.Mech.Components;
-using Content.Shared.Starlight.Utility;
+using Content.Shared._Starlight.Utility;
 using Content.Shared.Weapons.Hitscan.Events;
 #endregion Starlight
 

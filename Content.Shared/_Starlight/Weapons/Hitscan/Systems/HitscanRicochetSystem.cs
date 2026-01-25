@@ -1,13 +1,25 @@
-﻿using Content.Shared.Weapons.Hitscan.Components;
+using Content.Shared._Starlight.Weapons.Hitscan.Components;
+using Content.Shared._Starlight.Weapons.Hitscan.Events;
+using Content.Shared.Weapons.Hitscan.Components;
+using Content.Shared._Starlight.Weapons.Hitscan.Events;
 using Content.Shared.Weapons.Hitscan.Events;
+using Content.Shared._Starlight.Weapons.Hitscan.Events;
 using Content.Shared._Starlight.Combat.Ranged.Pierce;
+using Content.Shared._Starlight.Weapons.Hitscan.Events;
 using Content.Shared._Starlight.Weapon;
+using Content.Shared._Starlight.Weapons.Hitscan.Events;
 using Robust.Shared.GameObjects;
+using Content.Shared._Starlight.Weapons.Hitscan.Events;
 using Robust.Shared.Physics.Collision.Shapes;
+using Content.Shared._Starlight.Weapons.Hitscan.Events;
 using Robust.Shared.Physics;
+using Content.Shared._Starlight.Weapons.Hitscan.Events;
 using Robust.Shared.Random;
+using Content.Shared._Starlight.Weapons.Hitscan.Events;
 using System.Linq;
+using Content.Shared._Starlight.Weapons.Hitscan.Events;
 using System.Numerics;
+using Content.Shared._Starlight.Weapons.Hitscan.Events;
 
 namespace Content.Shared._Starlight.Weapons.Hitscan.Systems;
 
@@ -96,7 +108,7 @@ public sealed partial class HitscanRicochetSystem : EntitySystem
         chance = Math.Clamp(args.Chance * angleFactor, 0f, 1f);
         if(!_rand.Prob(chance)) return;
 
-        //    R = D - 2*(D·N)*N
+        //    R = D - 2*(D�N)*N
         var reflectedLocal = localDir - (2f * dot * localNormal);
 
         var matrix = _transform.GetWorldMatrix(ent.Owner);

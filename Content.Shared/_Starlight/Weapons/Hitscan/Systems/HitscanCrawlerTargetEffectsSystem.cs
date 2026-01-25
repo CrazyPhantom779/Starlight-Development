@@ -1,3 +1,4 @@
+using Content.Shared._Starlight.Weapons.Hitscan.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Stunnable;

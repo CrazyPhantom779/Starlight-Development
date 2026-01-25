@@ -1,4 +1,5 @@
-﻿using Content.Shared.Starlight;
+using Content.Shared._Starlight.Roles;
+
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;

@@ -1,3 +1,4 @@
+using Content.Shared._Starlight.Computers.RemoteEye.Components;
 using System.Diagnostics.CodeAnalysis;
 using Content.Shared._Starlight.Computers.RemoteEye;
 using Content.Shared._Starlight.Xenobiology.MiscItems;

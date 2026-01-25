@@ -1,4 +1,4 @@
-﻿using System.Diagnostics.CodeAnalysis;
+using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Events;
@@ -13,7 +13,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
 #region Starlight
-using Content.Shared.Starlight.Medical.Surgery.Events;
+using Content.Shared._Starlight.Medical.Surgery.Events;
 using Robust.Shared.Physics;
 using Robust.Shared.Physics.Systems;
 #endregion Starlight
@@ -490,9 +490,9 @@ public partial class SharedBodySystem
         var walkSpeed = 0f;
         var sprintSpeed = 0f;
         var acceleration = 0f;
-        var maxDensity = 0f; // 🌟Starlight🌟
-        var minSpeedMod = 0f; // 🌟Starlight🌟
-        var maxSpeedMod = 0f; // 🌟Starlight🌟
+        var maxDensity = 0f; // ??Starlight??
+        var minSpeedMod = 0f; // ??Starlight??
+        var maxSpeedMod = 0f; // ??Starlight??
         foreach (var legEntity in body.LegEntities)
         {
             if (!TryComp<MovementBodyPartComponent>(legEntity, out var legModifier))
@@ -501,12 +501,12 @@ public partial class SharedBodySystem
             walkSpeed += legModifier.WalkSpeed;
             sprintSpeed += legModifier.SprintSpeed;
             acceleration += legModifier.Acceleration;
-            maxDensity += legModifier.MaxDensity; // 🌟Starlight🌟
-            minSpeedMod += legModifier.MinSpeedMod; // 🌟Starlight🌟
-            maxSpeedMod += legModifier.MaxSpeedMod; // 🌟Starlight🌟
+            maxDensity += legModifier.MaxDensity; // ??Starlight??
+            minSpeedMod += legModifier.MinSpeedMod; // ??Starlight??
+            maxSpeedMod += legModifier.MaxSpeedMod; // ??Starlight??
         }
 
-        // 🌟Starlight🌟 Start
+        // ??Starlight?? Start
         var density = TryComp<FixturesComponent>(bodyId, out var fixtures)
             && fixtures.Fixtures.TryGetValue("fix1", out var fixture)
             ? fixture.Density : 185f;
@@ -522,12 +522,12 @@ public partial class SharedBodySystem
 
         minSpeedMod /= body.RequiredLegs;
         maxSpeedMod /= body.RequiredLegs;
-        // 🌟Starlight🌟 End
+        // ??Starlight?? End
 
         walkSpeed /= body.RequiredLegs;
         sprintSpeed /= body.RequiredLegs;
         acceleration /= body.RequiredLegs;
-        Movement.ChangeBaseSpeed(bodyId, walkSpeed, sprintSpeed, acceleration, movement, minSpeedMod, maxSpeedMod); // 🌟Starlight🌟
+        Movement.ChangeBaseSpeed(bodyId, walkSpeed, sprintSpeed, acceleration, movement, minSpeedMod, maxSpeedMod); // ??Starlight??
     }
 
     #endregion
@@ -652,7 +652,7 @@ public partial class SharedBodySystem
             }
         }
     }
-    // 🌟Starlight🌟
+    // ??Starlight??
     public IEnumerable<Entity<BodyPartComponent>> GetAllBodyPart(
         EntityUid partId,
         BodyPartComponent? part = null)

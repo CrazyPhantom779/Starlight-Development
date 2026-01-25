@@ -1,4 +1,5 @@
-using Content.Shared.Starlight.Antags.Abductor;
+using Content.Shared._Starlight.Overlay;
+using Content.Shared._Starlight.Antags.Abductor;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 

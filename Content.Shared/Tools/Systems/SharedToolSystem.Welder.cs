@@ -1,3 +1,4 @@
+using Content.Shared._Starlight.ItemSwitch;
 using Content.Shared.ActionBlocker;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.Components.SolutionManager;
@@ -85,7 +86,7 @@ public abstract partial class SharedToolSystem
     {
         if (ShouldWelderBuggerOff(entity))
             return;
-        using (args.PushGroup(nameof(WelderComponent)))
+        using (args.PushGroup(nameof(WelderComponent)));
         {
             if (ItemToggle.IsActivated(entity.Owner))
             {

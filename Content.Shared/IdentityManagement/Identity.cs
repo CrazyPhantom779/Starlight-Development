@@ -1,4 +1,4 @@
-﻿using Content.Shared.Ghost;
+using Content.Shared.Ghost;
 using Content.Shared.IdentityManagement.Components;
 
 namespace Content.Shared.IdentityManagement;
@@ -15,7 +15,7 @@ public static class Identity
     /// </summary>
     /// <remarks>
     /// This will return the true identity of the entity if called before the
-    /// identity component has been initialized — this may occur for example if
+    /// identity component has been initialized � this may occur for example if
     /// the client raises an event in response to an entity entering PVS for
     /// the first time.
     /// </remarks>

@@ -1,8 +1,8 @@
+using Content.Shared._Starlight.Ghosting;
 using System.Numerics;
 using Content.Shared._NullLink;
 using Content.Shared._Starlight.Abstract.Conditions;
-using Content.Shared.Starlight;
-using Content.Shared.Starlight.Utility;
+using Content.Shared._Starlight.Utility;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
