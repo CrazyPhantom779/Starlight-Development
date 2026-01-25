@@ -5,7 +5,7 @@ using Content.Shared.EntityTable;
 using Robust.Shared.Map;
 using Robust.Shared.Random;
 
-namespace Content.Server.GameTicking.Rules.VariationPass;
+namespace Content.Server._Starlight.GameTicking.Rules.VariationPass;
 
 /// <summary>
 /// Handles putting things in lockers around the station, intended for creatures.

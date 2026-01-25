@@ -14,7 +14,7 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Bed.Sleep;
 
-namespace Content.Server.CollectiveMind;
+namespace Content.Server._Starlight.CollectiveMind;
 
 public sealed partial class CollectiveMind : SharedCollectiveMindSystem
 {

@@ -3,7 +3,7 @@ using Robust.Shared.Prototypes;
 using Content.Shared.GameTicking;
 using Content.Shared.Body.Systems;
 
-namespace Content.Shared.CollectiveMind;
+namespace Content.Shared._Starlight.CollectiveMind;
 
 public abstract partial class SharedCollectiveMindSystem : EntitySystem
 {

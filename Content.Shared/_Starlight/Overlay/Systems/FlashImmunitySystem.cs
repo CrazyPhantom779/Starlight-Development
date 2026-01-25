@@ -5,7 +5,7 @@ using Content.Shared.Inventory;
 using Content.Shared.Inventory.Events;
 using Robust.Shared.Player;
 
-namespace Content.Shared.Starlight.Overlay;
+namespace Content.Shared._Starlight.Overlay.Systems;
 
 public sealed class FlashImmunitySystem : EntitySystem
 {

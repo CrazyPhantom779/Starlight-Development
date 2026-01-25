@@ -9,7 +9,7 @@ using Robust.Shared.Random;
 using System.Linq;
 using System.Numerics;
 
-namespace Content.Server._Starlight.Combat.Ranged;
+namespace Content.Shared._Starlight.Weapons.Hitscan.Systems;
 
 public sealed partial class HitscanRicochetSystem : EntitySystem
 {

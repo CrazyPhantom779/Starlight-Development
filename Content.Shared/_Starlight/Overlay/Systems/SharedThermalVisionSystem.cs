@@ -6,7 +6,7 @@ using Content.Shared.Starlight.Overlay;
 using Robust.Shared.Prototypes;
 using static Content.Shared.Weapons.Ranged.Systems.SharedGunSystem;
 
-namespace Content.Shared.Eye.Blinding.Components;
+namespace Content.Shared._Starlight.Overlay.Systems;
 
 public abstract class SharedThermalVisionSystem : EntitySystem
 {

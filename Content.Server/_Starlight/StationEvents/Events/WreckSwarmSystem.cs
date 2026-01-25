@@ -18,7 +18,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
 
-namespace Content.Server.StationEvents.Events;
+namespace Content.Server._Starlight.StationEvents.Events;
 
 public sealed class WreckSwarmSystem : GameRuleSystem<WreckSwarmComponent>
 {

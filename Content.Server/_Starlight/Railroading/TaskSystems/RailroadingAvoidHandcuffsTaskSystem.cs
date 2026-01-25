@@ -5,7 +5,7 @@ using Content.Shared.Cuffs;
 using Content.Shared.Mobs;
 using Content.Shared.Objectives;
 
-namespace Content.Server._Starlight.Railroading;
+namespace Content.Server._Starlight.Railroading.TaskSystems;
 
 // todo make TaskSystem<TTask,TWatcher>
 public sealed partial class RailroadingAvoidHandcuffsTaskSystem : EntitySystem

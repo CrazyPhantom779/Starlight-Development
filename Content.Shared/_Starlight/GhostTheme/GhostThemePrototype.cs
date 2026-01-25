@@ -6,7 +6,7 @@ using Content.Shared.Starlight.Utility;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
-namespace Content.Shared.Starlight.GhostTheme;
+namespace Content.Shared._Starlight.GhostTheme;
 
 [Prototype("ghostTheme")]
 public sealed partial class GhostThemePrototype : IPrototype

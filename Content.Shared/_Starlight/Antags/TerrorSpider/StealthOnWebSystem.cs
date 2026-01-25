@@ -10,7 +10,7 @@ using Content.Shared.Verbs;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Timing;
 
-namespace Content.Shared.Starlight.Antags.TerrorSpider;
+namespace Content.Shared._Starlight.Antags.TerrorSpider;
 
 public sealed class StealthOnWebSystem : EntitySystem
 {

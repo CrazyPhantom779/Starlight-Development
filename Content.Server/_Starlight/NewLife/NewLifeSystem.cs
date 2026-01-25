@@ -39,7 +39,7 @@ using Content.Server.RoundEnd;
 using Content.Server.GameTicking;
 using Content.Shared.Starlight.CCVar;
 
-namespace Content.Server.Ghost.Roles;
+namespace Content.Server._Starlight.NewLife;
 
 [UsedImplicitly]
 public sealed class NewLifeSystem : EntitySystem

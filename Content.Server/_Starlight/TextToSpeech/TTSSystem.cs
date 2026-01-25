@@ -20,7 +20,7 @@ using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
-namespace Content.Server.Starlight.TTS;
+namespace Content.Server._Starlight.TextToSpeech;
 
 public sealed partial class TTSSystem : EntitySystem
 {

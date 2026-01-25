@@ -22,7 +22,7 @@ using Content.Shared.Atmos;
 using Content.Server.Chat.Systems;
 using Content.Shared.Damage.Systems;
 
-namespace Content.Server.Starlight.Antags.Abductor;
+namespace Content.Server._Starlight.Antags.Abductor.EntitySystems;
 
 public sealed partial class AbductorSystem : SharedAbductorSystem
 {

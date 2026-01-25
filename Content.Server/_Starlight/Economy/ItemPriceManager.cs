@@ -4,7 +4,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.GameObjects;
 using Content.Shared.Destructible.Thresholds;
 
-namespace Content.Server.Economy
+namespace Content.Server._Starlight.Economy
 {
     public sealed class ItemPriceManager : EntitySystem
     {

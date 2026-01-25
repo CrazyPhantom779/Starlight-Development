@@ -13,7 +13,7 @@ using Content.Shared.Starlight.Overlay;
 using Content.Shared.Mech.Components;
 using Content.Shared.Mech;
 
-namespace Content.Client._Starlight.Overlay;
+namespace Content.Client._Starlight.Overlay.Systems;
 
 public sealed class ThermalVisionSystem : SharedThermalVisionSystem
 {

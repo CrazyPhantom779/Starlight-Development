@@ -39,7 +39,7 @@ using System.Threading.Channels;
 using System.Threading.Tasks;
 using System;
 
-namespace Content.Server.Administration.Systems;
+namespace Content.Server._Starlight;
 
 [UsedImplicitly]
 public sealed partial class MentorSystem : SharedMentorSystem

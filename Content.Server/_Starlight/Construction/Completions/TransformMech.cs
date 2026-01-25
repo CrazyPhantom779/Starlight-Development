@@ -11,7 +11,7 @@ using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
-namespace Content.Server.Construction.Completions;
+namespace Content.Server._Starlight.Construction.Completions;
 
 /// <summary>
 /// Transforms a mech to a different type, this is used for upgrading mechs.

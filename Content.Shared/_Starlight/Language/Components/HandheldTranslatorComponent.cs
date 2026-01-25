@@ -1,4 +1,4 @@
-namespace Content.Shared._Starlight.Language.Components.Translators;
+namespace Content.Shared._Starlight.Language.Components;
 
 /// <summary>
 ///   A translator that must be held in a hand or a pocket of an entity in order ot have effect.

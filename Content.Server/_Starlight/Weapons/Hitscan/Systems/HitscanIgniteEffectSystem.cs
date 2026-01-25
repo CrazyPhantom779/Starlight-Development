@@ -4,7 +4,7 @@ using Content.Shared.Damage.Systems;
 using Content.Shared.Weapons.Hitscan.Components;
 using Content.Shared.Weapons.Hitscan.Events;
 
-namespace Content.Server.Weapons.Hitscan.Systems;
+namespace Content.Server._Starlight.Weapons.Hitscan.Systems;
 
 public sealed class HitscanIgniteEffectSystem : EntitySystem
 {

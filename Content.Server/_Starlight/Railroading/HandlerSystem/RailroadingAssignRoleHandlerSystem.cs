@@ -5,7 +5,7 @@ using Content.Shared._Starlight.Railroading.Events;
 using Content.Shared.Mind.Components;
 using Content.Shared.Roles.Components;
 
-namespace Content.Server._Starlight.Railroading;
+namespace Content.Server._Starlight.Railroading.HandlerSystem;
 
 public sealed partial class RailroadingAssignRoleHandlerSystem : EntitySystem
 {

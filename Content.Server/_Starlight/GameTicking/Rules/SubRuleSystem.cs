@@ -8,7 +8,7 @@ using Content.Shared.GameTicking.Rules;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
-namespace Content.Server.GameTicking.Rules;
+namespace Content.Server._Starlight.GameTicking.Rules;
 
 /// <summary>
 /// A system to handle one-shot dynamic rules, with slightly different add/start semantics.

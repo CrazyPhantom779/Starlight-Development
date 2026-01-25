@@ -6,7 +6,7 @@ using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Utility;
 using Content.Client.Paper.UI;
 
-namespace Content.Client.UserInterface.RichText;
+namespace Content.Client._Starlight.UserInterface.RichText;
 
 /// <summary>
 /// Converts [check] tags into clickable buttons that toggle between ✔ and ✖.

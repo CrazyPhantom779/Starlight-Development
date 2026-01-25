@@ -4,7 +4,7 @@ using Content.Shared._Starlight.Railroading.Events;
 using Content.Shared.Mobs;
 using Content.Shared.Objectives;
 
-namespace Content.Server._Starlight.Railroading;
+namespace Content.Server._Starlight.Railroading.TaskSystems;
 
 public sealed partial class RailroadingSurviveTaskSystem : EntitySystem
 {

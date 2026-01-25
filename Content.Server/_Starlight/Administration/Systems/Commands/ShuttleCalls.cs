@@ -8,7 +8,7 @@ using Robust.Shared.ContentPack;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Maths;
 
-namespace Content.Server.Administration.Commands
+namespace Content.Server._Starlight.Administration.Systems.Commands
 {
     [AdminCommand(AdminFlags.Round)]
     public sealed class AllowShuttleCallsCommand : LocalizedEntityCommands

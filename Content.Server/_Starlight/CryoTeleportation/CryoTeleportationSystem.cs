@@ -23,7 +23,7 @@ using Robust.Shared.Configuration;
 using Robust.Shared.Containers;
 using Content.Shared.Station.Components;
 
-namespace Content.Server.Starlight.CryoTeleportation;
+namespace Content.Server._Starlight.CryoTeleportation;
 
 public sealed class CryoTeleportationSystem : EntitySystem
 {

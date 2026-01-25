@@ -6,7 +6,7 @@ using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
-namespace Content.Shared.Preferences.Loadouts.Effects;
+namespace Content.Shared._Starlight.Preferences.Loadouts.Effects;
 
 /// <summary>
 /// Takes a list of PlayerFlags and checks if the player has any of them. 

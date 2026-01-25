@@ -2,7 +2,7 @@
 using Robust.Shared.Serialization;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.List;
 
-namespace Content.Shared.CollectiveMind;
+namespace Content.Shared._Starlight.CollectiveMind;
 
 [RegisterComponent, NetworkedComponent]
 public sealed partial class CollectiveMindComponent : Component

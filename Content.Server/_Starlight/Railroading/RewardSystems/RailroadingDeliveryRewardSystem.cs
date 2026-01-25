@@ -16,7 +16,7 @@ using Robust.Shared.Random;
 using Robust.Shared.Prototypes;
 using System.Linq;
 
-namespace Content.Server._Starlight.Railroading;
+namespace Content.Server._Starlight.Railroading.RewardSystems;
 
 public sealed partial class RailroadingDeliveryRewardSystem : EntitySystem
 {

@@ -1,7 +1,7 @@
 ﻿using Robust.Shared.Audio;
 using Robust.Shared.Player;
 
-namespace Content.Server.Starlight.TTS;
+namespace Content.Server._Starlight.TextToSpeech;
 
 public sealed class AnnouncementSpokeEvent : EntityEventArgs
 {

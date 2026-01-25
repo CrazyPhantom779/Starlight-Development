@@ -15,7 +15,7 @@ using Content.Shared._Starlight.Weapon;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
-namespace Content.Server._Starlight.Combat.Ranged;
+namespace Content.Shared._Starlight.Weapons.Hitscan.Systems;
 
 public sealed partial class PierceSystem : EntitySystem
 {

@@ -7,7 +7,7 @@ using Content.Shared.Access.Components;
 using System.Linq;
 using Content.Shared.Access;
 
-namespace Content.Server._Starlight.Railroading;
+namespace Content.Server._Starlight.Railroading.HandlerSystem;
 
 public sealed partial class RailroadingModifyIdCardHandlerSystem : EntitySystem
 {

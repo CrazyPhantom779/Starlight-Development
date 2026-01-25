@@ -11,7 +11,7 @@ using Robust.Shared.Animations;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
-namespace Content.Shared._Starlight.Computers.RemoteEye;
+namespace Content.Shared._Starlight.Computers.RemoteEye.Components;
 [RegisterComponent, NetworkedComponent, Access(typeof(SharedRemoteEyeSystem))]
 public sealed partial class RemoteEyeConsoleComponent : Component
 {

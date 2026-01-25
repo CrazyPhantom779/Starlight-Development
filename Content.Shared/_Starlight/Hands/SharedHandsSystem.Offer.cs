@@ -9,7 +9,7 @@ using Content.Shared.Verbs;
 using Robust.Shared.Network;
 using Robust.Shared.Prototypes;
 
-namespace Content.Shared.Hands.EntitySystems;
+namespace Content.Shared._Starlight.Hands;
 
 public abstract partial class SharedHandsSystem : EntitySystem
 {

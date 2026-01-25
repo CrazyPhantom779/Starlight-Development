@@ -7,7 +7,7 @@ using Robust.Shared.Utility;
 using Content.Client.Paper.UI;
 using Robust.Client.Graphics;
 
-namespace Content.Client.UserInterface.RichText;
+namespace Content.Client._Starlight.UserInterface.RichText;
 
 /// <summary>
 /// Converts [form] tags into clickable buttons that open fill-in dialogs.

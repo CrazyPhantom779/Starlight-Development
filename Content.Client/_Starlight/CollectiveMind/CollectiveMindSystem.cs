@@ -2,7 +2,7 @@ using Content.Client.Chat.Managers;
 using Content.Shared.CollectiveMind;
 using Robust.Client.Player;
 
-namespace Content.Client.CollectiveMind;
+namespace Content.Client._Starlight.CollectiveMind;
 
 public sealed partial class CollectiveMindSystem : SharedCollectiveMindSystem
 {

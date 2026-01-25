@@ -18,7 +18,7 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Player;
 using Robust.Shared.Audio;
 
-namespace Content.Client.Starlight.Weapon.Systems;
+namespace Content.Client._Starlight.Weapon;
 public sealed partial class WeaponDismantleOnShootSystem : SharedWeaponDismantleOnShootSystem
 {
 }

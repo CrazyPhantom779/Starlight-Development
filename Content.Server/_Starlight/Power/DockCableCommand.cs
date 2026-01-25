@@ -4,7 +4,7 @@ using Content.Shared.Administration;
 using Robust.Shared.Console;
 using Robust.Shared.Map.Components;
 
-namespace Content.Server.Power.Commands;
+namespace Content.Server._Starlight.Power;
 
 /// <summary>
 /// Debug/admin command for inspecting and managing docked cable connections.

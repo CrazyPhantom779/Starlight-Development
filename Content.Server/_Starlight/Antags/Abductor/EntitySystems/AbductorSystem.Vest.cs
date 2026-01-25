@@ -11,7 +11,7 @@ using System.Linq;
 using Content.Shared.Popups;
 using Content.Shared.Interaction;
 
-namespace Content.Server.Starlight.Antags.Abductor;
+namespace Content.Server._Starlight.Antags.Abductor.EntitySystems;
 
 public sealed partial class AbductorSystem : SharedAbductorSystem
 {

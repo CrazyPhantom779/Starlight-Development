@@ -29,7 +29,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Toolshed.TypeParsers;
 
-namespace Content.Server.Starlight.Energy.Supermatter;
+namespace Content.Server._Starlight.Energy.Supermatter;
 
 public sealed class SupermatterSystem : AccUpdateEntitySystem
 {

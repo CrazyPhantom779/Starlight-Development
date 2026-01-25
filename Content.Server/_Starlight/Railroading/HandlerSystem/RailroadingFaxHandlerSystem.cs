@@ -6,7 +6,7 @@ using Content.Shared.DeviceNetwork.Events;
 using Content.Shared.Fax.Components;
 using Robust.Shared.Random;
 
-namespace Content.Server._Starlight.Railroading;
+namespace Content.Server._Starlight.Railroading.HandlerSystem;
 
 public sealed partial class RailroadingFaxHandlerSystem : EntitySystem
 {

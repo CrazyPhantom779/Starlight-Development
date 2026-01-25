@@ -14,7 +14,7 @@ using Content.Shared.Objectives;
 using Robust.Server.Player;
 using Robust.Shared.Prototypes;
 
-namespace Content.Server._Starlight.Railroading;
+namespace Content.Server._Starlight.Railroading.TaskSystems;
 
 public sealed partial class RailroadingMetabolizeTaskSystem : EntitySystem
 {

@@ -10,7 +10,7 @@ using Robust.Shared.Prototypes;
 using Content.Shared.Inventory.Events;
 using Content.Shared.Starlight.Overlay;
 
-namespace Content.Client._Starlight.Overlay;
+namespace Content.Client._Starlight.Overlay.Systems;
 
 public sealed class NightVisionSystem : EntitySystem
 {

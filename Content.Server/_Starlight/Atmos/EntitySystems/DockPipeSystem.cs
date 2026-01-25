@@ -14,7 +14,7 @@ using Robust.Shared.Log;
 using Content.Shared.Starlight.CCVar;
 using Robust.Shared.Configuration;
 
-namespace Content.Server.Atmos.EntitySystems
+namespace Content.Server._Starlight.Atmos.EntitySystems
 {
     /// <summary>
     /// Allows pipes to connect over docks.

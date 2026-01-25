@@ -10,7 +10,7 @@ using Content.Shared.Starlight.CCVar;
 using Robust.Shared.Configuration;
 using Robust.Shared.Prototypes;
 
-namespace Content.Server.Starlight.GameTicking;
+namespace Content.Server._Starlight.GameTicking;
 
 public sealed class PeacefulRoundEndSystem : EntitySystem
 {

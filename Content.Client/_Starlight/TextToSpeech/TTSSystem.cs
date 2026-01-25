@@ -12,7 +12,7 @@ using Robust.Shared.ContentPack;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
-namespace Content.Client._Starlight.TTS;
+namespace Content.Client._Starlight.TextToSpeech;
 
 /// <summary>
 /// Plays TTS audio

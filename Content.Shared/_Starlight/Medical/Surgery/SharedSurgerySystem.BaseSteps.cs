@@ -15,7 +15,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using System.Linq;
 
-namespace Content.Shared.Starlight.Medical.Surgery;
+namespace Content.Shared._Starlight.Medical.Surgery;
 // Based on the RMC14.
 // https://github.com/RMC-14/RMC-14
 public abstract partial class SharedSurgerySystem

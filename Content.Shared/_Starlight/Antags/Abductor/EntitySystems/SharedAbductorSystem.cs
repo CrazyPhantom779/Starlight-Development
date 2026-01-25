@@ -9,7 +9,7 @@ using Content.Shared.Weapons.Melee.Events;
 using Robust.Shared.Containers;
 using Robust.Shared.Timing;
 
-namespace Content.Shared.Starlight.Antags.Abductor;
+namespace Content.Shared._Starlight.Antags.Abductor.EntitySystems;
 
 public abstract class SharedAbductorSystem : EntitySystem
 {

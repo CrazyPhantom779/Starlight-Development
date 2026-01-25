@@ -1,6 +1,6 @@
 ﻿using System.Threading.Tasks;
 
-namespace Content.Server.Starlight.TextToSpeech;
+namespace Content.Server._Starlight.TextToSpeech;
 public interface ITTSManager
 {
     Task<byte[]?> ConvertTextToSpeechAnnounce(int voice, string text);

@@ -6,7 +6,7 @@ using Robust.Shared.Prototypes;
 using Content.Shared.Eye.Blinding.Components;
 using Robust.Shared.Configuration;
 
-namespace Content.Client._Starlight.Overlay;
+namespace Content.Client._Starlight.Overlay.Overlays;
 
 /*
 Time to mini rant here. this NEEDs to be a abstract because if its not, then

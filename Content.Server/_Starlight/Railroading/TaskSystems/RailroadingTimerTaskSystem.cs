@@ -16,7 +16,7 @@ using Robust.Server.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
-namespace Content.Server._Starlight.Railroading;
+namespace Content.Server._Starlight.Railroading.TaskSystems;
 
 public sealed partial class RailroadingTimerTaskSystem : AccUpdateEntitySystem
 {

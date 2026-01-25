@@ -7,7 +7,7 @@ using Content.Shared.Objectives;
 using Content.Shared.Station.Components;
 using Robust.Shared.Random;
 
-namespace Content.Server._Starlight.Railroading;
+namespace Content.Server._Starlight.Railroading.TaskSystems;
 
 public sealed partial class RailroadDarkTaskSystem : AccUpdateEntitySystem
 {

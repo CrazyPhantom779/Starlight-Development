@@ -9,7 +9,7 @@ using Robust.Shared.Console;
 using Robust.Shared.Map;
 using Robust.Shared.Map.Components;
 
-namespace Content.Server.Atmos.Commands;
+namespace Content.Server._Starlight.Atmos.Commands;
 
 /// <summary>
 /// Command for managing and inspecting docked pipe connections.

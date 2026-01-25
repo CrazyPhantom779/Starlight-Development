@@ -10,7 +10,7 @@ using Content.Shared.Inventory.Events;
 using Content.Shared.Popups;
 using Robust.Server.Audio;
 
-namespace Content.Server.Starlight.FactionClothingBlockerSystem;
+namespace Content.Server._Starlight.AccessClothingBlockerSystem;
 
 public sealed class AccessClothingBlockerSystem : EntitySystem
 {

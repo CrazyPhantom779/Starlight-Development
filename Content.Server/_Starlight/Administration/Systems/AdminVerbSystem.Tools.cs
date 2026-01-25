@@ -11,7 +11,7 @@ using Robust.Shared.Player;
 using Robust.Shared.Utility;
 using static Content.Server.Administration.Systems.AdminVerbSystem;
 
-namespace Content.Server.Starlight.Administration.Systems;
+namespace Content.Server._Starlight.Administration.Systems;
 public sealed partial class AdminVerbSystem : EntitySystem
 {
     [Dependency] private readonly AdminTestArenaSystem _adminTestArenaSystem = default!;

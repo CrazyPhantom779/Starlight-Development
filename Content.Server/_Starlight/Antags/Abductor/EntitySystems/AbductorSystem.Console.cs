@@ -18,7 +18,7 @@ using System.Linq;
 using Content.Server.VendingMachines;
 using Content.Shared.VendingMachines;
 
-namespace Content.Server.Starlight.Antags.Abductor;
+namespace Content.Server._Starlight.Antags.Abductor.EntitySystems;
 
 public sealed partial class AbductorSystem : SharedAbductorSystem
 {

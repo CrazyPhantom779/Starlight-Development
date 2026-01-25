@@ -15,7 +15,7 @@ using Content.Shared.Popups;
 using System;
 using Content.Shared.ActionBlocker;
 
-namespace Content.Server.Starlight.Antags.Abductor;
+namespace Content.Server._Starlight.Antags.Abductor.EntitySystems;
 
 public sealed partial class AbductorSystem : SharedAbductorSystem
 {

@@ -3,7 +3,7 @@ using Content.Shared.CCVar;
 
 // ReSharper disable CheckNamespace
 
-namespace Content.Shared.Preferences;
+namespace Content.Shared._Starlight.Preferences;
 
 public sealed partial class HumanoidCharacterProfile
 {

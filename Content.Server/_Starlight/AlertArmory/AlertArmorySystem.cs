@@ -26,7 +26,7 @@ using Robust.Shared.Prototypes;
 using Content.Shared.Mobs.Components;
 using Robust.Shared.Player;
 
-namespace Content.Server.Starlight.AlertArmory;
+namespace Content.Server._Starlight.AlertArmory;
 
 public sealed class AlertArmorySystem : EntitySystem
 {

@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 using Content.Shared.GameTicking;
 using Robust.Shared.Prototypes;
 
-namespace Content.Server.Administration.Systems;
+namespace Content.Shared._Starlight;
 
 public sealed partial class StarlightEntitySystem : EntitySystem
 {

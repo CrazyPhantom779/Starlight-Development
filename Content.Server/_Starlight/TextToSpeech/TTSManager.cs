@@ -19,7 +19,7 @@ using NAudio.Mixer;
 using OggVorbisEncoder;
 using System.Runtime.CompilerServices;
 
-namespace Content.Server.Starlight.TextToSpeech;
+namespace Content.Server._Starlight.TextToSpeech;
 
 public sealed class TTSManager : ITTSManager
 {

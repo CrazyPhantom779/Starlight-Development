@@ -5,7 +5,7 @@ using Content.Server.NodeContainer.EntitySystems;
 using Content.Server.NodeContainer.Nodes;
 using Content.Shared.Atmos;
 
-namespace Content.Server.Cargo.Systems;
+namespace Content.Server._Starlight.Cargo.Systems;
 
 /// <summary>
 /// A variant of the ATS cargo pallets that deals with gasses

@@ -7,7 +7,7 @@ using Robust.Shared.Enums;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
 
-namespace Content.Server.Starlight;
+namespace Content.Server._Starlight;
 
 public sealed partial class PlayerRolesManager : IPlayerRolesManager, IPostInjectInit
 {

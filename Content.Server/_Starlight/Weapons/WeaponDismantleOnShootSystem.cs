@@ -19,7 +19,7 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
 using Content.Shared.Damage.Systems;
 
-namespace Content.Server._Starlight.Weapon.Systems;
+namespace Content.Server._Starlight.Weapons;
 public sealed partial class WeaponDismantleOnShootSystem : SharedWeaponDismantleOnShootSystem
 {
     [Dependency] private readonly ThrowingSystem _throwing = default!;

@@ -16,7 +16,7 @@ using Robust.Shared.Network;
 using Robust.Shared.Timing;
 using Content.Shared.Damage.Components;
 
-namespace Content.Shared.Medical.Items.EntitySystems;
+namespace Content.Shared._Starlight.Medical.Items.EntitySystems;
 
 public sealed class PatchSystem : EntitySystem
 {

@@ -4,11 +4,11 @@ using Content.Shared.FixedPoint;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
-namespace Content.Shared._Starlight.Railroading;
+namespace Content.Shared._Starlight.Railroading.Components.Tasks;
 
 /// <summary>
 /// Components like Task describe the objectives that need to be completed and store progress.
-/// Ideally, progress should be separated, but I’d rather not create a separate progress component for each one.
+/// Ideally, progress should be separated, but Iâ€™d rather not create a separate progress component for each one.
 /// </summary>
 [RegisterComponent]
 public sealed partial class RailroadMetabolizeTaskComponent : Component

@@ -3,7 +3,7 @@ using Robust.Shared.Audio;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
 
-namespace Content.Server.StationEvents.Components;
+namespace Content.Server._Starlight.StationEvents.Components;
 
 [RegisterComponent, Access(typeof(WreckSwarmSystem))]
 public sealed partial class WreckSwarmComponent : Component

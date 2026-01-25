@@ -8,7 +8,7 @@ using Content.Shared.Item;
 using Content.Shared.Movement.Pulling.Components;
 using Content.Shared.Movement.Pulling.Systems;
 
-namespace Content.Shared._Starlight.NullSpace;
+namespace Content.Shared._Starlight.NullSpace.Systems;
 
 public abstract partial class SharedNullSpaceSystem : EntitySystem
 {

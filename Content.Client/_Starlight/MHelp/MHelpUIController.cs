@@ -18,7 +18,7 @@ using Robust.Shared.Utility;
 using Content.Shared._NullLink;
 using Content.Client.Stylesheets;
 
-namespace Content.Client.UserInterface.Systems.Bwoink;
+namespace Content.Client._Starlight.MHelp;
 
 [UsedImplicitly]
 public sealed class MHelpUIController : UIController, IOnSystemChanged<MentorSystem>

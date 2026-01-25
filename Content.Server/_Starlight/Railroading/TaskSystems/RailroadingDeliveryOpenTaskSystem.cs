@@ -5,7 +5,7 @@ using Content.Shared.Delivery;
 using Content.Shared.Objectives;
 using Robust.Shared.Prototypes;
 
-namespace Content.Server._Starlight.Railroading;
+namespace Content.Server._Starlight.Railroading.TaskSystems;
 
 public sealed partial class RailroadingDeliveryOpenTaskSystem : EntitySystem
 {

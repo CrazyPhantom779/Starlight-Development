@@ -1,4 +1,4 @@
-namespace Content.Server.Starlight.TTS;
+namespace Content.Server._Starlight.TextToSpeech;
 
 public sealed class CollectiveMindSpokeEvent : EntityEventArgs
 {

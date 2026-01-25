@@ -7,7 +7,7 @@ using Robust.Shared.Prototypes;
 using Robust.Shared.GameObjects;
 using Content.Server.Administration.Systems;
 
-namespace Content.Client.Starlight.GhostTheme;
+namespace Content.Client._Starlight.GhostTheme;
 
 public sealed class GhostThemeSystem : EntitySystem
 {

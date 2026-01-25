@@ -4,7 +4,7 @@ using Content.Server.Station.Systems;
 using Content.Shared.Administration;
 using Robust.Shared.Console;
 
-namespace Content.Server.Starlight.AlertArmory.Commands;
+namespace Content.Server._Starlight.AlertArmory.Commands;
 
 /// <summary>
 /// Call/Recall Armory shuttles.

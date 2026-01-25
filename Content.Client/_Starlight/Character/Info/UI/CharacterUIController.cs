@@ -2,7 +2,7 @@
 using Content.Shared._Starlight.Character.Info;
 
 // ReSharper disable CheckNamespace
-namespace Content.Client.UserInterface.Systems.Character;
+namespace Content.Client._Starlight.Character.Info.UI;
 
 public sealed partial class CharacterUIController
 {

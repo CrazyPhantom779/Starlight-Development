@@ -6,7 +6,7 @@ using Content.Shared.Implants.Components;
 using Content.Shared.Radio.Components;
 using Robust.Shared.Toolshed;
 
-namespace Content.Server.Administration.Commands;
+namespace Content.Server._Starlight.Administration.Systems.Commands;
 
 [ToolshedCommand, AdminCommand(AdminFlags.Fun)]
 public sealed class RadioCommand : ToolshedCommand

@@ -11,7 +11,7 @@ using Robust.Client.Player;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 
-namespace Content.Client._Starlight.Overlay;
+namespace Content.Client._Starlight.Overlay.Systems;
 
 public sealed class CycloriteVisionSystem : EntitySystem
 {

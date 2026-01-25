@@ -8,7 +8,7 @@ using Content.Shared.Ghost.Roles;
 using Content.Shared.Starlight.GhostTheme;
 using Content.Shared.Starlight.NewLife;
 
-namespace Content.Server.Ghost.Roles.UI;
+namespace Content.Server._Starlight.Railroading;
 
 public sealed class CardSelectionEui : BaseEui
 {

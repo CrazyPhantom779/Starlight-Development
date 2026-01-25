@@ -7,7 +7,7 @@ using Content.Shared.Atmos;
 using Content.Shared.FixedPoint;
 using Robust.Shared.Physics;
 
-namespace Content.Server.Starlight.Energy.Supermatter;
+namespace Content.Server._Starlight.Energy.Supermatter;
 internal static class Const
 {
     public static FixedPoint2 HeatPercent = 0.82f;

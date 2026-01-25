@@ -15,7 +15,7 @@ using Content.Server.NodeContainer.EntitySystems;
 using Content.Shared.Starlight.CCVar;
 using Robust.Shared.Configuration;
 
-namespace Content.Server.Power.EntitySystems
+namespace Content.Server._Starlight.Power
 {
     /// <summary>
     /// Allows cables to connect over docks.

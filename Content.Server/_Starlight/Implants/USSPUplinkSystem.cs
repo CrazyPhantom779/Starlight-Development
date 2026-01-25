@@ -11,7 +11,7 @@ using Content.Server.RoundEnd;
 using Content.Shared.Implants.Components;
 
 using Content.Server.GameTicking.Rules;
-namespace Content.Server.Implants;
+namespace Content.Server._Starlight.Implants;
 public sealed class USSPUplinkSystem : EntitySystem
 {
     [Dependency] private readonly StoreSystem _storeSystem = default!;

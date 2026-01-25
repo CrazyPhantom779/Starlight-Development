@@ -4,7 +4,7 @@ using Content.Shared.Database;
 using Content.Shared.IgnitionSource;
 using Content.Shared.Starlight.EntityEffects.Components;
 
-namespace Content.Shared.Starlight.EntityEffects.EntitySystems;
+namespace Content.Shared._Starlight.EntityEffects.EntitySystems;
 
 public abstract class SharedDissolvableSystem : EntitySystem
 {

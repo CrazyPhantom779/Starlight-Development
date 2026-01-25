@@ -4,7 +4,7 @@ using Content.Shared.Starlight.Economy;
 using Robust.Server.Player;
 using Robust.Shared.Random;
 
-namespace Content.Server._Starlight.Railroading;
+namespace Content.Server._Starlight.Railroading.RewardSystems;
 
 public sealed partial class RailroadingDonationRewardSystem : EntitySystem
 {

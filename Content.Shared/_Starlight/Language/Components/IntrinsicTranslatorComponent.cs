@@ -1,4 +1,4 @@
-namespace Content.Shared._Starlight.Language.Components.Translators;
+namespace Content.Shared._Starlight.Language.Components;
 
 /// <summary>
 ///   A translator attached to an entity that translates its speech.

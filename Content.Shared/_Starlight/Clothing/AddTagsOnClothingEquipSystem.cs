@@ -1,7 +1,7 @@
 using Content.Shared.Clothing.Components;
 using Content.Shared.Tag;
 
-namespace Content.Shared.Clothing.EntitySystems;
+namespace Content.Shared._Starlight.Clothing;
 
 public sealed class AddTagsOnClothingEquipSystem : EntitySystem
 {

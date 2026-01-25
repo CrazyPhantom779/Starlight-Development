@@ -2,7 +2,7 @@ using Content.Shared.Tag;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.CollectiveMind;
+namespace Content.Shared._Starlight.CollectiveMind;
 
 [Prototype("collectiveMind")]
 [Serializable, NetSerializable]

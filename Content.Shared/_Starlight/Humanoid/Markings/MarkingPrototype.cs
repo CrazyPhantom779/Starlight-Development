@@ -4,7 +4,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 
 // ReSharper disable CheckNamespace
 
-namespace Content.Shared.Humanoid.Markings;
+namespace Content.Shared._Starlight.Humanoid.Markings;
 
 public sealed partial class MarkingPrototype : IInheritingPrototype
 {

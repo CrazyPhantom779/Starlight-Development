@@ -1,6 +1,6 @@
 ﻿using Content.Shared._Starlight.Language;
 
-namespace Content.Server.Starlight.TTS;
+namespace Content.Server._Starlight.TextToSpeech;
 
 public sealed class RadioSpokeEvent : EntityEventArgs
 {

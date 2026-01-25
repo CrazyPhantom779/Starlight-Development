@@ -15,7 +15,7 @@ using System.Linq;
 using Content.Shared.Weapons.Ranged.Events;
 using Content.Shared.Examine;
 
-namespace Content.Shared.Starlight.Knockback;
+namespace Content.Shared._Starlight.Knockback;
 
 public abstract partial class SharedKnockbackSystem : EntitySystem
 {

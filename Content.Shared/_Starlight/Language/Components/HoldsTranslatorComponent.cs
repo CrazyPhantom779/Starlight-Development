@@ -1,4 +1,4 @@
-namespace Content.Shared._Starlight.Language.Components.Translators;
+namespace Content.Shared._Starlight.Language.Components;
 
 /// <summary>
 ///     Applied internally to the holder of an Entity with [HandheldTranslatorComponent].

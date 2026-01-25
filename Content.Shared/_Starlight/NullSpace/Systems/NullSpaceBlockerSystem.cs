@@ -2,7 +2,7 @@ using Robust.Shared.Network;
 using Robust.Shared.Physics.Events;
 using Robust.Shared.Prototypes;
 
-namespace Content.Shared._Starlight.NullSpace;
+namespace Content.Shared._Starlight.NullSpace.Systems;
 
 public sealed class NullSpaceBlockerSystem : EntitySystem
 {

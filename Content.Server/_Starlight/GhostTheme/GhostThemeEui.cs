@@ -4,7 +4,7 @@ using Content.Shared.Eui;
 using Content.Shared.Ghost.Roles;
 using Content.Shared.Starlight;
 
-namespace Content.Server.Ghost.Roles.UI;
+namespace Content.Server._Starlight.GhostTheme;
 
 public sealed class GhostThemeEui : BaseEui
 {

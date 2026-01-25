@@ -1,7 +1,7 @@
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.List;
 
-namespace Content.Shared._Starlight.Language.Components.Translators;
+namespace Content.Shared._Starlight.Language.Components;
 
 public abstract partial class BaseTranslatorComponent : Component
 {

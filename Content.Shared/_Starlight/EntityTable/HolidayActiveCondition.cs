@@ -3,7 +3,7 @@ using Content.Shared.EntityTable.EntitySelectors;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.EntityTable.Conditions;
+namespace Content.Shared._Starlight.EntityTable;
 
 /// <summary>
 /// EntityTable condition: spawns if the specified holiday is currently active.

@@ -7,7 +7,7 @@ using Robust.Server.Player;
 using Robust.Shared.Player;
 using Robust.Shared.Random;
 
-namespace Content.Server._Starlight.Railroading;
+namespace Content.Server._Starlight.Railroading.HandlerSystem;
 
 public sealed partial class RailroadingAnnounceHandlerSystem : EntitySystem
 {

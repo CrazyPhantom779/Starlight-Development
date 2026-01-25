@@ -4,7 +4,7 @@ using Content.Shared.Emp;
 using Content.Shared.Weapons.Hitscan.Components;
 using Content.Shared.Weapons.Hitscan.Events;
 
-namespace Content.Shared.Weapons.Hitscan.Systems;
+namespace Content.Shared._Starlight.Weapons.Hitscan.Systems;
 
 public sealed class HitscanEmpEffectSystem : EntitySystem
 {

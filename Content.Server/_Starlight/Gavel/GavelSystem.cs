@@ -5,7 +5,7 @@ using Content.Shared.Popups;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Timing;
 
-namespace Content.Server.Starlight.Gavel;
+namespace Content.Server._Starlight.Gavel;
 
 public sealed class GavelSystem : EntitySystem
 {

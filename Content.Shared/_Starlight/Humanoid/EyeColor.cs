@@ -1,4 +1,4 @@
-namespace Content.Shared.Humanoid;
+namespace Content.Shared._Starlight.Humanoid;
 
 public static class EyeColor
 {

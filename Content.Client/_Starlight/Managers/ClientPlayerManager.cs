@@ -7,7 +7,7 @@ using Robust.Shared.ContentPack;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
 
-namespace Content.Client.Administration.Managers;
+namespace Content.Client._Starlight.Managers;
 
 public sealed class ClientPlayerManager : IClientPlayerRolesManager, IPostInjectInit, ISharedPlayersRoleManager
 {

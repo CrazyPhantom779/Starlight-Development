@@ -1,6 +1,6 @@
 ﻿using System.Text;
 
-namespace Content.Server.Starlight.TTS;
+namespace Content.Server._Starlight.TextToSpeech;
 
 public static class NumberConverter
 {

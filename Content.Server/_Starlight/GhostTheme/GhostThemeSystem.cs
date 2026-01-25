@@ -43,7 +43,7 @@ using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using System.Linq;
 
-namespace Content.Server.Ghost.Roles;
+namespace Content.Server._Starlight.GhostTheme;
 
 [UsedImplicitly]
 public sealed class GhostThemeSystem : EntitySystem

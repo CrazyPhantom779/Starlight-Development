@@ -5,7 +5,7 @@ using Content.Shared.Store.Conditions;
 using Content.Shared.Store.Events;
 using Robust.Shared.GameObjects;
 
-namespace Content.Server.Store.Systems;
+namespace Content.Server._Starlight.Store.Systems;
 
 /// <summary>
 /// This system handles stock-limited listings in the store system.

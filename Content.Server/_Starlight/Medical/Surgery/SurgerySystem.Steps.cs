@@ -18,7 +18,7 @@ using Robust.Shared.Timing;
 using Content.Shared.Damage.Components;
 
 
-namespace Content.Server.Starlight.Medical.Surgery;
+namespace Content.Server._Starlight.Medical.Surgery;
 // Based on the RMC14.
 // https://github.com/RMC-14/RMC-14
 //  

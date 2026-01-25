@@ -8,7 +8,7 @@ using Robust.Shared.IoC;
 using Content.Client.Paper.UI;
 using Robust.Client.Graphics;
 
-namespace Content.Client.UserInterface.RichText;
+namespace Content.Client._Starlight.UserInterface.RichText;
 
 /// <summary>
 /// Converts [signature] tags into clickable buttons that sign with the player's name.

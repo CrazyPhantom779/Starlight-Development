@@ -1,4 +1,4 @@
-namespace Content.Shared.CollectiveMind;
+namespace Content.Shared._Starlight.CollectiveMind;
 
 public sealed class CollectiveMindMessageAttemptEvent : CancellableEntityEventArgs
 {

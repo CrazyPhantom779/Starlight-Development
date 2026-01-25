@@ -4,7 +4,7 @@ using Robust.Shared.Random;
 using Robust.Shared.Reflection;
 using System.Text.RegularExpressions;
 
-namespace Content.Server.Speech.EntitySystems
+namespace Content.Server._Starlight.Speech.EntitySystems
 {
     public sealed class ChavAccentSystem : EntitySystem
     {

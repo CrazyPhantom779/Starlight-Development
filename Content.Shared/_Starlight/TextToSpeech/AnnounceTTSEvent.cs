@@ -1,7 +1,7 @@
 using Robust.Shared.Audio;
 using Robust.Shared.Serialization;
 
-namespace Content.Shared.Starlight.TextToSpeech;
+namespace Content.Shared._Starlight.TextToSpeech;
 
 [Serializable, NetSerializable]
 public sealed class AnnounceTtsEvent

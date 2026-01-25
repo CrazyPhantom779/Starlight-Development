@@ -38,7 +38,7 @@ using Robust.Shared.Timing;
 using Robust.Shared.Utility;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
-namespace Content.Shared.Starlight.Economy;
+namespace Content.Server._Starlight.Economy;
 public sealed partial class SalarySystem : SharedSalarySystem
 {
     [Dependency] private readonly IEntityManager _entityManager = default!;
