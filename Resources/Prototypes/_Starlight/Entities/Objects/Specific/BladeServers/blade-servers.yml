@@ -1,0 +1,61 @@
+- type: entity
+  parent: ConstructibleBladeServer
+  id: HologramBladeServer
+  name: hologram blade server
+  description: A blade server for storing holographic projection data. Requires both a brain chip and body chip to function.
+  components:
+  - type: BladeServer
+    stripeColor: "#4cc9f0"
+  - type: InnerCableReceiver
+  - type: ExtensionCableReceiver
+  - type: ApcPowerReceiver
+    powerLoad: 50
+  - type: Machine
+    board: HologramServerMachineCircuitboard
+  - type: ItemSlots
+    slots:
+      hologram_brain_chip:
+        name: Brain Chip
+        whitelist:
+          tags:
+            - HologramBrainChip
+      hologram_body_chip:
+        name: Body Chip
+        whitelist:
+          tags:
+            - HologramBodyChip
+  - type: ContainerContainer
+    containers:
+      hologram_brain_chip: !type:ContainerSlot
+      hologram_body_chip: !type:ContainerSlot
+      machine_board: !type:Container
+      machine_parts: !type:Container
+  - type: HologramBladeServer
+    brainChipSlot: hologram_brain_chip
+    bodyChipSlot: hologram_body_chip
+    isPowered: true
+  - type: MindContainer
+  - type: Tag
+    tags:
+      - HologramDisk
+
+- type: entity
+  parent: HologramBladeServer
+  id: HologramBladeHoloCorgi
+  name: hologram blade server (holo corgi)
+  description: A blade server for storing holographic projection data. Requires both a brain chip and body chip to function. Contains a Holo Corgi.
+  components:
+  - type: ItemSlots
+    slots:
+      hologram_brain_chip:
+        name: Brain Chip
+        whitelist:
+          tags:
+            - HologramBrainChip
+        startingItem: HologramBrainChip  # Empty brain chip
+      hologram_body_chip:
+        name: Body Chip
+        whitelist:
+          tags:
+            - HologramBodyChip
+        startingItem: HologramBodyChipCorgi  # Pre-programmed corgi chip

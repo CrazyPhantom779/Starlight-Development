@@ -173,3 +173,20 @@
       prototype: ComputerCommsLaw
 
 ## Departmental Communications Consoles END
+
+# Hologram Console
+- type: entity
+  parent: BaseComputerCircuitboard
+  id: ComputerHologramCircuitboard
+  name: hologram console board
+  description: A circuit board for a hologram console.
+  components:
+    - type: Sprite
+      state: cpu_science
+    - type: ComputerBoard
+      prototype: ComputerHologram
+    - type: StaticPrice
+      price: 15
+    - type: Tag
+      tags:
+      - HighRiskItem

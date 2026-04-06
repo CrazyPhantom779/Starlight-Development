@@ -1,0 +1,16 @@
+- type: entity
+  id: EffectHologramProjectionBeam
+  components:
+  - type: Sprite
+    drawdepth: Effects
+    layers:
+      - shader: unshaded
+        map: ["enum.EffectLayers.Unshaded"]
+        sprite: _Starlight/Effects/hologram_projection_beam.rsi
+        state: beam
+    color: "#c0f9ff"
+  - type: Tag
+    tags:
+      - HideContextMenu
+  - type: Stealth
+    lastVisibility: 0.2

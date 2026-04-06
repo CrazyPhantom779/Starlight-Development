@@ -111,3 +111,15 @@
     Blunt: 5
     Slash: 5
     Piercing: 5
+
+# Holograms
+- type: damageModifierSet
+  id: Hardlight
+  coefficients:
+    Blunt: 1.6
+    Slash: 1.0
+    Piercing: 0.7
+    Shock: 1.2
+    Heat: 1.35
+  flatReductions:
+    Blunt: 5
