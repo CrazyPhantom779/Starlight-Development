@@ -6,7 +6,7 @@
   maxPlayers: 350
   stations:
     StarlightPermafrost:
-      stationProto: StandardNanotrasenStation
+      stationProto: StandardNanotrasenStationNoTrade
       components:
         - type: StationNameSetup
           mapNameTemplate: '{0} Permafrost {1}'

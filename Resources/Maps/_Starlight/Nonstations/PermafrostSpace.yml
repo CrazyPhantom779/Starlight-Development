@@ -64,10 +64,6 @@ entities:
       bodyStatus: InAir
       fixedRotation: False
       bodyType: Dynamic
-    - type: GridInertialDamping
-      enabled: true
-      linearDamping: 0.8
-      angularDamping: 0.8
     - type: Fixtures
       fixtures: {}
     - type: OccluderTree
@@ -87,27 +83,6 @@ entities:
     - type: GridAtmosphere
       version: 2
       data:
-        tiles:
-          0,0:
-            0: 79
-          0,-1:
-            0: 65535
-          -1,0:
-            0: 128
-          1,0:
-            0: 33
-          1,-1:
-            0: 4369
-          -1,-2:
-            0: 32768
-          1,-2:
-            0: 8192
-        uniqueMixes:
-        - volume: 2500
-          temperature: 213.15
-          moles:
-            Oxygen: 21.824879
-            Nitrogen: 82.10312
         chunkSize: 4
     - type: GasTileOverlay
     - type: ExplosionAirtightGrid

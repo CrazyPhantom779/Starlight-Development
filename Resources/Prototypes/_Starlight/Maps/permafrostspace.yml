@@ -1,0 +1,15 @@
+- type: gameMap
+  id: StarlightPermafrostSpace
+  mapName: 'PermafrostSpace'
+  mapPath: /Maps/_Starlight/Nonstations/PermafrostSpace.yml
+  minPlayers: 60
+  maxPlayers: 350
+  stations:
+    StarlightPermafrost:
+      stationProto: StandardNanotrasenStation
+      components:
+        - type: StationNameSetup
+          mapNameTemplate: '{0} Permafrost {1}'
+          nameGenerator:
+            !type:NanotrasenNameGenerator
+            prefixCreator: 'ST'
