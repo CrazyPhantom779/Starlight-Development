@@ -171,6 +171,9 @@
   id: DockGamma
 
 - type: Tag
+  id: DockMiningShaft
+
+- type: Tag
   id: DogEmotes
 
 - type: Tag

@@ -49,6 +49,27 @@
     - type: PriorityDock
       tag: DockEscape
 
+- type: entity
+  parent: AirlockExternalGlassShuttleEmergencyLocked
+  id: AirlockExternalGlassShuttleMiningShaftLocked
+  suffix: External, Mining Shaft Destination, Glass, Docking, Locked
+  components:
+    - type: PriorityDock
+      tag: DockMiningShaft
+
+- type: entity
+  parent: AirlockExternalGlassShuttleMiningShaftLocked
+  id: AirlockExternalGlassShuttleMiningShaftSpawn
+  suffix: External, Mining Shaft Spawn, Glass, Docking
+  components:
+    - type: RandomGridFill
+      pathWeights:
+        "/Maps/_Starlight/Shuttles/Mining/MiningElevator.yml": 1
+      addComponents:
+      - type: IFF
+        flags:
+        - HideLabel
+
 # syndicate locked variants of every airlock used in shadow borgi ops cause my god this evac pod is massive
 
 - type: entity
