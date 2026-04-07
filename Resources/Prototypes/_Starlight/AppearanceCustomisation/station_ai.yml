@@ -186,8 +186,8 @@
       sprite: _Starlight/Mobs/Silicon/station_ai.rsi
       state: ai_dead
     Intellicard:
-      sprite: Objects/Devices/ai_card.rsi
-      state: full
+      sprite: _Starlight/Objects/Devices/ai_card.rsi
+      state: thinking_card
 
 - type: stationAiCustomization
   parent: StationAiIconBase
@@ -486,8 +486,8 @@
       sprite: _Starlight/Mobs/Silicon/station_ai.rsi
       state: ai_dead
     Intellicard:
-      sprite: Objects/Devices/ai_card.rsi
-      state: full
+      sprite: _Starlight/Objects/Devices/ai_card.rsi
+      state: too_deep_card
 
 - type: stationAiCustomization
   parent: StationAiIconBase
