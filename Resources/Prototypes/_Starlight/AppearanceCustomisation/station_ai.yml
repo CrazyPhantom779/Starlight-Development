@@ -322,7 +322,7 @@
       state: ai_monochrome_dead
     Intellicard:
       sprite: _Starlight/Objects/Devices/ai_card.rsi
-      state: monochrome
+      state: mono
 
 - type: stationAiCustomization
   parent: StationAiIconBase
