@@ -303,13 +303,72 @@
             "name": "hourglass_card"
         },
         {
-            "name": "rat_card"
+            "name": "rat_card",
+            "copyright": "Made by Conflee for Starlight."
         },
         {
-            "name": "royal_card"
+            "name": "royal_card",
+            "copyright": "Made by Conflee for Starlight."
         },
         {
-            "name": "sillycon_card"
+            "name": "sillycon_card",
+            "copyright": "Made by Conflee for Starlight."
+        },
+        {
+            "name": "thinking_card",
+            "copyright": "Taken from TG station"
+        },
+        {
+            "name": "too_deep_card",
+            "copyright": "Taken from TG station",
+            "delays": [
+                [
+                    0.1,
+                    0.1,
+                    0.1,
+                    0.1,
+                    0.1,
+                    0.1,
+                    0.1,
+                    0.1,
+                    0.1,
+                    0.1
+                ]
+            ]
+        },
+        {
+            "name": "base_syndicard",
+            "copyright": "Taken from TG station"
+        },
+        {
+            "name": "dead_syndicard",
+            "copyright": "Taken from TG station",
+            "delays": [
+                [
+                0.4,
+                0.4
+                ]
+            ]
+        },
+        {
+            "name": "dead_syndicard",
+            "copyright": "Taken from TG station",
+            "delays": [
+                [
+                0.4,
+                0.4
+                ]
+            ]
+        },
+        {
+            "name": "empty_syndicard",
+            "copyright": "Taken from TG station",
+            "delays": [
+                [
+                0.4,
+                0.4
+                ]
+            ]
         }
     ]
 }
