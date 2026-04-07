@@ -355,6 +355,6 @@
       enum.StationAiVisualLayers.Icon:
         unshaded:
           Empty: { state: empty_syndicard }
-          Occupied: { state: red }
+          Occupied: { state: full_syndicard }
           Rebooting: { state: dead_syndicard }
           Dead: { state: dead_syndicard }
