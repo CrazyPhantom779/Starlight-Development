@@ -352,7 +352,9 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
 
         if (!_whitelistSystem.CheckBoth(ev.Target, comp.Blacklist, comp.Whitelist) && // Starlight-edit: rework all has comp to whitelist & blacklist.
             !alwaysConvertible ||
-            !_mobState.IsAlive(ev.Target))
+            !_mobState.IsAlive(ev.Target) ||
+            HasComp<ZombieComponent>(ev.Target) ||
+            !HasComp<Revolutionary.Components.RevolutionaryConverterComponent>(ev.Used))
         {
             return;
         }
@@ -363,7 +365,7 @@ public sealed class RevolutionaryRuleSystem : GameRuleSystem<RevolutionaryRuleCo
         // Starlight: Add a component to track which head revolutionary converted this revolutionary
         if (ev.User != null && HasComp<HeadRevolutionaryComponent>(ev.User.Value))
         {
-            var converterComp = EnsureComp<RevolutionaryConverterComponent>(ev.Target);
+            var converterComp = EnsureComp<Shared.Revolutionary.Components.RevolutionaryConverterComponent>(ev.Target);
             converterComp.ConverterUid = ev.User.Value;
         }
         // Starlight End
