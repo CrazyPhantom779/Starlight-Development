@@ -351,16 +351,6 @@
             ]
         },
         {
-            "name": "dead_syndicard",
-            "copyright": "Taken from TG station",
-            "delays": [
-                [
-                0.4,
-                0.4
-                ]
-            ]
-        },
-        {
             "name": "empty_syndicard",
             "copyright": "Taken from TG station",
             "delays": [
