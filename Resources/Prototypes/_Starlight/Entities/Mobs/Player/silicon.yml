@@ -332,3 +332,29 @@
   - type: ContainerComp
     proto: TSFAiHeld
     container: station_ai_mind_slot
+
+# Items
+- type: entity
+  id: SyndicateIntellicard
+  name: syndicard
+  description: A syndicate storage device for AIs.
+  parent: Intellicard
+  components:
+  - type: Sprite
+    sprite: _Starlight/Objects/Devices/ai_card.rsi
+    layers:
+    - state: base_syndicard
+    - state: empty_syndicard
+      map: ["unshaded"]
+      shader: unshaded
+    - state: red
+      map: ["enum.StationAiVisualLayers.Icon"]
+      shader: unshaded
+  - type: GenericVisualizer
+    visuals:
+      enum.StationAiVisualLayers.Icon:
+        unshaded:
+          Empty: { state: empty_syndicard }
+          Occupied: { state: red }
+          Rebooting: { state: dead_syndicard }
+          Dead: { state: dead_syndicard }
