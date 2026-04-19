@@ -19,6 +19,7 @@
     # MoffStation - Start - Card Games added to Vending Machine
     PlayingCardDeckBoxBlack: 2
     NunoCardDeckBox: 1
+    GoFishCardDeckBox: 1
     # MoffStation - End
     Magic9Ball: 2
   contrabandInventory:
