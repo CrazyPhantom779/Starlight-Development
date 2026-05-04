@@ -1,5 +1,5 @@
-using Content.Shared._CD.CartridgeLoader.Cartridges; // CD
 using Robust.Shared.Serialization;
+using Content.Shared._Starlight.CartridgeLoader.Cartridges; // Starlight
 
 namespace Content.Shared.CartridgeLoader.Cartridges;
 
@@ -16,16 +16,18 @@ public sealed class LogProbeUiState : BoundUserInterfaceState
     /// </summary>
     public List<PulledAccessLog> PulledLogs;
 
+    // Starlight Start
     /// <summary>
-    /// CD: The NanoChat data if a card was scanned, null otherwise
+    /// The NanoChat data if a card was scanned, null otherwise
     /// </summary>
     public NanoChatData? NanoChatData { get; }
+    // Starlight End
 
-    public LogProbeUiState(string entityName, List<PulledAccessLog> pulledLogs, NanoChatData? nanoChatData = null) // CD - NanoChat support
+    public LogProbeUiState(string entityName, List<PulledAccessLog> pulledLogs, NanoChatData? nanoChatData = null) // Starlight Edit: NanoChat support
     {
         EntityName = entityName;
         PulledLogs = pulledLogs;
-        NanoChatData = nanoChatData; // CD
+        NanoChatData = nanoChatData; // Starlight
     }
 }
 

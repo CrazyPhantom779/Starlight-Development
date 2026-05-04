@@ -15,7 +15,7 @@ using Content.Shared.Implants;
 using Content.Shared.Inventory;
 using Content.Shared.Lock;
 using Content.Shared.PDA;
-using Content.Shared._CD.NanoChat; // CD
+using Content.Shared._Starlight.NanoChat; // Starlight
 
 namespace Content.Server.Access.Systems
 {
@@ -28,7 +28,7 @@ namespace Content.Server.Access.Systems
         [Dependency] private readonly ChameleonClothingSystem _chameleon = default!;
         [Dependency] private readonly ChameleonControllerSystem _chamController = default!;
         [Dependency] private readonly LockSystem _lock = default!;
-        [Dependency] private readonly SharedNanoChatSystem _nanoChat = default!; // CD
+        [Dependency] private readonly SharedNanoChatSystem _nanoChat = default!; // Starlight
 
         public override void Initialize()
         {
@@ -82,7 +82,7 @@ namespace Content.Server.Access.Systems
             _chameleon.SetSelectedPrototype(ent, comp.IdCard);
         }
 
-        // CD - Add number change handler
+        // Starlgiht Start: Number change handler
         private void OnNumberChanged(Entity<AgentIDCardComponent> ent, ref AgentIDCardNumberChangedMessage args)
         {
             if (!TryComp<NanoChatCardComponent>(ent, out var comp))
@@ -91,6 +91,7 @@ namespace Content.Server.Access.Systems
             _nanoChat.SetNumber((ent, comp), args.Number);
             Dirty(ent, comp);
         }
+        // Starlight End
 
         private void OnAfterInteract(EntityUid uid, AgentIDCardComponent component, AfterInteractEvent args)
         {
@@ -105,7 +106,7 @@ namespace Content.Server.Access.Systems
             access.Tags.UnionWith(targetAccess.Tags);
             var addedLength = access.Tags.Count - beforeLength;
 
-            // CD - Copy NanoChat data if available
+            // Starlight Starlight: Copy NanoChat data if available
             if (TryComp<NanoChatCardComponent>(args.Target, out var targetNanoChat) &&
                 TryComp<NanoChatCardComponent>(uid, out var agentNanoChat))
             {
@@ -131,7 +132,7 @@ namespace Content.Server.Access.Systems
                     }
                 }
             }
-            // End CD
+            // Starlight End
 /* starlight start
             if (addedLength == 0)
             {
@@ -160,16 +161,17 @@ namespace Content.Server.Access.Systems
             if (!TryComp<IdCardComponent>(uid, out var idCard))
                 return;
 
-            // CD - Get current number if it exists
+            // Starlight: Get current number if it exists
             uint? currentNumber = null;
             if (TryComp<NanoChatCardComponent>(uid, out var comp))
                 currentNumber = comp.Number;
+            // Starlight End
 
             var state = new AgentIDCardBoundUserInterfaceState(
                 idCard.FullName ?? "",
                 idCard.LocalizedJobTitle ?? "",
                 idCard.JobIcon,
-                currentNumber); // CD - Pass current number
+                currentNumber); // Starlight: Pass current number
 
             _uiSystem.SetUiState(uid, AgentIDCardUiKey.Key, state);
         }

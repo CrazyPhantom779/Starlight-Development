@@ -9,9 +9,9 @@ namespace Content.Shared._Starlight.NanoChat;
 /// </summary>
 public static class NanoChatEmoteCache
 {
-    private static Dictionary<string, EmoteData>? _emoteCache;
-    private static Dictionary<string, List<EmoteData>>? _categoryCache;
-    private static List<string>? _allCategories;
+    private static Dictionary<string, EmoteData>? s_emoteCache;
+    private static Dictionary<string, List<EmoteData>>? s_categoryCache;
+    private static List<string>? s_allCategories;
 
     /// <summary>
     /// Data structure for cached emote information.
@@ -35,7 +35,7 @@ public static class NanoChatEmoteCache
         get
         {
             EnsureCacheLoaded();
-            return _emoteCache!;
+            return s_emoteCache!;
         }
     }
 
@@ -47,7 +47,7 @@ public static class NanoChatEmoteCache
         get
         {
             EnsureCacheLoaded();
-            return _categoryCache!;
+            return s_categoryCache!;
         }
     }
 
@@ -59,7 +59,7 @@ public static class NanoChatEmoteCache
         get
         {
             EnsureCacheLoaded();
-            return _allCategories!;
+            return s_allCategories!;
         }
     }
 
@@ -69,7 +69,7 @@ public static class NanoChatEmoteCache
     public static SpriteSpecifier? GetEmoteSprite(string emoteId)
     {
         EnsureCacheLoaded();
-        return _emoteCache!.TryGetValue(emoteId, out var data) ? data.Sprite : null;
+        return s_emoteCache!.TryGetValue(emoteId, out var data) ? data.Sprite : null;
     }
 
     /// <summary>
@@ -78,7 +78,7 @@ public static class NanoChatEmoteCache
     public static bool EmoteExists(string emoteId)
     {
         EnsureCacheLoaded();
-        return _emoteCache!.ContainsKey(emoteId);
+        return s_emoteCache!.ContainsKey(emoteId);
     }
 
     /// <summary>
@@ -96,12 +96,12 @@ public static class NanoChatEmoteCache
         var results = new List<EmoteData>();
 
         // Exact ID matches first
-        if (_emoteCache!.TryGetValue(lowerQuery, out var exactMatch))
+        if (s_emoteCache!.TryGetValue(lowerQuery, out var exactMatch))
         {
             results.Add(exactMatch);
         }
 
-        foreach (var emote in _emoteCache.Values)
+        foreach (var emote in s_emoteCache.Values)
         {
             if (emote.Id == lowerQuery)
                 continue; // Already added
@@ -121,7 +121,7 @@ public static class NanoChatEmoteCache
     public static List<EmoteData> GetEmotesInCategory(string category)
     {
         EnsureCacheLoaded();
-        return _categoryCache!.TryGetValue(category, out var emotes)
+        return s_categoryCache!.TryGetValue(category, out var emotes)
             ? new List<EmoteData>(emotes)
             : new List<EmoteData>();
     }
@@ -132,19 +132,19 @@ public static class NanoChatEmoteCache
     /// </summary>
     public static void InvalidateCache()
     {
-        _emoteCache = null;
-        _categoryCache = null;
-        _allCategories = null;
+        s_emoteCache = null;
+        s_categoryCache = null;
+        s_allCategories = null;
     }
 
     private static void EnsureCacheLoaded()
     {
-        if (_emoteCache != null)
+        if (s_emoteCache != null)
             return;
 
         var prototypeManager = IoCManager.Resolve<IPrototypeManager>();
-        _emoteCache = new Dictionary<string, EmoteData>();
-        _categoryCache = new Dictionary<string, List<EmoteData>>();
+        s_emoteCache = new Dictionary<string, EmoteData>();
+        s_categoryCache = new Dictionary<string, List<EmoteData>>();
         var categories = new HashSet<string>();
 
         foreach (var proto in prototypeManager.EnumeratePrototypes<NanoChatEmotePrototype>())
@@ -168,24 +168,24 @@ public static class NanoChatEmoteCache
                 SearchString = searchString
             };
 
-            _emoteCache[proto.ID] = emoteData;
+            s_emoteCache[proto.ID] = emoteData;
             categories.Add(proto.Category);
 
-            if (!_categoryCache.ContainsKey(proto.Category))
-                _categoryCache[proto.Category] = new List<EmoteData>();
+            if (!s_categoryCache.ContainsKey(proto.Category))
+                s_categoryCache[proto.Category] = new List<EmoteData>();
 
-            _categoryCache[proto.Category].Add(emoteData);
+            s_categoryCache[proto.Category].Add(emoteData);
         }
 
         // Sort emotes within each category
-        foreach (var category in _categoryCache.Keys.ToList())
+        foreach (var category in s_categoryCache.Keys.ToList())
         {
-            _categoryCache[category] = _categoryCache[category]
+            s_categoryCache[category] = s_categoryCache[category]
                 .OrderBy(e => e.Priority)
                 .ThenBy(e => e.Id)
                 .ToList();
         }
 
-        _allCategories = categories.OrderBy(c => c).ToList();
+        s_allCategories = categories.OrderBy(c => c).ToList();
     }
 }

@@ -1,7 +1,7 @@
 using Content.Shared.Audio;
 using Content.Shared.CartridgeLoader;
-using Content.Shared._CD.CartridgeLoader.Cartridges;
-using Content.Shared._CD.NanoChat;
+using Content.Shared._Starlight.CartridgeLoader.Cartridges;
+using Content.Shared._Starlight.NanoChat;
 
 namespace Content.Server.CartridgeLoader.Cartridges;
 

@@ -6,16 +6,16 @@ using Content.Shared.Database;
 using Content.Shared.Hands.EntitySystems;
 using Content.Shared.Labels.EntitySystems;
 using Content.Shared.Paper;
-using Content.Shared._CD.NanoChat; // CD
 using Content.Shared.Popups;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Timing;
 using System.Text;
 using Robust.Shared.Random;
+using Content.Shared._Starlight.NanoChat; // Starlight
 
 namespace Content.Server.CartridgeLoader.Cartridges;
 
-public sealed partial class LogProbeCartridgeSystem : EntitySystem // CD - Made partial
+public sealed partial class LogProbeCartridgeSystem : EntitySystem // Starlight Edit: Made partial
 {
     [Dependency] private readonly CartridgeLoaderSystem _cartridge = default!;
     [Dependency] private readonly IGameTiming _timing = default!;
@@ -33,7 +33,7 @@ public sealed partial class LogProbeCartridgeSystem : EntitySystem // CD - Made 
     {
         base.Initialize();
 
-        InitializeNanoChat(); // CD
+        InitializeNanoChat(); // Starlight
         SubscribeLocalEvent<LogProbeCartridgeComponent, CartridgeUiReadyEvent>(OnUiReady);
         SubscribeLocalEvent<LogProbeCartridgeComponent, CartridgeAfterInteractEvent>(AfterInteract);
         SubscribeLocalEvent<LogProbeCartridgeComponent, CartridgeMessageEvent>(OnMessage);
@@ -50,14 +50,14 @@ public sealed partial class LogProbeCartridgeSystem : EntitySystem // CD - Made 
         if (args.InteractEvent.Handled || !args.InteractEvent.CanReach || args.InteractEvent.Target is not { } target)
             return;
 
-        // CD begin - Add NanoChat card scanning
+        // Starlight Start: Add NanoChat card scanning
         if (TryComp<NanoChatCardComponent>(target, out var nanoChatCard))
         {
             ScanNanoChatCard(ent, args, target, nanoChatCard);
             args.InteractEvent.Handled = true;
             return;
         }
-        // CD end
+        // Starlight End
 
         if (!TryComp(target, out AccessReaderComponent? accessReaderComponent))
             return;
@@ -68,7 +68,7 @@ public sealed partial class LogProbeCartridgeSystem : EntitySystem // CD - Made 
 
         ent.Comp.EntityName = Name(target);
         ent.Comp.PulledAccessLogs.Clear();
-        ent.Comp.ScannedNanoChatData = null; // CD - Clear any previous NanoChat data
+        ent.Comp.ScannedNanoChatData = null; // Starlight: Clear any previous NanoChat data
 
         foreach (var accessRecord in accessReaderComponent.AccessLog)
         {
@@ -136,7 +136,7 @@ public sealed partial class LogProbeCartridgeSystem : EntitySystem // CD - Made 
 
     private void UpdateUiState(Entity<LogProbeCartridgeComponent> ent, EntityUid loaderUid)
     {
-        var state = new LogProbeUiState(ent.Comp.EntityName, ent.Comp.PulledAccessLogs, ent.Comp.ScannedNanoChatData); // CD - NanoChat support
+        var state = new LogProbeUiState(ent.Comp.EntityName, ent.Comp.PulledAccessLogs, ent.Comp.ScannedNanoChatData); // Starlight Edit: NanoChat support
         _cartridge.UpdateCartridgeUiState(loaderUid, state);
     }
 }
