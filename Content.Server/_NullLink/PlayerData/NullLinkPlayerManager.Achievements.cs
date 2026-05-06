@@ -70,14 +70,16 @@ public sealed partial class NullLinkPlayerManager : INullLinkPlayerManager
     {
         if (!_actors.TryGetServerGrain(out var serverGrain))
         {
-            if (!_cfg.GetCVar(NullLinkCCVars.Enabled))
+            if (_cfg.GetCVar(NullLinkCCVars.Enabled))
             {
-                _sawmill.Debug($"UnlockAchievement skipped for {userId}/{achievementId}: NullLink is disabled.");
+                _sawmill.Error($"UnlockAchievement failed for {userId}/{achievementId}: server grain unavailable.");
                 return false;
             }
 
-            _sawmill.Error($"UnlockAchievement failed for {userId}/{achievementId}: server grain is unavailable.");
-            return false;
+            _sawmill.Warning($"[Achievements] Local unlock fallback for {userId}/{achievementId}");
+
+            SetCachedAchievementUnlocked(userId, achievementId, characterName);
+            return true;
         }
 
         try
@@ -97,14 +99,16 @@ public sealed partial class NullLinkPlayerManager : INullLinkPlayerManager
     {
         if (!_actors.TryGetServerGrain(out var serverGrain))
         {
-            if (!_cfg.GetCVar(NullLinkCCVars.Enabled))
+            if (_cfg.GetCVar(NullLinkCCVars.Enabled))
             {
-                _sawmill.Debug($"LockAchievement skipped for {userId}/{achievementId}: NullLink is disabled.");
+                _sawmill.Error($"LockAchievement failed for {userId}/{achievementId}: server grain unavailable.");
                 return false;
             }
 
-            _sawmill.Error($"LockAchievement failed for {userId}/{achievementId}: server grain is unavailable.");
-            return false;
+            _sawmill.Warning($"[Achievements] Local lock fallback for {userId}/{achievementId}");
+
+            SetCachedAchievementLocked(userId, achievementId);
+            return true;
         }
 
         try
