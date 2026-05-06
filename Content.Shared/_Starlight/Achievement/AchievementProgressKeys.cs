@@ -8,4 +8,5 @@ public static class AchievementProgressKeys
     public const string VampireBloodDrank = "vampire.blooddrank";
 
     public static string SpawnJob(string jobId) => $"spawn.job.{jobId}";
+    public static string AntagGreentext(string antag) => $"antag.{antag}.greentext";
 }

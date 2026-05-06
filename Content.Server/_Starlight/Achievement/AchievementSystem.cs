@@ -1,13 +1,11 @@
 using System.Threading.Tasks;
 using Content.Server._NullLink.Helpers;
 using Content.Server._NullLink.PlayerData;
-using Content.Server.Chat;
 using Content.Server.Nuke;
 using Content.Shared._Starlight.Antags.Vampires;
 using Content.Shared._Starlight.Antags.Vampires.Components;
 using Content.Shared._Starlight.Achievement;
 using Content.Shared.GameTicking;
-using Content.Shared.Interaction.Events;
 using Content.Shared.Inventory;
 using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
@@ -19,6 +17,9 @@ using Robust.Shared.Network;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
+using Content.Server.GameTicking;
+using Content.Shared.Mind;
+using Content.Shared.Objectives.Systems;
 
 namespace Content.Server._Starlight.Achievement;
 
@@ -29,10 +30,14 @@ public sealed class AchievementSystem : EntitySystem
     [Dependency] private readonly IPlayerManager _playerManager = default!;
     [Dependency] private readonly IPrototypeManager _prototypeManager = default!;
     [Dependency] private readonly InventorySystem _inventory = default!;
+    [Dependency] private readonly SharedObjectivesSystem _objectives = default!;
+    [Dependency] private readonly SharedMindSystem _mindSystem = default!;
+    [Dependency] private readonly ILogManager _logManager = default!;
 
-    private static readonly TimeSpan AchievementHydrationRetryDelay = TimeSpan.FromSeconds(3);
+    private static readonly TimeSpan _achievementHydrationRetryDelay = TimeSpan.FromSeconds(3);
     private readonly Dictionary<Guid, Dictionary<string, double>> _roundProgress = [];
     private readonly HashSet<Guid> _achievementFetchInFlight = [];
+    private ISawmill _sawmill = default!;
 
     public override void Initialize()
     {
@@ -41,7 +46,9 @@ public sealed class AchievementSystem : EntitySystem
         SubscribeLocalEvent<VampireComponent, VampireBloodDrankEvent>(OnVampireBloodDrank);
         SubscribeLocalEvent<NukeExplodedEvent>(OnNukeExploded);
         SubscribeLocalEvent<RoundRestartCleanupEvent>(OnRoundRestartCleanup);
+        SubscribeLocalEvent<RoundEndTextAppendEvent>(OnRoundEnd);
         _playerManager.PlayerStatusChanged += OnPlayerStatusChanged;
+        _sawmill = _logManager.GetSawmill("Hub");
 
         foreach (var session in _playerManager.Sessions)
         {
@@ -150,9 +157,7 @@ public sealed class AchievementSystem : EntitySystem
         => GetProgress(session.UserId, progressType);
 
     public double GetProgress(Guid userId, string progressType)
-    {
-        return _nullLinkPlayers.GetCachedAchievementProgress(userId, progressType);
-    }
+        => _nullLinkPlayers.GetCachedAchievementProgress(userId, progressType);
 
     public void ResetProgress(ICommonSession session, string? progressType = null)
         => ResetProgress(session.UserId, progressType);
@@ -284,9 +289,77 @@ public sealed class AchievementSystem : EntitySystem
         }
     }
 
-    private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev)
-    {
+    private void OnRoundRestartCleanup(RoundRestartCleanupEvent ev) =>
         _roundProgress.Clear();
+
+    private void OnRoundEnd(RoundEndTextAppendEvent ev) =>
+        Timer.Spawn(TimeSpan.FromSeconds(5), () => RunGreentextCheck(ev));
+
+    private void RunGreentextCheck(RoundEndTextAppendEvent _)
+    {
+        _sawmill.Info("[Greentext] Starting greentext check...");
+
+        foreach (var session in _playerManager.Sessions)
+        {
+            _sawmill.Info($"[Greentext] Checking session: {session.Name}");
+
+            if (session.AttachedEntity is not { } uid)
+            {
+                _sawmill.Info($"[Greentext] No attached entity for {session.Name}");
+                continue;
+            }
+
+            if (!_mindSystem.TryGetMind(uid, out var mindId, out var mind))
+            {
+                _sawmill.Info($"[Greentext] No mind found for {session.Name}");
+                continue;
+            }
+
+            if (mind.Objectives.Count == 0)
+            {
+                _sawmill.Info($"[Greentext] No objectives for {session.Name}");
+                continue;
+            }
+
+            if (!AreAllObjectivesComplete(mindId, mind))
+            {
+                _sawmill.Info($"[Greentext] Objectives NOT complete for {session.Name}");
+                continue;
+            }
+
+            _sawmill.Info($"[Greentext] All objectives complete for {session.Name}");
+
+            string? antag = null;
+
+            foreach (var roleUid in mind.MindRoleContainer.ContainedEntities)
+            {
+                if (TryComp<MetaDataComponent>(roleUid, out var roleMeta))
+                {
+                    _sawmill.Info($"[Greentext] Role prototype: {roleMeta.EntityPrototype?.ID}");
+                }
+
+                antag = GetAntagType(roleUid);
+
+                if (antag != null)
+                    break;
+            }
+
+            _sawmill.Info($"[Greentext] Resolved antag: {antag}");
+
+            if (antag == null)
+            {
+                _sawmill.Warning($"[Greentext] No antag type resolved for {session.Name}");
+                continue;
+            }
+
+            var progressKey = AchievementProgressKeys.AntagGreentext(antag);
+
+            _sawmill.Info($"[Greentext] Granting progress key: {progressKey}");
+
+            AddProgress(session, progressKey);
+
+            CheckProgressAchievements(session, progressKey);
+        }
     }
     #endregion
 
@@ -362,7 +435,7 @@ public sealed class AchievementSystem : EntitySystem
             return;
         }
 
-        Timer.Spawn(AchievementHydrationRetryDelay, () =>
+        Timer.Spawn(_achievementHydrationRetryDelay, () =>
         {
             if (!_playerManager.TryGetSessionById(new NetUserId(userId), out var retrySession))
                 return;
@@ -372,6 +445,60 @@ public sealed class AchievementSystem : EntitySystem
 
             QueueAchievementHydration(retrySession);
         });
+    }
+
+    private bool AreAllObjectivesComplete(EntityUid mindId, MindComponent mind)
+    {
+        var mindEntity = new Entity<MindComponent>(mindId, mind);
+
+        foreach (var objectiveUid in mind.Objectives)
+        {
+            if (!_objectives.IsCompleted(objectiveUid, mindEntity))
+                return false;
+        }
+
+        return true;
+    }
+
+    private string? GetAntagType(EntityUid roleUid)
+    {
+        if (!TryComp<MetaDataComponent>(roleUid, out var meta))
+            return null;
+
+        var proto = meta.EntityPrototype?.ID;
+        if (proto == null)
+            return null;
+
+        _sawmill.Info($"[Greentext] Raw role proto: {proto}");
+
+        return proto switch
+        {
+            "MindRoleParadoxClone" => "paradoxclone",
+
+            "MindRoleCosmicCultist" => "cosmiccultist",
+            "MindRoleChangeling" => "changeling",
+            "MindRoleDragon" => "dragon",
+            "MindRoleSpaceNinja" => "spaceninja",
+
+            "MindRoleNukeops" => "nukeops",
+            "MindRoleNukeopsMedic" => "nukeopsmedic",
+            "MindRoleNukeopsCommander" => "nukeopscommander",
+
+            "MindRoleHeadRev" => "headrev",
+            "MindRoleRev" => "rev",
+            "MindRoleThief" => "thief",
+            "MindRoleTraitor" => "traitor",
+            "MindRoleTraitorSleeper" => "traitorsleeper",
+
+            "MindRoleMothershipCore" => "mothershipcore",
+            "MindRoleXenoborg" => "xenoborg",
+            "MindRoleBrighteye" => "brighteye",
+            "MindRoleSELFAgent" => "selfagent",
+            "MindRoleTerminator" => "terminator",
+            "MindRoleVampire" => "vampire",
+
+            _ => null
+        };
     }
     #endregion
 }

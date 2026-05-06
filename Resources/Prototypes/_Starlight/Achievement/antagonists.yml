@@ -1,0 +1,265 @@
+# Cosmic Cultist
+- type: achievement
+  id: greentext_cosmiccultist
+  name: achievement-greentext-cosmiccultist-name
+  description: achievement-greentext-cosmiccultist-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.cosmiccultist.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Changeling
+- type: achievement
+  id: greentext_changeling
+  name: achievement-greentext-changeling-name
+  description: achievement-greentext-changeling-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.changeling.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Dragon
+- type: achievement
+  id: greentext_dragon
+  name: achievement-greentext-dragon-name
+  description: achievement-greentext-dragon-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.dragon.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Space Ninja
+- type: achievement
+  id: greentext_spaceninja
+  name: achievement-greentext-spaceninja-name
+  description: achievement-greentext-spaceninja-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.spaceninja.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Nuke Ops
+- type: achievement
+  id: greentext_nukeops
+  name: achievement-greentext-nukeops-name
+  description: achievement-greentext-nukeops-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.nukeops.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Nuke Ops Medic
+- type: achievement
+  id: greentext_nukeops_medic
+  name: achievement-greentext-nukeops-medic-name
+  description: achievement-greentext-nukeops-medic-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.nukeopsmedic.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Nuke Ops Commander
+- type: achievement
+  id: greentext_nukeops_commander
+  name: achievement-greentext-nukeops-commander-name
+  description: achievement-greentext-nukeops-commander-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.nukeopscommander.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Paradox Clone
+- type: achievement
+  id: greentext_paradoxclone
+  name: achievement-greentext-paradoxclone-name
+  description: achievement-greentext-paradoxclone-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.paradoxclone.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Head Revolutionary
+- type: achievement
+  id: greentext_headrev
+  name: achievement-greentext-headrev-name
+  description: achievement-greentext-headrev-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.headrev.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Revolutionary
+- type: achievement
+  id: greentext_rev
+  name: achievement-greentext-rev-name
+  description: achievement-greentext-rev-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.rev.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Thief
+- type: achievement
+  id: greentext_thief
+  name: achievement-greentext-thief-name
+  description: achievement-greentext-thief-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.thief.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Traitor
+- type: achievement
+  id: greentext_traitor
+  name: achievement-greentext-traitor-name
+  description: achievement-greentext-traitor-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.traitor.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Sleeper Traitor
+- type: achievement
+  id: greentext_traitor_sleeper
+  name: achievement-greentext-traitor-sleeper-name
+  description: achievement-greentext-traitor-sleeper-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.traitorsleeper.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Mothership Core
+- type: achievement
+  id: greentext_mothershipcore
+  name: achievement-greentext-mothershipcore-name
+  description: achievement-greentext-mothershipcore-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.mothershipcore.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Xenoborg
+- type: achievement
+  id: greentext_xenoborg
+  name: achievement-greentext-xenoborg-name
+  description: achievement-greentext-xenoborg-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.xenoborg.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Brighteye
+- type: achievement
+  id: greentext_brighteye
+  name: achievement-greentext-brighteye-name
+  description: achievement-greentext-brighteye-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.brighteye.greentext
+    requiredProgress: 1
+    perRound: true
+
+# SELF Agent
+- type: achievement
+  id: greentext_selfagent
+  name: achievement-greentext-selfagent-name
+  description: achievement-greentext-selfagent-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.selfagent.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Terminator
+- type: achievement
+  id: greentext_terminator
+  name: achievement-greentext-terminator-name
+  description: achievement-greentext-terminator-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.terminator.greentext
+    requiredProgress: 1
+    perRound: true
+
+# Vampire
+- type: achievement
+  id: greentext_vampire
+  name: achievement-greentext-vampire-name
+  description: achievement-greentext-vampire-description
+  category: antagonist
+  icon:
+    sprite: _Starlight/Interface/Achievements/icons.rsi
+    state: fishMedal # TODO: Sprite
+  requirements:
+  - progressType: antag.vampire.greentext
+    requiredProgress: 1
+    perRound: true
