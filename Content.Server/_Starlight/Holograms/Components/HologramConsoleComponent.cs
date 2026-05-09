@@ -74,7 +74,7 @@ public sealed partial class HologramConsoleComponent : Component
     /// Dictionary mapping blade server UIDs to their spawned hologram UIDs (portable mode only)
     /// </summary>
     [DataField("activeHolograms")]
-    public Dictionary<EntityUid, EntityUid> ActiveHolograms = new();
+    public Dictionary<EntityUid, EntityUid> ActiveHolograms = [];
 
     /// <summary>
     /// EntityUid of the hologram that was called from blade server in exclusive mode

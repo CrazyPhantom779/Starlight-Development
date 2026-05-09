@@ -29,11 +29,11 @@ public abstract partial class SharedHologramSystem : EntitySystem
         if (TryComp<Stealth.Components.StealthComponent>(uid, out var stealth))
             _stl.SetVisibility(uid, 0.8f, stealth);
     }
-    
+
     [Dependency] private readonly Stealth.SharedStealthSystem _stl = default!;
     public const string TagHardLight = "Hardlight";
     public const string TagHoloMapped = "HoloMapped"; // TODO: HOLO
-    
+
     private const string PopupHoloInteractionFail = "holo-interaction-fail";
     private const string PopupInteractionWithHoloFail = "interaction-with-holo-fail";
 
@@ -53,7 +53,7 @@ public abstract partial class SharedHologramSystem : EntitySystem
         // Allow all interactions - hologram can interact with everything now
         return;
 
-        // Disabled for the time being till I figure out how I want interactiosn to go
+        // Disabled for the time being till I figure out how I want interactions to go
         /*
         if (!args.Target.HasValue || HoloInteractionAllowed(args.Uid, args.Target))
             return;

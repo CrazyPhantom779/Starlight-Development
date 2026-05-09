@@ -15,21 +15,21 @@ public sealed partial class HologramProjectedComponent : Component
     /// <summary>
     ///     A whitelist to check for on projectors, to determine if they're valid.
     /// </summary>
-    [DataField("validProjectorWhitelist"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField]
     [AutoNetworkedField]
     public EntityWhitelist ValidProjectorWhitelist = new();
 
     /// <summary>
     ///     A timer for a grace period before the Holo is returned, to allow for moving through doors.
     /// </summary>
-    [DataField("gracePeriod"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
     [AutoNetworkedField]
     public TimeSpan GracePeriod = TimeSpan.FromSeconds(0.1f);
 
     /// <summary>
     ///     The prototype of the effect to spawn for the Hologram's projection. Leave null to disable the visual projection effect.
     /// </summary>
-    [DataField("effectPrototype", customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     [AutoNetworkedField]
     public string? EffectPrototype;
 
@@ -40,7 +40,7 @@ public sealed partial class HologramProjectedComponent : Component
     ///     This provides a super cool effect of the Hologram only getting the visual information they technically should, but it's also a bit of a pain from a player perspective.
     ///     Primarily used for the station AI.
     /// </remarks>
-    [DataField("setEyeTarget"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField]
     [AutoNetworkedField]
     public bool SetEyeTarget = false;
 

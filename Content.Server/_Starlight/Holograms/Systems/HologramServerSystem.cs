@@ -1,7 +1,7 @@
 using Content.Shared._Starlight.Holograms;
 using Content.Shared.Power;
 
-namespace Content.Server._Starlight.Holograms;
+namespace Content.Server._Starlight.Holograms.Systems;
 
 public sealed partial class HologramServerSystem : EntitySystem
 {

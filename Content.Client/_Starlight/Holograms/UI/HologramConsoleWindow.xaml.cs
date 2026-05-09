@@ -389,12 +389,10 @@ public sealed class BladeServerListEntry : PanelContainer
     }
 
     public void SetSelected(bool selected)
-    {
-        _panel.PanelOverride = new StyleBoxFlat
+    => _panel.PanelOverride = new StyleBoxFlat
         {
-            BackgroundColor = selected ? Color.FromHex("#1e3a8a") : Color.FromHex("#1f2937"),
-            BorderColor = selected ? Color.FromHex("#3b82f6") : Color.FromHex("#374151"),
-            BorderThickness = new Thickness(2)
-        };
-    }
+        BackgroundColor = selected ? Color.FromHex("#1e3a8a") : Color.FromHex("#1f2937"),
+        BorderColor = selected ? Color.FromHex("#3b82f6") : Color.FromHex("#374151"),
+        BorderThickness = new Thickness(2)
+    };
 }

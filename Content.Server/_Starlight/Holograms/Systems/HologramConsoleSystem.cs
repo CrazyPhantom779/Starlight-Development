@@ -9,9 +9,7 @@ using Content.Shared._Starlight.Holograms.Components;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Item;
 using Content.Shared.Mind;
-using Content.Shared.Mind.Components;
 using Content.Shared.Power;
-using Content.Shared.Power.EntitySystems;
 using Content.Shared.PowerCell;
 using Content.Shared.PowerCell.Components;
 using Robust.Server.GameObjects;
@@ -99,9 +97,7 @@ public sealed class HologramConsoleSystem : EntitySystem
     }
 
     private void OnUIClosed(EntityUid uid, HologramConsoleComponent component, BoundUIClosedEvent args)
-    {
-        UpdateBriefcaseAppearance(uid, component);
-    }
+        => UpdateBriefcaseAppearance(uid, component);
 
     private void OnBladeInserted(EntityUid uid, HologramConsoleComponent component, EntInsertedIntoContainerMessage args)
     {
@@ -322,7 +318,6 @@ public sealed class HologramConsoleSystem : EntitySystem
             batteryPercent = maxCharge > 0 ? charge / maxCharge * 100f : 0f;
         }
 
-
         // Check if linked to hologram server machine (for stationary mode)
         var hasServer = IsPortable(console) || component.LinkedServer != null;
 
@@ -347,20 +342,11 @@ public sealed class HologramConsoleSystem : EntitySystem
     }
 
     private bool IsBladeServerPowered(EntityUid bladeServerUid)
-    {
-        if (TryComp<ApcPowerReceiverComponent>(bladeServerUid, out var powerReceiver) && powerReceiver.Powered)
-            return true;
-
-        if (TryComp<TransformComponent>(bladeServerUid, out var xform) &&
-            xform.ParentUid != EntityUid.Invalid &&
-            TryComp<ApcPowerReceiverComponent>(xform.ParentUid, out var rackPower) &&
-            rackPower.Powered)
-        {
-            return true;
-        }
-
-        return false;
-    }
+    => (TryComp<ApcPowerReceiverComponent>(bladeServerUid, out var powerReceiver) && powerReceiver.Powered)
+        || (TryComp<TransformComponent>(bladeServerUid, out var xform)
+            && xform.ParentUid != EntityUid.Invalid
+            && TryComp<ApcPowerReceiverComponent>(xform.ParentUid, out var rackPower)
+            && rackPower.Powered);
 
     private string GetProjectorLocation(EntityUid projector, TransformComponent xform)
     {
@@ -491,8 +477,8 @@ public sealed class HologramConsoleSystem : EntitySystem
             if (holo != null)
             {
                 // Force the actual mind into the projected hologram body.
-                if (brainChipComp.HoloMind != null &&
-                    brainChipComp.HoloMind != null)
+                if (brainChipComp.HoloMind is not null and
+                    not null)
                 {
                     _mind.TransferTo(brainChipComp.HoloMind.Value, holo.Value);
                 }

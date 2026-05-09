@@ -1,0 +1,19 @@
+- type: job
+  id: Hologram
+  name: job-name-hologram
+  description: job-description-hologram
+  playTimeTracker: JobHologram
+  requirements:
+  - !type:OverallPlaytimeRequirement
+    time: 10h
+  weight: 10
+  canBeAntag: false
+  icon: JobIconHologram
+  supervisors: job-supervisors-rd
+  jobEntity: HologramJobBrainChip
+  jobPreviewEntity: MobHologramHardlight
+  applyTraits: false
+  special:
+  - !type:AddComponentSpecial
+    components:
+    - type: SkipLoadingCharacterRecords

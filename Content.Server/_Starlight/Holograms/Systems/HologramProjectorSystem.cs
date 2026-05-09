@@ -1,10 +1,9 @@
 using Content.Server.Power.Components;
 using Content.Shared._Starlight.Holograms;
-using Content.Shared._Starlight.Holograms.Components;
 using Content.Shared.Power;
 using Content.Shared.SurveillanceCamera.Components;
 
-namespace Content.Server._Starlight.Holograms;
+namespace Content.Server._Starlight.Holograms.Systems;
 
 public sealed class HologramProjectorSystem : EntitySystem
 {

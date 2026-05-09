@@ -27,7 +27,7 @@ using Content.Server.Station.Systems;
 using Content.Server.Station.Components;
 using Content.Shared.Mind;
 
-namespace Content.Server._Starlight.Holograms;
+namespace Content.Server._Starlight.Holograms.Systems;
 
 public sealed class HologramSystem : SharedHologramSystem
 {
@@ -158,7 +158,7 @@ public sealed class HologramSystem : SharedHologramSystem
                             return;
                         }
                     }
-                    
+
                     // Only add HologramComponent to items (not UnremoveableComponent - that's handled by unremovable: true)
                     if (!HasComp<HologramComponent>(item))
                         AddComp<HologramComponent>(item);

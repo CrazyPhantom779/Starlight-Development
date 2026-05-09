@@ -1,0 +1,127 @@
+- type: entity
+  id: HologramJobBrainChip
+  parent: PositronicBrain
+  name: hologram neural image
+  description: A stored neural pattern used to project a hardlight hologram.
+  categories: [ HideSpawnMenu, DoNotMap ]
+  components:
+  - type: Sprite
+    visible: false
+  - type: HologramBrainChip
+  - type: Tag
+    tags:
+    - HologramBrainChip
+    - HideContextMenu
+
+- type: entity
+  id: HologramJobBodyChip
+  parent: BaseItem
+  name: hologram body profile
+  description: Stored body projection data for a hologram.
+  categories: [ HideSpawnMenu, DoNotMap ]
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/module.rsi
+    state: generic
+  - type: HologramBodyChip
+    hologramPrototype: MobHologramHardlight
+    hologramName: hologram
+
+- type: entity
+  id: HologramJobBladeServer
+  parent: HologramBladeServer
+  name: hologram blade server
+  suffix: Hologram job spawn
+  components:
+  - type: HologramJobSpawn
+    spawnOnJoin: true
+  - type: ContainerSpawnPoint
+    containerId: hologram_brain_chip
+    job: Hologram
+    spawnType: Job
+  # The job only spawns the brain/mind chip.
+  # The body chip is preloaded so the console sees this as a complete hologram server.
+  - type: ContainerFill
+    containers:
+      hologram_body_chip:
+      - HologramJobBodyChip
+
+- type: entity
+  id: HologramJobServerRack
+  parent: BaseMachinePowered
+  name: hologram server rack
+  description: A rack of blade servers that stores and projects hologram crew.
+  suffix: 4 job slots
+  placement:
+    mode: SnapgridCenter
+  components:
+  - type: Sprite
+    sprite: _Starlight/Structures/Machines/servers.rsi
+    layers:
+    - state: holo-off
+    - state: holo-on
+      visible: false
+      map: [ "enum.PowerDeviceVisualLayers.Powered" ]
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.PowerDeviceVisuals.Powered:
+        enum.PowerDeviceVisualLayers.Powered:
+          True: { visible: true }
+          False: { visible: false }
+  - type: ApcPowerReceiver
+    powerLoad: 400
+    priority: Low
+  - type: ExtensionCableReceiver
+  - type: ItemSlots
+    slots:
+      blade_server_1:
+        name: hologram server slot 1
+        startingItem: HologramJobBladeServer
+        whitelist:
+          components:
+          - HologramBladeServer
+      blade_server_2:
+        name: hologram server slot 2
+        startingItem: HologramJobBladeServer
+        whitelist:
+          components:
+          - HologramBladeServer
+      blade_server_3:
+        name: hologram server slot 3
+        startingItem: HologramJobBladeServer
+        whitelist:
+          components:
+          - HologramBladeServer
+      blade_server_4:
+        name: hologram server slot 4
+        startingItem: HologramJobBladeServer
+        whitelist:
+          components:
+          - HologramBladeServer
+  - type: ContainerContainer
+    containers:
+      blade_server_1: !type:ContainerSlot
+      blade_server_2: !type:ContainerSlot
+      blade_server_3: !type:ContainerSlot
+      blade_server_4: !type:ContainerSlot
+  - type: Destructible
+    thresholds:
+    - trigger: !type:DamageTrigger
+        damage: 300
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  id: HologramJobServerRackSpawner
+  parent: MarkerBase
+  name: hologram job server rack spawner
+  components:
+  - type: Sprite
+    layers:
+    - state: blue
+  - type: EntityTableSpawner
+    table: !type:GroupSelector
+      children:
+      - id: HologramJobServerRack

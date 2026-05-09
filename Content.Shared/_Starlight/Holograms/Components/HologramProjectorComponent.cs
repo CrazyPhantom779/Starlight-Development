@@ -21,12 +21,12 @@ public sealed partial class HologramProjectorComponent : Component
     /// <summary>
     ///     The tile offset of the projector effect for this projector for each direction.
     /// </summary>
-    [DataField("effectOffsets")]
+    [DataField]
     public Dictionary<Direction, Vector2> EffectOffsets { get; set; } = new() { { Direction.North, Vector2.Zero }, { Direction.East, Vector2.Zero }, { Direction.South, Vector2.Zero }, { Direction.West, Vector2.Zero } };
 
     /// <summary>
     ///     Whether this projector is currently active and working.
     /// </summary>
-    [DataField("isActive")]
+    [DataField]
     public bool IsActive = true;
 }
