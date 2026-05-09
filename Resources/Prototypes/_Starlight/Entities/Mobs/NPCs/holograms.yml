@@ -61,7 +61,7 @@
   description: "A holographic projection of a corgi, computed by the SAI and materialized into hardlight via a nearby projector"
   parent: BaseHologramAnimal
   id: MobCorgiHolo
-  suffix: AI
+  categories: [ HideSpawnMenu ]
   components:
   - type: LagCompensation
   - type: HTN

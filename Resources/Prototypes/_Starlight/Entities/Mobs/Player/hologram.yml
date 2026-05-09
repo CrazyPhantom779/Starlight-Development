@@ -178,11 +178,12 @@
     screamId: Scream
     screamAction: ActionScream
 
-# Hardlight hologram 
+# Hardlight hologram
 - type: entity
   name: Urist McLight
   parent: BaseHologramHumanoid
   id: MobHologramHardlight
+  categories: [ HideSpawnMenu ]
   components:
   - type: Hologram
   - type: Damageable
@@ -233,3 +234,9 @@
     softness: 0.4
     color: "#00FFFF"
     energy: 5
+  - type: Tag
+    tags:
+      - DoorBumpOpener
+      - CanPilot
+      - FootstepSound
+      - SiliconEmotes

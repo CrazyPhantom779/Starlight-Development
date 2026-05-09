@@ -47,8 +47,6 @@
       maxActiveHolograms: 2
       allowHologramCarry: false
       powerDrawPerHologram: 50
-      searchRange: 0 # Don't search for servers in portable mode
-      bladeServerScanRange: 15 # Scan for blade servers
       showMap: false
     - type: HologramProjector
       projectorRange: 5.0
@@ -64,8 +62,8 @@
         blade_server_slot:
           name: Blade Server
           whitelist:
-            components:
-              - BladeServer
+            tags:
+              - HologramDisk
           insertOnInteract: true
           ejectOnInteract: false
           ejectOnBreak: true

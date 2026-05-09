@@ -44,14 +44,14 @@ public sealed partial class HologramConsoleWindow : BaseWindow
 
         ProjectButton.OnPressed += _ =>
         {
-            if (!_selectedBladeServer.HasValue)
+            if (_selectedBladeServer is not { } selectedBladeServer)
                 return;
 
             var projector = _isPortableMode
                 ? NetEntity.Invalid
                 : (_selectedProjector ?? NetEntity.Invalid);
 
-            OnProjectHologram?.Invoke(_selectedBladeServer.Value, projector);
+            OnProjectHologram?.Invoke(selectedBladeServer, projector);
         };
 
         RecallButton.OnPressed += _ =>
@@ -68,10 +68,10 @@ public sealed partial class HologramConsoleWindow : BaseWindow
 
     private void OnProjectorSelectedFromMap(NetEntity? netEntity)
     {
-        if (!netEntity.HasValue)
+        if (netEntity is not { } selectedProjector)
             return;
 
-        _selectedProjector = netEntity.Value;
+        _selectedProjector = selectedProjector;
         UpdateSelectionStateAfterChange();
     }
 
@@ -81,7 +81,7 @@ public sealed partial class HologramConsoleWindow : BaseWindow
         {
             NavMap.Visible = false;
             NoServerOverlay.Visible = true;
-            NoServerMapLabel.Text = "NO PROJECTORS FOUND";
+            NoServerMapLabel.Text = "NO SAME-GRID PROJECTORS";
             return;
         }
 
@@ -173,15 +173,15 @@ public sealed partial class HologramConsoleWindow : BaseWindow
 
         ProjectorCountLabel.Text =
             state.Projectors.Count > 0
-                ? $" {state.Projectors.Count} Projectors "
-                : " No Projectors ";
+                ? $" {state.Projectors.Count} Same-Grid Projectors "
+                : " No Same-Grid Projectors ";
 
         UpdateSelectionState(state);
     }
 
     private void ValidateSelections(HologramConsoleBoundUserInterfaceState state)
     {
-        if (_selectedBladeServer != null && state.BladeServers.All(x => x.Uid != _selectedBladeServer.Value))
+        if (_selectedBladeServer is { } selectedBladeServer && state.BladeServers.All(x => x.Uid != selectedBladeServer))
             _selectedBladeServer = null;
 
         if (_selectedBladeServer == null && state.BladeServers.Count > 0)
@@ -190,7 +190,7 @@ public sealed partial class HologramConsoleWindow : BaseWindow
             _selectedBladeServer = (inactive ?? state.BladeServers.First()).Uid;
         }
 
-        if (_selectedProjector != null && state.Projectors.All(x => x.Uid != _selectedProjector.Value))
+        if (_selectedProjector is { } selectedProjector && state.Projectors.All(x => x.Uid != selectedProjector))
             _selectedProjector = null;
 
         if (!state.IsPortable && _selectedProjector == null && state.Projectors.Count > 0)
@@ -199,10 +199,10 @@ public sealed partial class HologramConsoleWindow : BaseWindow
 
     private BladeServerInfo? GetSelectedBladeInfo()
     {
-        if (_currentState == null || _selectedBladeServer == null)
+        if (_currentState == null || _selectedBladeServer is not { } selectedBladeServer)
             return null;
 
-        return _currentState.BladeServers.FirstOrDefault(x => x.Uid == _selectedBladeServer.Value);
+        return _currentState.BladeServers.FirstOrDefault(x => x.Uid == selectedBladeServer);
     }
 
     private void HandleNoServerState()
@@ -213,7 +213,7 @@ public sealed partial class HologramConsoleWindow : BaseWindow
 
         BladeServersList.RemoveAllChildren();
 
-        StatusLabel.Text = "No server connected";
+        StatusLabel.Text = "No same-grid hologram hardware";
         StatusLabel.FontColorOverride = Color.FromHex("#ef4444");
 
         ActiveIndicator.Text = "● OFFLINE";
@@ -222,15 +222,13 @@ public sealed partial class HologramConsoleWindow : BaseWindow
         ProjectButton.Disabled = true;
         RecallButton.Disabled = true;
 
-        ProjectorCountLabel.Text = " No Projectors ";
+        ProjectorCountLabel.Text = " No Same-Grid Projectors ";
     }
 
     private void UpdateBattery(HologramConsoleBoundUserInterfaceState state)
     {
-        if (!state.BatteryPercent.HasValue)
+        if (state.BatteryPercent is not { } percent)
             return;
-
-        var percent = state.BatteryPercent.Value;
 
         BatteryBar.Value = Math.Clamp(percent / 100f, 0f, 1f);
         BatteryLabel.Text = $"{percent:F0}%";

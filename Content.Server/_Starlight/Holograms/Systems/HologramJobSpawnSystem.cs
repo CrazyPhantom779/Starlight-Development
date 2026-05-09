@@ -1,5 +1,6 @@
 using Content.Server._Starlight.Holograms.Components;
 using Content.Server.Spawners.EntitySystems;
+using Content.Shared._Starlight.Holograms;
 using Content.Shared._Starlight.Holograms.Components;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Mind;
@@ -8,6 +9,10 @@ using Content.Shared.Power;
 
 namespace Content.Server._Starlight.Holograms.Systems;
 
+/// <summary>
+/// Converts AI-style container job spawns into usable hologram blade-server state.
+/// The player job entity is the brain chip; this system records its mind and optionally projects it.
+/// </summary>
 public sealed class HologramJobSpawnSystem : EntitySystem
 {
     [Dependency] private readonly HologramSystem _hologram = default!;
@@ -18,8 +23,7 @@ public sealed class HologramJobSpawnSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<HologramJobSpawnComponent, ContainerSpawnEvent>(OnContainerSpawn);
-        SubscribeLocalEvent<HologramJobSpawnComponent, PowerChangedEvent>(OnPowerChanged);
-        SubscribeLocalEvent<HologramJobSpawnComponent, ComponentShutdown>(OnShutdown);
+        SubscribeLocalEvent<HologramBladeServerComponent, PowerChangedEvent>(OnBladePowerChanged);
     }
 
     private void OnContainerSpawn(EntityUid uid, HologramJobSpawnComponent component, ref ContainerSpawnEvent args)
@@ -30,73 +34,113 @@ public sealed class HologramJobSpawnSystem : EntitySystem
         if (!TryComp<HologramBrainChipComponent>(args.Player, out var brainChip))
             return;
 
-        if (!TryComp<MindContainerComponent>(args.Player, out var mindContainer) ||
-            mindContainer.Mind is not { } mindId)
+        if (!TryComp<MindContainerComponent>(args.Player, out var mindContainer) || mindContainer.Mind is not { } mindId)
             return;
 
         brainChip.HoloMind = mindId;
-
-        TryNameBodyChip(uid, bladeServer, mindId);
+        EnsureBodyChip(uid, bladeServer, mindId);
 
         if (!component.SpawnOnJoin)
             return;
 
-        if (component.LinkedHologram != null && Exists(component.LinkedHologram.Value))
+        if (bladeServer.ActiveHologram is { } active && Exists(active))
             return;
 
-        if (!_hologram.TryGenerateHumanoidHologram(mindId, Transform(uid).Coordinates, out var holo))
+        var projector = FindSameGridProjector(uid);
+        var coords = projector is { } projectorUid
+            ? Transform(projectorUid).Coordinates
+            : Transform(uid).Coordinates;
+
+        if (!_hologram.TryGenerateHumanoidHologram(mindId, coords, out var hologram) || hologram is not { } hologramUid)
             return;
 
-        component.LinkedHologram = holo.Value;
+        bladeServer.ActiveHologram = hologramUid;
 
-        // Treat the blade server as this hologram's home projector.
-        if (TryComp<HologramProjectedComponent>(holo.Value, out var projected))
-        {
-            var netServer = GetNetEntity(uid);
-            projected.CurProjector = netServer;
-            projected.ProjectorOverride = netServer;
-            Dirty(holo.Value, projected);
-        }
+        if (projector is { } linkedProjector)
+            SetProjection(hologramUid, linkedProjector);
     }
 
-    private void TryNameBodyChip(EntityUid uid, HologramBladeServerComponent bladeServer, EntityUid mindId)
+    private void EnsureBodyChip(EntityUid bladeServerUid, HologramBladeServerComponent bladeServer, EntityUid mindId)
     {
-        if (!TryComp<ItemSlotsComponent>(uid, out var slots))
+        if (!TryComp<ItemSlotsComponent>(bladeServerUid, out var slots))
             return;
 
-        if (!_itemSlots.TryGetSlot(uid, bladeServer.BodyChipSlot, out var bodySlot, slots) ||
-            bodySlot.Item == null)
+        if (!_itemSlots.TryGetSlot(bladeServerUid, bladeServer.BodyChipSlot, out var bodySlot, slots))
             return;
 
-        if (!TryComp<HologramBodyChipComponent>(bodySlot.Item.Value, out var bodyChip))
+        if (bodySlot.Item is { } existing)
+        {
+            NameBodyChip(existing, mindId);
+            return;
+        }
+
+        var chip = Spawn("HologramJobBodyChip", Transform(bladeServerUid).Coordinates);
+        if (!_itemSlots.TryInsert(bladeServerUid, bodySlot, chip, user: null))
+        {
+            Del(chip);
+            return;
+        }
+
+        NameBodyChip(chip, mindId);
+    }
+
+    private void NameBodyChip(EntityUid bodyChip, EntityUid mindId)
+    {
+        if (!TryComp<HologramBodyChipComponent>(bodyChip, out var bodyComp))
             return;
 
-        if (!string.IsNullOrWhiteSpace(bodyChip.HologramName))
+        if (!string.IsNullOrWhiteSpace(bodyComp.HologramName))
             return;
 
         if (TryComp<MindComponent>(mindId, out var mind))
-            bodyChip.HologramName = mind.CharacterName;
+            bodyComp.HologramName = mind.CharacterName;
     }
 
-    private void OnPowerChanged(EntityUid uid, HologramJobSpawnComponent component, ref PowerChangedEvent args)
+    private EntityUid? FindSameGridProjector(EntityUid bladeServer)
+    {
+        var grid = Transform(bladeServer).GridUid;
+        if (grid == null)
+            return null;
+
+        var query = EntityQueryEnumerator<HologramProjectorComponent>();
+        while (query.MoveNext(out var projector, out var projectorComp))
+        {
+            if (!projectorComp.IsActive)
+                continue;
+
+            if (Transform(projector).GridUid == grid)
+                return projector;
+        }
+
+        return null;
+    }
+
+    private void SetProjection(EntityUid hologram, EntityUid projector)
+    {
+        if (!TryComp<HologramProjectedComponent>(hologram, out var projected))
+            return;
+
+        var netProjector = GetNetEntity(projector);
+        projected.CurProjector = netProjector;
+        projected.ProjectorOverride = null;
+        projected.CurrentlyInProjector = true;
+        projected.VanishTime = TimeSpan.Zero;
+        Dirty(hologram, projected);
+    }
+
+    private void OnBladePowerChanged(EntityUid uid, HologramBladeServerComponent component, ref PowerChangedEvent args)
     {
         if (args.Powered)
             return;
 
-        KillLinkedHologram(component);
+        KillActive(component);
     }
 
-    private void OnShutdown(EntityUid uid, HologramJobSpawnComponent component, ComponentShutdown args)
-        => KillLinkedHologram(component);
-
-    private void KillLinkedHologram(HologramJobSpawnComponent component)
+    private void KillActive(HologramBladeServerComponent component)
     {
-        if (component.LinkedHologram == null)
-            return;
+        if (component.ActiveHologram is { } hologram && Exists(hologram))
+            _hologram.DoKillHologram(hologram);
 
-        if (Exists(component.LinkedHologram.Value))
-            _hologram.DoKillHologram(component.LinkedHologram.Value);
-
-        component.LinkedHologram = null;
+        component.ActiveHologram = null;
     }
 }

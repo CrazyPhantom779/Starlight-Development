@@ -36,8 +36,8 @@ public sealed partial class HologramServerSystem : EntitySystem
 
         component.ActiveHolograms.Clear();
 
-        if (component.LinkedHologram != null && Exists(component.LinkedHologram.Value))
-            _hologram.DoKillHologram(component.LinkedHologram.Value);
+        if (component.LinkedHologram is { } linkedHologram && Exists(linkedHologram))
+            _hologram.DoKillHologram(linkedHologram);
 
         component.LinkedHologram = null;
     }

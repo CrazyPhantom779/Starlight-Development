@@ -1,5 +1,6 @@
 using System.Linq;
 using Content.Shared._Starlight.Holograms;
+using Content.Shared.Tag;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Shared.Prototypes;
@@ -10,8 +11,10 @@ public sealed class HologramVisualizerSystem : EntitySystem
 {
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
+    [Dependency] private readonly TagSystem _tag = default!;
 
     private const string ShaderName = "StarlightHologram";
+    private const string HideContextMenuTag = "HideContextMenu";
     private const float HologramHue = 0.64f;
 
     public override void Initialize()
@@ -24,6 +27,8 @@ public sealed class HologramVisualizerSystem : EntitySystem
 
     private void OnHologramInit(Entity<HologramComponent> ent, ref ComponentInit args)
     {
+        _tag.AddTag(ent.Owner, HideContextMenuTag);
+
         if (!TryComp<SpriteComponent>(ent.Owner, out var sprite))
             return;
 

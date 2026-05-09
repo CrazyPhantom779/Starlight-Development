@@ -1,5 +1,6 @@
 - type: entity
   id: EffectHologramProjectionBeam
+  categories: [ HideSpawnMenu ]
   components:
   - type: Sprite
     drawdepth: Effects
@@ -9,8 +10,5 @@
         sprite: _Starlight/Effects/hologram_projection_beam.rsi
         state: beam
     color: "#c0f9ff"
-  - type: Tag
-    tags:
-      - HideContextMenu
   - type: Stealth
     lastVisibility: 0.2

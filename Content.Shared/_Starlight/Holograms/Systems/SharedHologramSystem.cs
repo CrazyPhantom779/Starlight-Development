@@ -47,45 +47,14 @@ public abstract partial class SharedHologramSystem : EntitySystem
         SubscribeLocalEvent<HologramComponent, ComponentStartup>(HologramComponentStartup);
     }
 
-    // Stops the Hologram from interacting with anything they shouldn't.
     private void OnHoloInteractionAttempt(EntityUid uid, HologramComponent component, InteractionAttemptEvent args)
     {
-        // Allow all interactions - hologram can interact with everything now
-        return;
-
-        // Disabled for the time being till I figure out how I want interactions to go
-        /*
-        if (!args.Target.HasValue || HoloInteractionAllowed(args.Uid, args.Target))
-            return;
-
-        args.Cancelled = true;
-
-        // Send a popup to the player about the interaction, and play a sound.
-        var popup = Loc.GetString(PopupHoloInteractionFail, ("target-name", MetaData(args.Target.Value).EntityName));
-        _popup.PopupEntity(popup, args.Target.Value, args.Uid);
-        _audio.PlayPvs(component.OnSound, args.Target.Value);
-        */
+        // Hardlight holograms are currently allowed to interact normally.
     }
 
-    // Stops everyone else from interacting with the Holograms.
     private void OnInteractionWithHoloAttempt(EntityUid uid, HologramComponent component, GettingInteractedWithAttemptEvent args)
     {
-        // Allow all interactions with holograms
-        return;
-
-        // Ditto ^
-        /*
-        // Allow the interaction if either of them are hardlight, or if the interactor is a Hologram.
-        if (HoloInteractionAllowed(uid, args.Uid))
-            return;
-
-        args.Cancelled = true;
-
-        // Send a popup to the player about the interaction, and play a sound.
-        var popup = Loc.GetString(PopupInteractionWithHoloFail, ("target-name", MetaData(uid).EntityName));
-        _popup.PopupEntity(popup, uid, args.Uid);
-        _audio.PlayPvs(component.OnSound, uid);
-        */
+        // Other entities are currently allowed to interact with holograms normally.
     }
 
     private void OnHoloCollide(EntityUid uid, HologramComponent component, ref PreventCollideEvent args)
@@ -104,16 +73,16 @@ public abstract partial class SharedHologramSystem : EntitySystem
     /// <returns>True if both entities are holograms, or if either is hardlight. A null entity will return true.</returns>
     public bool HoloInteractionAllowed(EntityUid hologram, EntityUid? potential, HologramComponent? holoComp = null)
     {
-        if (potential == null)
+        if (potential is not { } potentialUid)
             return true;
 
         if (!Resolve(hologram, ref holoComp))
             return false;
 
-        return _tag.HasTag(hologram, TagHardLight) || // Is the hologram hardlight?
-            _tag.HasTag(potential.Value, TagHardLight) || // Is the collider hardlight?
-            HasComp<HologramComponent>(potential) || // Is the collider a hologram?
-            _whitelist.IsValid(holoComp.CollideWhitelist, potential.Value); // Is the collider whitelisted in the hologram's collision whitelist?
+        return _tag.HasTag(hologram, TagHardLight) ||
+            _tag.HasTag(potentialUid, TagHardLight) ||
+            HasComp<HologramComponent>(potentialUid) ||
+            _whitelist.IsValid(holoComp.CollideWhitelist, potentialUid);
     }
 
     /// <summary>

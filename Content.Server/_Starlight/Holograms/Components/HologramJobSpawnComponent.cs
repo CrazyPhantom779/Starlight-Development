@@ -1,16 +1,14 @@
 namespace Content.Server._Starlight.Holograms.Components;
 
 /// <summary>
-/// Marks a hologram blade server as a round-start job spawn target.
-/// When a Hologram job player is inserted into this server, their mind is stored
-/// on the brain chip and optionally projected immediately.
+/// Marks a hologram blade server as a valid round-start job container spawn.
 /// </summary>
 [RegisterComponent]
 public sealed partial class HologramJobSpawnComponent : Component
 {
+    /// <summary>
+    /// If true, the server immediately projects the spawned job mind into a hologram.
+    /// </summary>
     [DataField]
     public bool SpawnOnJoin = true;
-
-    [ViewVariables]
-    public EntityUid? LinkedHologram;
 }

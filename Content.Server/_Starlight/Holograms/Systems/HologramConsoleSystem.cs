@@ -1,21 +1,20 @@
 using System.Diagnostics.CodeAnalysis;
 using System.Linq;
 using Content.Server._Starlight.Holograms.Components;
-using Content.Server.Mind;
 using Content.Server.Power.Components;
 using Content.Server.Power.EntitySystems;
-using Content.Server.Station.Systems;
+using Content.Shared._Moffstation.BladeServer;
 using Content.Shared._Starlight.Holograms;
 using Content.Shared._Starlight.Holograms.Components;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Item;
 using Content.Shared.Mind;
-using Content.Shared.Power;
 using Content.Shared.PowerCell;
 using Content.Shared.PowerCell.Components;
 using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
+using Content.Shared.Mind.Components;
 
 namespace Content.Server._Starlight.Holograms.Systems;
 
@@ -24,15 +23,12 @@ public sealed class HologramConsoleSystem : EntitySystem
     private const string PortableBladeSlot = "blade_server_slot";
 
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
-    [Dependency] private readonly StationSystem _station = default!;
     [Dependency] private readonly HologramSystem _hologram = default!;
-    [Dependency] private readonly EntityLookupSystem _lookup = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly PowerCellSystem _powerCell = default!;
     [Dependency] private readonly BatterySystem _battery = default!;
     [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly MindSystem _mind = default!;
 
     public override void Initialize()
     {
@@ -44,10 +40,9 @@ public sealed class HologramConsoleSystem : EntitySystem
         SubscribeLocalEvent<HologramConsoleComponent, HologramConsoleRecallMessage>(OnRecallHologram);
         SubscribeLocalEvent<HologramConsoleComponent, HologramConsoleToggleCarryMessage>(OnToggleCarry);
         SubscribeLocalEvent<HologramConsoleComponent, PowerCellSlotEmptyEvent>(OnBatteryEmpty);
-        SubscribeLocalEvent<HologramConsoleComponent, PowerChangedEvent>(OnConsolePowerChanged);
         SubscribeLocalEvent<HologramConsoleComponent, EntInsertedIntoContainerMessage>(OnBladeInserted);
         SubscribeLocalEvent<HologramConsoleComponent, EntRemovedFromContainerMessage>(OnBladeRemoved);
-        SubscribeLocalEvent<HologramServerComponent, ComponentRemove>(OnServerRemoved);
+        SubscribeLocalEvent<HologramBladeServerComponent, ComponentShutdown>(OnBladeShutdown);
     }
 
     public bool IsPortable(EntityUid uid) => HasComp<ItemComponent>(uid);
@@ -58,35 +53,16 @@ public sealed class HologramConsoleSystem : EntitySystem
         if (!IsPortable(uid))
             return;
 
-        KillAllHolograms(component.ActiveHolograms);
+        KillAllPortableHolograms(component.ActiveHolograms);
         UpdateUserInterface(uid, component);
         UpdateBriefcaseAppearance(uid, component);
     }
 
-    private void OnConsolePowerChanged(EntityUid uid, HologramConsoleComponent component, ref PowerChangedEvent args)
-    {
-        if (IsPortable(uid) || args.Powered)
-            return;
-
-        if (TryGetLinkedServer(uid, component, out _, out var serverComp))
-            KillAllHolograms(serverComp.ActiveHolograms);
-
-        UpdateUserInterface(uid, component);
-    }
-
-    private void OnServerRemoved(EntityUid uid, HologramServerComponent component, ComponentRemove args)
-    {
-        KillAllHolograms(component.ActiveHolograms);
-
-        if (component.LinkedHologram is { } linkedHologram && Exists(linkedHologram))
-            _hologram.DoKillHologram(linkedHologram);
-
-        component.LinkedHologram = null;
-    }
+    private void OnBladeShutdown(EntityUid uid, HologramBladeServerComponent component, ComponentShutdown args)
+        => KillBladeHologram(component);
 
     private void OnUIOpened(EntityUid uid, HologramConsoleComponent component, BoundUIOpenedEvent args)
     {
-        EnsureLinkedServer(uid, component);
         UpdateUserInterface(uid, component);
         UpdateBriefcaseAppearance(uid, component);
     }
@@ -108,54 +84,14 @@ public sealed class HologramConsoleSystem : EntitySystem
         if (args.Container.ID != PortableBladeSlot)
             return;
 
-        if (component.ActiveHolograms.Remove(args.Entity, out var hologram) && Exists(hologram))
-            _hologram.DoKillHologram(hologram);
+        if (component.ActiveHolograms.Remove(args.Entity, out var portableHologram) && Exists(portableHologram))
+            _hologram.DoKillHologram(portableHologram);
+
+        if (TryComp<HologramBladeServerComponent>(args.Entity, out var blade))
+            KillBladeHologram(blade);
 
         UpdateBriefcaseAppearance(uid, component);
         UpdateUserInterface(uid, component);
-    }
-
-    private void EnsureLinkedServer(EntityUid console, HologramConsoleComponent component)
-    {
-        if (IsPortable(console))
-            return;
-
-        if (component.LinkedServer is { } linkedServer &&
-            Exists(linkedServer) &&
-            HasComp<HologramServerComponent>(linkedServer))
-            return;
-
-        component.LinkedServer = null;
-
-        foreach (var nearby in _lookup.GetEntitiesInRange(Transform(console).Coordinates, component.SearchRange))
-        {
-            if (!HasComp<HologramServerComponent>(nearby))
-                continue;
-
-            component.LinkedServer = nearby;
-            return;
-        }
-    }
-
-    private bool TryGetLinkedServer(
-        EntityUid console,
-        HologramConsoleComponent component,
-        out EntityUid server,
-        [NotNullWhen(true)] out HologramServerComponent? serverComp)
-    {
-        EnsureLinkedServer(console, component);
-
-        if (component.LinkedServer is not { } linkedServer ||
-            !TryComp<HologramServerComponent>(linkedServer, out var linkedServerComp))
-        {
-            server = default;
-            serverComp = null;
-            return false;
-        }
-
-        server = linkedServer;
-        serverComp = linkedServerComp;
-        return true;
     }
 
     private void UpdateBriefcaseAppearance(EntityUid uid, HologramConsoleComponent? component = null)
@@ -166,7 +102,7 @@ public sealed class HologramConsoleSystem : EntitySystem
         if (!IsPortable(uid) || !HasComp<AppearanceComponent>(uid))
             return;
 
-        CleanupHolograms(component.ActiveHolograms);
+        CleanupPortableHolograms(component.ActiveHolograms);
 
         var uiOpen = _ui.IsUiOpen(uid, HologramConsoleUiKey.Key);
         var hasActive = component.ActiveHolograms.Count > 0;
@@ -192,49 +128,32 @@ public sealed class HologramConsoleSystem : EntitySystem
         if (!_ui.HasUi(console, HologramConsoleUiKey.Key))
             return;
 
-        EnsureLinkedServer(console, component);
-
         var isPortable = IsPortable(console);
-        HologramServerComponent? serverComp = null;
-        Dictionary<EntityUid, EntityUid> activeHolograms;
-
-        if (isPortable)
-        {
-            activeHolograms = component.ActiveHolograms;
-        }
-        else if (TryGetLinkedServer(console, component, out _, out serverComp))
-        {
-            activeHolograms = serverComp.ActiveHolograms;
-            MigrateLegacyLinkedHologram(serverComp);
-        }
-        else
-        {
-            activeHolograms = [];
-        }
-
-        CleanupHolograms(activeHolograms);
-
         var bladeServerList = new List<BladeServerInfo>();
         NetEntity? firstActiveHologram = null;
+        var activeCount = 0;
 
-        foreach (var bladeServerUid in CollectBladeServers(console, component))
+        foreach (var bladeServerUid in CollectBladeServers(console))
         {
-            if (!TryGetBladeServerData(bladeServerUid, out _, out var brainComp, out var bodyChip, out var bodyComp))
+            if (!TryGetBladeServerData(bladeServerUid, out var bladeComp, out var brainComp, out var bodyChip, out var bodyComp))
                 continue;
 
             if (brainComp.HoloMind == null && bodyComp.HologramPrototype == null)
                 continue;
 
-            var isActive = activeHolograms.TryGetValue(bladeServerUid, out var activeHologram) && Exists(activeHologram);
+            CleanupBladeHologram(bladeComp);
+
+            var isActive = bladeComp.ActiveHologram is { } activeHologram && Exists(activeHologram);
             NetEntity? activeNet = null;
             NetEntity? currentProjector = null;
 
-            if (isActive)
+            if (isActive && bladeComp.ActiveHologram is { } activeHologramUid)
             {
-                activeNet = GetNetEntity(activeHologram);
+                activeNet = GetNetEntity(activeHologramUid);
                 firstActiveHologram ??= activeNet;
+                activeCount++;
 
-                if (TryComp<HologramProjectedComponent>(activeHologram, out var projected))
+                if (TryComp<HologramProjectedComponent>(activeHologramUid, out var projected))
                     currentProjector = projected.CurProjector;
             }
 
@@ -249,20 +168,24 @@ public sealed class HologramConsoleSystem : EntitySystem
         var projectors = new List<ProjectorInfo>();
         var projectorCoordinates = new Dictionary<NetEntity, NetCoordinates>();
 
-        if (!isPortable && _station.GetOwningStation(console) is { } station)
+        if (!isPortable && Transform(console).GridUid is { } consoleGrid)
         {
-            var query = EntityQueryEnumerator<HologramProjectorComponent, TransformComponent>();
-            while (query.MoveNext(out var projector, out _, out var xform))
+            var query = EntityQueryEnumerator<HologramProjectorComponent>();
+            while (query.MoveNext(out var projector, out var projectorComp))
             {
-                if (_station.GetOwningStation(projector, xform) != station)
+                if (!projectorComp.IsActive)
+                    continue;
+
+                var projectorXform = Transform(projector);
+                if (projectorXform.GridUid != consoleGrid)
                     continue;
 
                 if (HasComp<ItemComponent>(projector))
                     continue;
 
                 var netEntity = GetNetEntity(projector);
-                projectors.Add(new ProjectorInfo(netEntity, MetaData(projector).EntityName, GetProjectorLocation(projector, xform)));
-                projectorCoordinates[netEntity] = GetNetCoordinates(xform.Coordinates);
+                projectors.Add(new ProjectorInfo(netEntity, MetaData(projector).EntityName, GetProjectorLocation(projector, projectorXform)));
+                projectorCoordinates[netEntity] = GetNetCoordinates(projectorXform.Coordinates);
             }
         }
 
@@ -284,45 +207,47 @@ public sealed class HologramConsoleSystem : EntitySystem
             isPortable,
             batteryPercent,
             component.AllowHologramCarry,
-            activeHolograms.Count,
+            activeCount,
             component.MaxActiveHolograms,
             bladeServerList.Count,
             component.ShowMap,
             component.ShowProjectButton,
             component.ShowRecallButton,
             component.ShowBladeServerPanel,
-            isPortable || component.LinkedServer != null);
+            isPortable || Transform(console).GridUid != null);
 
         _ui.SetUiState(console, HologramConsoleUiKey.Key, state);
     }
 
-    private HashSet<EntityUid> CollectBladeServers(EntityUid console, HologramConsoleComponent component)
+    private HashSet<EntityUid> CollectBladeServers(EntityUid console)
     {
         var bladeServers = new HashSet<EntityUid>();
 
-        if (IsPortable(console) && _itemSlots.GetItemOrNull(console, PortableBladeSlot) is { } portableBlade)
+        if (IsPortable(console))
         {
-            if (HasComp<HologramBladeServerComponent>(portableBlade))
-                bladeServers.Add(portableBlade);
-        }
-
-        var entitiesInRange = _lookup.GetEntitiesInRange(Transform(console).Coordinates, component.BladeServerScanRange);
-        foreach (var entity in entitiesInRange)
-        {
-            if (HasComp<HologramBladeServerComponent>(entity))
+            if (_itemSlots.GetItemOrNull(console, PortableBladeSlot) is { } portableBlade &&
+                HasComp<HologramBladeServerComponent>(portableBlade))
             {
-                bladeServers.Add(entity);
-                continue;
+                bladeServers.Add(portableBlade);
             }
 
-            if (TryComp<Content.Shared._Moffstation.BladeServer.BladeServerRackComponent>(entity, out _) &&
-                TryComp<ItemSlotsComponent>(entity, out var rackSlots))
+            return bladeServers;
+        }
+
+        var consoleGrid = Transform(console).GridUid;
+        if (consoleGrid == null)
+            return bladeServers;
+
+        var rackQuery = EntityQueryEnumerator<BladeServerRackComponent>();
+        while (rackQuery.MoveNext(out var rackUid, out var rackComp))
+        {
+            if (Transform(rackUid).GridUid != consoleGrid)
+                continue;
+
+            foreach (var slot in rackComp.BladeSlots)
             {
-                foreach (var slot in rackSlots.Slots.Values)
-                {
-                    if (slot.Item is { } bladeServer && HasComp<HologramBladeServerComponent>(bladeServer))
-                        bladeServers.Add(bladeServer);
-                }
+                if (slot.Item is { } bladeServer && HasComp<HologramBladeServerComponent>(bladeServer))
+                    bladeServers.Add(bladeServer);
             }
         }
 
@@ -372,18 +297,42 @@ public sealed class HologramConsoleSystem : EntitySystem
     }
 
     private string GetHologramName(HologramBrainChipComponent brainComp, EntityUid bodyChip, HologramBodyChipComponent bodyComp)
-        => brainComp.HoloMind is { } holoMind && TryComp<MindComponent>(holoMind, out var mindComp)
-            ? mindComp.CharacterName ?? "Unknown"
-            : !string.IsNullOrWhiteSpace(bodyComp.HologramName)
-            ? bodyComp.HologramName
-            : bodyComp.HologramPrototype != null ? MetaData(bodyChip).EntityName : "Unknown";
+    {
+        if (brainComp.HoloMind is { } holoMind && TryComp<MindComponent>(holoMind, out var mindComp))
+            return mindComp.CharacterName ?? "Unknown";
+
+        if (!string.IsNullOrWhiteSpace(bodyComp.HologramName))
+            return bodyComp.HologramName;
+
+        if (bodyComp.HologramPrototype != null)
+            return MetaData(bodyChip).EntityName;
+
+        return "Unknown";
+    }
 
     private bool IsBladeServerPowered(EntityUid bladeServerUid)
-        => (TryComp<ApcPowerReceiverComponent>(bladeServerUid, out var powerReceiver)
-            && powerReceiver.Powered)
-            || (TryComp(bladeServerUid, out TransformComponent? xform) && xform.ParentUid != EntityUid.Invalid
-                && TryComp<ApcPowerReceiverComponent>(xform.ParentUid, out var rackPower)
-                && rackPower.Powered);
+    {
+        if (TryComp<ApcPowerReceiverComponent>(bladeServerUid, out var ownPower))
+            return ownPower.Powered;
+
+        var parent = Transform(bladeServerUid).ParentUid;
+        if (parent == EntityUid.Invalid)
+            return false;
+
+        if (!TryComp(parent, out BladeServerRackComponent? rackComp))
+            return false;
+
+        if (!TryComp<ApcPowerReceiverComponent>(parent, out var rackPower) || !rackPower.Powered)
+            return false;
+
+        foreach (var slot in rackComp.BladeSlots)
+        {
+            if (slot.Item == bladeServerUid)
+                return slot.IsPowerEnabled;
+        }
+
+        return false;
+    }
 
     private string GetProjectorLocation(EntityUid projector, TransformComponent xform)
     {
@@ -401,7 +350,7 @@ public sealed class HologramConsoleSystem : EntitySystem
     private void OnProjectHologram(EntityUid console, HologramConsoleComponent component, HologramConsoleProjectHologramMessage args)
     {
         var bladeServer = GetEntity(args.BladeServerUid);
-        if (!Exists(bladeServer) || !TryGetBladeServerData(bladeServer, out _, out var brainChipComp, out _, out var bodyChipComp))
+        if (!Exists(bladeServer) || !TryGetBladeServerData(bladeServer, out var bladeComp, out var brainChipComp, out _, out var bodyChipComp))
             return;
 
         if (brainChipComp.HoloMind == null && bodyChipComp.HologramPrototype == null)
@@ -409,10 +358,12 @@ public sealed class HologramConsoleSystem : EntitySystem
 
         if (IsPortable(console))
         {
-            if (component.ActiveHolograms.ContainsKey(bladeServer))
+            CleanupPortableHolograms(component.ActiveHolograms);
+            CleanupBladeHologram(bladeComp);
+
+            if (bladeComp.ActiveHologram is { } active && Exists(active))
                 return;
 
-            CleanupHolograms(component.ActiveHolograms);
             if (component.ActiveHolograms.Count >= component.MaxActiveHolograms)
                 return;
 
@@ -426,24 +377,22 @@ public sealed class HologramConsoleSystem : EntitySystem
                 return;
 
             component.ActiveHolograms[bladeServer] = hologram;
+            bladeComp.ActiveHologram = hologram;
             SetProjection(hologram, console, true);
         }
         else
         {
-            if (!TryGetLinkedServer(console, component, out _, out var serverComp))
-                return;
-
             var projector = GetEntity(args.ProjectorUid);
             if (!Exists(projector) || !HasComp<HologramProjectorComponent>(projector))
                 return;
 
-            if (_station.GetOwningStation(console) != _station.GetOwningStation(projector))
+            if (Transform(console).GridUid == null || Transform(console).GridUid != Transform(projector).GridUid)
                 return;
 
-            CleanupHolograms(serverComp.ActiveHolograms);
-            MigrateLegacyLinkedHologram(serverComp);
+            CleanupBladeHologram(bladeComp);
 
-            if (serverComp.ActiveHolograms.TryGetValue(bladeServer, out var existing) && Exists(existing))
+            var activeCount = CountActiveSameGridBladeHolograms(console);
+            if (bladeComp.ActiveHologram is { } existing && Exists(existing))
             {
                 _hologram.MoveHologramToProjector(existing, projector);
                 SetProjection(existing, projector, false);
@@ -451,14 +400,13 @@ public sealed class HologramConsoleSystem : EntitySystem
                 return;
             }
 
-            if (serverComp.ActiveHolograms.Count >= component.MaxActiveHolograms)
+            if (component.MaxActiveHolograms > 0 && activeCount >= component.MaxActiveHolograms)
                 return;
 
             if (!TrySpawnHologram(brainChipComp, bodyChipComp, Transform(projector).Coordinates, out var hologram))
                 return;
 
-            serverComp.ActiveHolograms[bladeServer] = hologram;
-            serverComp.LinkedHologram = hologram;
+            bladeComp.ActiveHologram = hologram;
             SetProjection(hologram, projector, false);
         }
 
@@ -474,10 +422,12 @@ public sealed class HologramConsoleSystem : EntitySystem
     {
         hologram = default;
 
-        if (brainChipComp.HoloMind is { } mind &&
-            _hologram.TryGenerateHumanoidHologram(mind, coords, out var generatedHologram) &&
-            generatedHologram is { } generated)
+        if (brainChipComp.HoloMind is { } mind)
         {
+            if (!_hologram.TryGenerateHumanoidHologram(mind, coords, out var generatedHologram) ||
+                generatedHologram is not { } generated)
+                return false;
+
             hologram = generated;
             return true;
         }
@@ -486,13 +436,6 @@ public sealed class HologramConsoleSystem : EntitySystem
             return false;
 
         hologram = Spawn(bodyChipComp.HologramPrototype, coords);
-
-        if (brainChipComp.HoloMind is { } mindId)
-        {
-            _mind.TransferTo(mindId, hologram, ghostCheckOverride: true);
-            _mind.UnVisit(mindId);
-        }
-
         return true;
     }
 
@@ -511,24 +454,23 @@ public sealed class HologramConsoleSystem : EntitySystem
 
     private void OnRecallHologram(EntityUid console, HologramConsoleComponent component, HologramConsoleRecallMessage args)
     {
-        Dictionary<EntityUid, EntityUid>? activeHolograms;
-
-        if (IsPortable(console))
-            activeHolograms = component.ActiveHolograms;
-        else if (TryGetLinkedServer(console, component, out _, out var serverComp))
-            activeHolograms = serverComp.ActiveHolograms;
-        else
-            return;
-
         if (args.BladeServerUid is { } bladeServerNetEntity)
         {
             var bladeServer = GetEntity(bladeServerNetEntity);
-            if (activeHolograms.Remove(bladeServer, out var hologram) && Exists(hologram))
-                _hologram.DoKillHologram(hologram);
+            if (TryComp<HologramBladeServerComponent>(bladeServer, out var bladeComp))
+                KillBladeHologram(bladeComp);
+        }
+        else if (IsPortable(console))
+        {
+            KillAllPortableHolograms(component.ActiveHolograms);
         }
         else
         {
-            KillAllHolograms(activeHolograms);
+            foreach (var bladeServer in CollectBladeServers(console))
+            {
+                if (TryComp<HologramBladeServerComponent>(bladeServer, out var bladeComp))
+                    KillBladeHologram(bladeComp);
+            }
         }
 
         UpdateUserInterface(console, component);
@@ -548,51 +490,81 @@ public sealed class HologramConsoleSystem : EntitySystem
     {
         base.Update(frameTime);
 
+        var bladeQuery = EntityQueryEnumerator<HologramBladeServerComponent>();
+        while (bladeQuery.MoveNext(out _, out var bladeComp))
+        {
+            CleanupBladeHologram(bladeComp);
+        }
+
         var query = EntityQueryEnumerator<HologramConsoleComponent>();
         while (query.MoveNext(out var uid, out var component))
         {
-            if (IsPortable(uid))
-            {
-                CleanupHolograms(component.ActiveHolograms);
+            if (!IsPortable(uid))
+                continue;
 
-                if (component.ActiveHolograms.Count == 0)
-                    continue;
+            CleanupPortableHolograms(component.ActiveHolograms);
 
-                if (IsBatteryPowered(uid))
-                {
-                    var draw = component.PowerDrawPerHologram * component.ActiveHolograms.Count * frameTime;
-                    if (!_powerCell.TryUseCharge(uid, draw))
-                    {
-                        KillAllHolograms(component.ActiveHolograms);
-                        UpdateBriefcaseAppearance(uid, component);
-                        UpdateUserInterface(uid, component);
-                    }
-                }
-            }
-            else if (TryGetLinkedServer(uid, component, out _, out var serverComp))
-            {
-                CleanupHolograms(serverComp.ActiveHolograms);
-            }
+            if (component.ActiveHolograms.Count == 0)
+                continue;
+
+            if (!IsBatteryPowered(uid))
+                continue;
+
+            var draw = component.PowerDrawPerHologram * component.ActiveHolograms.Count * frameTime;
+            if (_powerCell.TryUseCharge(uid, draw))
+                continue;
+
+            KillAllPortableHolograms(component.ActiveHolograms);
+            UpdateBriefcaseAppearance(uid, component);
+            UpdateUserInterface(uid, component);
         }
     }
 
-    private void CleanupHolograms(Dictionary<EntityUid, EntityUid> activeHolograms)
+    private int CountActiveSameGridBladeHolograms(EntityUid console)
     {
-        var removed = false;
+        var count = 0;
+        foreach (var bladeServer in CollectBladeServers(console))
+        {
+            if (!TryComp<HologramBladeServerComponent>(bladeServer, out var bladeComp))
+                continue;
+
+            CleanupBladeHologram(bladeComp);
+
+            if (bladeComp.ActiveHologram is { } hologram && Exists(hologram))
+                count++;
+        }
+
+        return count;
+    }
+
+    private void CleanupBladeHologram(HologramBladeServerComponent bladeComp)
+    {
+        if (bladeComp.ActiveHologram is not { } hologram || Exists(hologram))
+            return;
+
+        bladeComp.ActiveHologram = null;
+    }
+
+    private void KillBladeHologram(HologramBladeServerComponent bladeComp)
+    {
+        if (bladeComp.ActiveHologram is { } hologram && Exists(hologram))
+            _hologram.DoKillHologram(hologram);
+
+        bladeComp.ActiveHologram = null;
+    }
+
+    private void CleanupPortableHolograms(Dictionary<EntityUid, EntityUid> activeHolograms)
+    {
         foreach (var (blade, hologram) in activeHolograms.ToArray())
         {
             if (Exists(blade) && Exists(hologram))
                 continue;
 
             activeHolograms.Remove(blade);
-            removed = true;
         }
-
-        if (!removed)
-            return;
     }
 
-    private void KillAllHolograms(Dictionary<EntityUid, EntityUid> activeHolograms)
+    private void KillAllPortableHolograms(Dictionary<EntityUid, EntityUid> activeHolograms)
     {
         foreach (var hologram in activeHolograms.Values)
         {
@@ -601,21 +573,5 @@ public sealed class HologramConsoleSystem : EntitySystem
         }
 
         activeHolograms.Clear();
-    }
-
-    private void MigrateLegacyLinkedHologram(HologramServerComponent serverComp)
-    {
-        if (serverComp.LinkedHologram is not { } linkedHologram || !Exists(linkedHologram))
-        {
-            serverComp.LinkedHologram = null;
-            return;
-        }
-
-        if (serverComp.ActiveHolograms.ContainsValue(linkedHologram))
-            return;
-
-        var bladeServer = serverComp.ActiveHolograms.Keys.FirstOrDefault();
-        if (bladeServer != default)
-            serverComp.ActiveHolograms[bladeServer] = linkedHologram;
     }
 }

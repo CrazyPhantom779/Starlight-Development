@@ -1,12 +1,12 @@
-using Content.Shared.Popups;
-using Robust.Shared.Player;
-using Robust.Shared.Map;
 using System.Diagnostics.CodeAnalysis;
-using Content.Shared.Storage.Components;
-using Content.Shared.Database;
 using Content.Shared._Starlight.Holograms.Components;
-using Content.Shared.Whitelist;
+using Content.Shared.Database;
 using Content.Shared.Movement.Pulling.Components;
+using Content.Shared.Popups;
+using Content.Shared.Storage.Components;
+using Content.Shared.Whitelist;
+using Robust.Shared.Map;
+using Robust.Shared.Player;
 
 namespace Content.Shared._Starlight.Holograms;
 
@@ -22,7 +22,6 @@ public partial class SharedHologramSystem
         var query = _entityManager.EntityQueryEnumerator<HologramProjectedComponent>();
         while (query.MoveNext(out var hologram, out var hologramProjectedComp))
         {
-            // Skip client-side entities (like spawn menu previews)
             if (_entityManager.IsClientSide(hologram))
                 continue;
 
@@ -38,24 +37,24 @@ public partial class SharedHologramSystem
         if (!Resolve(hologram, ref holoProjectedComp))
             return;
 
-        // Don't process if entity is terminating
         if (Terminating(hologram))
             return;
 
-        // If their last visited Projector is invalid ignoring occlusion and none is found
         EntityUid? curProjectorEntity = null;
-        if (holoProjectedComp.CurProjector != null)
-            TryGetEntity(holoProjectedComp.CurProjector.Value, out curProjectorEntity);
+        if (holoProjectedComp.CurProjector is { } curProjectorNet)
+            TryGetEntity(curProjectorNet, out curProjectorEntity);
 
         if (!IsHoloProjectorValid(hologram, curProjectorEntity, false) &&
             !TryGetHoloProjector(hologram, out curProjectorEntity, holoProjectedComp, false))
         {
-            // Kill the hologram.
             TryKillHologram(hologram);
             return;
         }
 
-        holoProjectedComp.CurProjector = GetNetEntity(curProjectorEntity.Value);
+        if (curProjectorEntity is not { } projector)
+            return;
+
+        holoProjectedComp.CurProjector = GetNetEntity(projector);
         Dirty(hologram, holoProjectedComp);
 
         var returnedEvent = new HologramReturnAttemptEvent();
@@ -63,34 +62,24 @@ public partial class SharedHologramSystem
         if (returnedEvent.Cancelled)
             return;
 
-        RaiseLocalEvent(hologram, new HologramReturnedEvent(curProjectorEntity.Value));
-
-        MoveHologramToProjector(hologram, curProjectorEntity.Value);
+        RaiseLocalEvent(hologram, new HologramReturnedEvent(projector));
+        MoveHologramToProjector(hologram, projector);
 
         _adminLogger.Add(LogType.Mind, LogImpact.Low,
-            $"{ToPrettyString(hologram):mob} was returned to projector {ToPrettyString(holoProjectedComp.CurProjector.Value):entity}");
+            $"{ToPrettyString(hologram):mob} was returned to projector {ToPrettyString(projector):entity}");
     }
 
     /// <summary>
     ///     Tests for the nearest projector to a set of coords.
     /// </summary>
-    /// <param name="coords">The coords to perform the check from.</param>
-    /// <param name="result">The UID of the projector, or null if no projectors are found.</param>
-    /// <param name="whiteList">An EntityWhitelist to check for on projectors to determine if they're valid.</param>
-    /// <param name="occlude">Should it check only for unoccluded and in range projectors?</param>
-    /// <returns>Returns true if a projector is found, false if not.</returns>
     public bool TryGetHoloProjector(MapCoordinates coords, [NotNullWhen(true)] out EntityUid? result, EntityWhitelist? whiteList = null, bool occlude = true)
     {
         result = null;
-
-        // Sort all projectors in distance increasing order.
-        // Use a list instead of SortedList so two projectors at the same distance do not discard one another.
         var nearProjList = new List<(float Distance, EntityUid Projector)>();
 
         var query = _entityManager.EntityQueryEnumerator<HologramProjectorComponent>();
         while (query.MoveNext(out var projector, out var projComp))
         {
-            // Skip inactive projectors
             if (!projComp.IsActive)
                 continue;
 
@@ -100,21 +89,21 @@ public partial class SharedHologramSystem
 
         nearProjList.Sort((a, b) => a.Distance.CompareTo(b.Distance));
 
-        // Find the nearest, valid projector.
         foreach (var (Distance, Projector) in nearProjList)
         {
             if (!IsHoloProjectorValid(coords, Projector, occlude, whiteList))
                 continue;
+
             result = Projector;
             return true;
         }
+
         return false;
     }
 
     /// <remarks>
     ///     This takes into consideration any ProjectorOverride the hologram may have.
     /// </remarks>
-    /// <inheritdoc cref="TryGetHoloProjector"/>
     public bool TryGetHoloProjector(EntityUid uid, [NotNullWhen(true)] out EntityUid? result, HologramProjectedComponent? projectedComp = null, bool occlude = true)
     {
         result = null;
@@ -122,80 +111,66 @@ public partial class SharedHologramSystem
         if (!Resolve(uid, ref projectedComp))
             return false;
 
-        if (projectedComp.ProjectorOverride != null) // Check for Component-set overrides.
+        if (projectedComp.ProjectorOverride is { } overrideNet)
         {
-            if (TryGetEntity(projectedComp.ProjectorOverride.Value, out var overrideEntity))
+            if (TryGetEntity(overrideNet, out var overrideEntity) &&
+                IsHoloProjectorValid(uid, overrideEntity, occlude))
             {
-                if (IsHoloProjectorValid(uid, overrideEntity, occlude))
-                {
-                    result = overrideEntity;
-                    return true;
-                }
+                result = overrideEntity;
+                return true;
             }
+
             return false;
         }
 
-        var projectorEvent = new HologramGetProjectorEvent(); // Check for Event-set overrides.
+        var projectorEvent = new HologramGetProjectorEvent();
         RaiseLocalEvent(uid, ref projectorEvent);
         if (projectorEvent.Override)
         {
             result = projectorEvent.ProjectorOverride;
-            return projectorEvent.ProjectorOverride != null;
+            return result != null;
         }
 
-        // Otherwise, we simply check for the nearest projector, considering any tags it requires.
         return TryGetHoloProjector(_transform.GetMapCoordinates(uid), out result, projectedComp.ValidProjectorWhitelist, occlude);
     }
 
     /// <summary>
     ///     Tests if a projector is valid for a given hologram.
     /// </summary>
-    /// <param name="hologram">The hologram to check for, or its position.</param>
-    /// <param name="projector">The projector to compare on, or its position.</param>
-    /// <param name="occlude">Should it check only for unoccluded and in range projectors?</param>.
-    /// <param name="raiseEvent">Should it raise the <see cref="HologramCheckProjectorValidEvent"/> event? Make sure this is set to false if you use this function in response to the event.</param>
-    /// <param name="projectedComp">The hologram's component. If provided, the hologram's list of allowed tags will be used.</param>
-    /// <returns>True if the projector is within range, and unoccluded to the hologram. Otherwise, false.</returns>
     public bool IsHoloProjectorValid(EntityUid hologram, [NotNullWhen(true)] EntityUid? projector, bool occlude = true, bool raiseEvent = true, HologramProjectedComponent? projectedComp = null)
     {
-        if (!Resolve(hologram, ref projectedComp) || projector == null || !Exists(projector.Value))
+        if (!Resolve(hologram, ref projectedComp) || projector is not { } projectorUid || !Exists(projectorUid))
             return false;
 
         if (raiseEvent)
         {
-            var validCheckEvent = new HologramCheckProjectorValidEvent(projector.Value);
+            var validCheckEvent = new HologramCheckProjectorValidEvent(projectorUid);
             RaiseLocalEvent(hologram, ref validCheckEvent);
-            if (validCheckEvent.Valid != null)
-                return validCheckEvent.Valid.Value;
+            if (validCheckEvent.Valid is { } valid)
+                return valid;
         }
 
-        return IsHoloProjectorValid(_transform.GetMapCoordinates(hologram), projector, occlude, projectedComp.ValidProjectorWhitelist);
+        return IsHoloProjectorValid(_transform.GetMapCoordinates(hologram), projectorUid, occlude, projectedComp.ValidProjectorWhitelist);
     }
 
-    /// <inheritdoc cref="IsHoloProjectorValid"/>
-    /// <param name="whitelist">A whitelist to check for on projectors, to determine if they're valid. Usually found on the Holo's <see cref="HologramProjectedComponent"/>.</param>
-    /// <remarks>
-    ///     Note this this method won't raise the <see cref="HologramCheckProjectorValidEvent"/> event, as the Hologram entity is not known.
-    ///     This is a limitation of the method, and should be kept in mind when using it.
-    /// </remarks> //TODO: HOLO Probably allow passing in a nullable UID for the hologram, and raise the event if it's not null.
+    /// <inheritdoc cref="IsHoloProjectorValid(EntityUid, EntityUid?, bool, bool, HologramProjectedComponent?)"/>
     public bool IsHoloProjectorValid(MapCoordinates hologram, [NotNullWhen(true)] EntityUid? projector, bool occlude = true, EntityWhitelist? whitelist = null)
     {
-        if (projector == null || !Exists(projector.Value))
+        if (projector is not { } projectorUid || !Exists(projectorUid))
             return false;
 
-        if (!TryComp<HologramProjectorComponent>(projector.Value, out var projComp))
+        if (!TryComp(projectorUid, out HologramProjectorComponent? projComp))
             return false;
 
         if (!projComp.IsActive)
             return false;
 
-        if (whitelist != null && !_whitelist.IsValid(whitelist, projector.Value))
+        if (whitelist != null && !_whitelist.IsValid(whitelist, projectorUid))
             return false;
 
-        // Get the projector's range
         var range = projComp.ProjectorRange;
 
-        if (occlude && !_examine.InRangeUnOccluded(hologram, _transform.ToMapCoordinates(Transform(projector.Value).Coordinates), range, null))
+        if (occlude && !_examine.InRangeUnOccluded(hologram, _transform.ToMapCoordinates(Transform(projectorUid).Coordinates), range, null))
             return false;
 
         return true;
@@ -204,39 +179,31 @@ public partial class SharedHologramSystem
     /// <summary>
     ///     Moves a hologram to a new location.
     /// </summary>
-    /// <remarks>
-    ///     Does no validation for any projectors before moving.
-    /// </remarks>
-    /// <param name="hologram">The hologram to move.</param>
-    /// <param name="projector">The projector to move it to, or the projector's position.</param>
     public void MoveHologram(EntityUid hologram, EntityCoordinates projector, HologramComponent? holoComp = null)
     {
         if (!Resolve(hologram, ref holoComp))
             return;
 
-        // Stops any pulling goin on.
-        if (TryComp<PullableComponent>(hologram, out var pullable) && pullable.BeingPulled)
+        if (TryComp(hologram, out PullableComponent? pullable) && pullable.BeingPulled)
             _pulling.TryStopPull(hologram, pullable);
 
-        if (TryComp<PullerComponent>(hologram, out var pulling) && pulling.Pulling != null &&
-            TryComp<PullableComponent>(pulling.Pulling.Value, out var subjectPulling))
-            _pulling.TryStopPull(pulling.Pulling.Value, subjectPulling);
+        if (TryComp(hologram, out PullerComponent? pulling) &&
+            pulling.Pulling is { } pullingEntity &&
+            TryComp(pullingEntity, out PullableComponent? subjectPulling))
+            _pulling.TryStopPull(pullingEntity, subjectPulling);
 
-        // Plays the vanishing effects.
         var meta = MetaData(hologram);
 
-        if (!_timing.InPrediction) // TODOPark: HOLO Change this to run on the first prediction once it predicts reliably.
+        if (!_timing.InPrediction)
         {
             var holoPos = Transform(hologram).Coordinates;
             _audio.PlayPvs(holoComp.OffSound, hologram);
             _popup.PopupCoordinates(Loc.GetString(holoComp.PopupDisappearOther, ("name", meta.EntityName)), holoPos, Filter.PvsExcept(hologram), false, PopupType.MediumCaution);
         }
 
-        // Does the do.
         _transform.SetCoordinates(hologram, projector);
         _transform.AttachToGridOrMap(hologram);
 
-        // Plays the appearing effects.
         if (!_timing.InPrediction)
         {
             _audio.PlayPvs(holoComp.OnSound, hologram);
@@ -251,15 +218,14 @@ public partial class SharedHologramSystem
 
     protected bool ProjectedUpdate(EntityUid hologram, HologramProjectedComponent hologramProjectedComp)
     {
-        if (TryGetHoloProjector(hologram, out var nearProj, hologramProjectedComp)) // Checks for a projector in range.
+        if (TryGetHoloProjector(hologram, out var nearProj, hologramProjectedComp) && nearProj is { } projector)
         {
-            hologramProjectedComp.CurProjector = GetNetEntity(nearProj.Value);
+            hologramProjectedComp.CurProjector = GetNetEntity(projector);
             hologramProjectedComp.CurrentlyInProjector = true;
             Dirty(hologram, hologramProjectedComp);
             return true;
         }
 
-        // If none is found, and they were in the range of a projector during the last check, we set the time they'll be disappeared at.
         if (hologramProjectedComp.CurrentlyInProjector)
         {
             hologramProjectedComp.CurrentlyInProjector = false;
@@ -272,23 +238,20 @@ public partial class SharedHologramSystem
             return true;
         }
 
-        // Attempts to return the hologram if their time is up.
         DoReturnHologram(hologram);
         Dirty(hologram, hologramProjectedComp);
         return false;
     }
 
-    // Forbid holograms from going inside anything. Osmosised from Nyano :)
     private void OnStoreInContainerAttempt(EntityUid uid, HologramComponent component, ref EntityStorageInsertedIntoAttemptEvent args)
     {
-        // Don't process storage attempts for entities that are being deleted
         if (Terminating(uid))
             return;
 
-        if (HasComp<HologramProjectedComponent>(uid))
-        {
-            DoReturnHologram(uid);
-            args.Cancelled = true;
-        }
+        if (!HasComp<HologramProjectedComponent>(uid))
+            return;
+
+        DoReturnHologram(uid);
+        args.Cancelled = true;
     }
 }

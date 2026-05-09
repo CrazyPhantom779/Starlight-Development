@@ -1,16 +1,15 @@
 using Content.Server.Mind;
-using Content.Server.Medical.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Mind.Components;
 using Content.Shared.Popups;
+using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Timing;
 
 namespace Content.Server._Starlight.Holograms.Systems;
 
 /// <summary>
-///     Handles hologram body scanner functionality.
-///     Scans a person to create brain and body chips for holographic projection.
+/// Writes scanned mind/body data onto hologram chips used on an occupied body scanner.
 /// </summary>
 public sealed class HologramBodyScannerSystem : EntitySystem
 {
@@ -32,53 +31,73 @@ public sealed class HologramBodyScannerSystem : EntitySystem
         if (args.Handled)
             return;
 
-        var currentTime = _timing.CurTime;
-        if (currentTime < component.LastScanTime + component.ScanDelay)
+        if (_timing.CurTime < component.LastScanTime + component.ScanDelay)
         {
             _popup.PopupEntity("The scanner is still processing the last scan!", uid, args.User);
             return;
         }
 
-        if (!TryComp<MedicalScannerComponent>(uid, out var scanner))
-            return;
-
-        if (scanner.BodyContainer.ContainedEntity == null)
+        if (!TryGetScannedEntity(uid, out var scannedEntity))
         {
             _popup.PopupEntity("The scanner is empty!", uid, args.User);
             return;
         }
 
-        var scannedEntity = scanner.BodyContainer.ContainedEntity.Value;
+        var wroteData = false;
 
-        if (!TryComp<MindContainerComponent>(scannedEntity, out var mindContainer) || mindContainer.Mind == null)
+        if (TryComp<HologramBrainChipComponent>(args.Used, out var brainChip))
         {
-            _popup.PopupEntity("The scanner cannot detect a consciousness to transfer!", uid, args.User);
+            if (!TryComp<MindContainerComponent>(scannedEntity, out var mindContainer) ||
+                mindContainer.Mind is not { } mindId)
+            {
+                _popup.PopupEntity("The scanner cannot detect a consciousness to transfer!", uid, args.User);
+                return;
+            }
+
+            brainChip.HoloMind = mindId;
+            _mind.TransferTo(mindId, args.Used, ghostCheckOverride: true);
+            _mind.UnVisit(mindId);
+
+            _popup.PopupEntity("Mind data saved to the hologram mind chip.", uid, args.User);
+            wroteData = true;
+        }
+
+        if (TryComp<HologramBodyChipComponent>(args.Used, out var bodyChip))
+        {
+            bodyChip.HologramName = MetaData(scannedEntity).EntityName;
+            bodyChip.HologramPrototype = _defaultHologramPrototype;
+
+            _popup.PopupEntity("Body data saved to the hologram body chip.", uid, args.User);
+            wroteData = true;
+        }
+
+        if (!wroteData)
+        {
+            _popup.PopupEntity("Use a hologram mind chip or body chip on the occupied scanner.", uid, args.User);
             return;
         }
 
-        var spawnPos = Transform(uid).Coordinates;
-
-        var brainChip = Spawn("HologramBrainChip", spawnPos);
-        if (TryComp<HologramBrainChipComponent>(brainChip, out var brainComp))
-        {
-            var mind = mindContainer.Mind.Value;
-            brainComp.HoloMind = mind;
-
-            _mind.TransferTo(mind, brainChip);
-            _popup.PopupEntity("Mind transferred to brain chip!", uid, args.User);
-        }
-
-        var bodyChip = Spawn("HologramBodyChip", spawnPos);
-        if (TryComp<HologramBodyChipComponent>(bodyChip, out var bodyComp))
-        {
-            var meta = MetaData(scannedEntity);
-            bodyComp.HologramName = meta.EntityName;
-            bodyComp.HologramPrototype = _defaultHologramPrototype;
-
-            _popup.PopupEntity("Body data saved to body chip!", uid, args.User);
-        }
-
-        component.LastScanTime = currentTime;
+        component.LastScanTime = _timing.CurTime;
         args.Handled = true;
     }
+
+    private bool TryGetScannedEntity(EntityUid uid, out EntityUid scannedEntity)
+    {
+        scannedEntity = default;
+
+        if (!TryComp<ContainerManagerComponent>(uid, out var containerManager))
+            return false;
+
+        foreach (var container in containerManager.Containers.Values)
+        {
+            foreach (var contained in container.ContainedEntities)
+            {
+                scannedEntity = contained;
+                return true;
+            }
+        }
+
+        return false;
+    }
 }
+

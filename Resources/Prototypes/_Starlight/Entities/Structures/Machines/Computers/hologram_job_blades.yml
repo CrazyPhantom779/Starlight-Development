@@ -1,0 +1,84 @@
+- type: entity
+  id: HologramJobBrainChip
+  parent: HologramBrainChip
+  name: hologram neural image
+  suffix: Job
+  categories: [ HideSpawnMenu, DoNotMap ]
+  components:
+  - type: MindContainer
+
+  # Safety only. This prevents the hard crash if the job ever falls back to
+  # spawning the chip directly, but that fallback should not happen once the
+  # rack insertion is fixed.
+  - type: Physics
+    bodyType: KinematicController
+
+- type: entity
+  id: HologramJobBodyChip
+  parent: HologramBodyChip
+  name: hologram body profile
+  suffix: Job
+  categories: [ HideSpawnMenu, DoNotMap ]
+  components:
+  - type: HologramBodyChip
+    hologramPrototype: MobHologramHardlight
+    hologramName: hologram
+
+- type: entity
+  id: HologramJobBladeServer
+  parent: HologramBladeServer
+  name: hologram blade server
+  suffix: Hologram job spawn
+  categories: [ HideSpawnMenu, DoNotMap ]
+  components:
+  # REQUIRED. If this is missing, the real BladeServerRack rejects it,
+  # and the blade appears on the floor beside/on top of the rack.
+  - type: BladeServer
+    stripeColor: "#45f3ffff"
+  - type: HologramJobSpawn
+    spawnOnJoin: true
+  - type: ContainerSpawnPoint
+    containerId: hologram_brain_chip
+    job: Hologram
+    spawnType: Job
+  - type: ItemSlots
+    slots:
+      hologram_brain_chip:
+        name: Brain Chip
+        whitelist:
+          tags:
+          - HologramBrainChip
+      hologram_body_chip:
+        name: Body Chip
+        whitelist:
+          tags:
+          - HologramBodyChip
+        startingItem: HologramJobBodyChip
+
+- type: entity
+  id: BladeServerRackHologramJob
+  parent: BladeServerRack
+  name: hologram blade server rack
+  suffix: Hologram job spawn
+  components:
+  - type: BladeServerRack
+    bladeServerVisualsOffset: 0, -4
+    startingContents:
+    - HologramJobBladeServer
+    - HologramJobBladeServer
+    - HologramJobBladeServer
+    - HologramJobBladeServer
+
+- type: entity
+  id: BladeServerRackHologramJobSpawner
+  parent: MarkerBase
+  name: hologram blade server rack spawner
+  suffix: Hologram job spawn
+  components:
+  - type: Sprite
+    layers:
+    - state: blue
+  - type: EntityTableSpawner
+    table: !type:GroupSelector
+      children:
+      - id: BladeServerRackHologramJob

@@ -40,42 +40,26 @@ public sealed class HologramConsoleBoundUserInterfaceState(
 }
 
 [Serializable, NetSerializable]
-public sealed class BladeServerInfo
+public sealed class BladeServerInfo(
+    NetEntity uid,
+    string hologramName,
+    bool isActive,
+    NetEntity? activeHologram = null,
+    NetEntity? currentProjector = null)
 {
-    public NetEntity Uid { get; init; }
-    public string HologramName { get; init; }
-    public bool IsActive { get; init; }
-    public NetEntity? ActiveHologram { get; init; }
-    public NetEntity? CurrentProjector { get; init; }
-
-    public BladeServerInfo(
-        NetEntity uid,
-        string hologramName,
-        bool isActive,
-        NetEntity? activeHologram = null,
-        NetEntity? currentProjector = null)
-    {
-        Uid = uid;
-        HologramName = hologramName;
-        IsActive = isActive;
-        ActiveHologram = activeHologram;
-        CurrentProjector = currentProjector;
-    }
+    public NetEntity Uid { get; init; } = uid;
+    public string HologramName { get; init; } = hologramName;
+    public bool IsActive { get; init; } = isActive;
+    public NetEntity? ActiveHologram { get; init; } = activeHologram;
+    public NetEntity? CurrentProjector { get; init; } = currentProjector;
 }
 
 [Serializable, NetSerializable]
-public sealed class ProjectorInfo
+public sealed class ProjectorInfo(NetEntity uid, string name, string location)
 {
-    public NetEntity Uid { get; init; }
-    public string Name { get; init; }
-    public string Location { get; init; }
-
-    public ProjectorInfo(NetEntity uid, string name, string location)
-    {
-        Uid = uid;
-        Name = name;
-        Location = location;
-    }
+    public NetEntity Uid { get; init; } = uid;
+    public string Name { get; init; } = name;
+    public string Location { get; init; } = location;
 }
 
 [Serializable, NetSerializable]
@@ -92,12 +76,9 @@ public sealed class HologramConsoleRecallMessage(NetEntity? bladeServerUid = nul
 }
 
 [Serializable, NetSerializable]
-public sealed class HologramConsoleEjectBladeServerMessage : BoundUserInterfaceMessage
+public sealed class HologramConsoleEjectBladeServerMessage(NetEntity bladeServerUid) : BoundUserInterfaceMessage
 {
-    public NetEntity BladeServerUid { get; }
-
-    public HologramConsoleEjectBladeServerMessage(NetEntity bladeServerUid) =>
-        BladeServerUid = bladeServerUid;
+    public NetEntity BladeServerUid { get; } = bladeServerUid;
 }
 
 [Serializable, NetSerializable]
