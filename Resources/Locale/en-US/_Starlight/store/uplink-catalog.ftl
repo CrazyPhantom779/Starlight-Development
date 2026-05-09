@@ -136,3 +136,7 @@ uplink-mimana-stealthy-desc = A mutated mimana that seems to fade into the backg
 
 uplink-hushpup-ammo-name = Buckshot box (12 gauge)
 uplink-hushpup-ammo-desc = A box of 16 buckshot shotgun shells. Compatible with the Hushpup.
+
+
+uplink-chameleon-bundle-name = Chameleon Kit Crate
+uplink-chameleon-bundle-desc = A crate containing a backpack full of items that contain chameleon technology allowing you to disguise as pretty much anything on the station, and more!

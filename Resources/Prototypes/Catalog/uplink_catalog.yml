@@ -131,8 +131,11 @@
   description: uplink-gloves-knuckleduster-desc
   icon: { sprite: Clothing/Hands/Gloves/KnuckleDusters/syndicateknuckleduster.rsi, state: syndicateknuckleduster }
   productEntity: ClothingHandsKnuckleDustersSyndicate
+  discountCategory: veryRareDiscounts
+  discountDownTo:
+    Telecrystal: 2
   cost:
-    Telecrystal: 1 # Starlight-edit: 6 -> 1
+    Telecrystal: 1 # Starlight-edit: 4 -> 1
   categories:
   - UplinkWeaponry
 
@@ -184,20 +187,6 @@
     Telecrystal: 6
   cost:
     Telecrystal: 10
-  categories:
-  - UplinkWeaponry
-
-- type: listing
-  id: UplinkFireAxe
-  name: uplink-fire-axe-flaming-name
-  description: uplink-fire-axe-flaming-desc
-  icon: { sprite: /Textures/Objects/Weapons/Melee/fireaxeflaming.rsi, state: icon }
-  productEntity: FireAxeFlaming
-  discountCategory: usualDiscounts
-  discountDownTo:
-    Telecrystal: 4 # Starlight-edit: 10 -> 4
-  cost:
-    Telecrystal: 6 # Starlight-edit: 15 -> 6
   categories:
   - UplinkWeaponry
 
@@ -323,6 +312,11 @@
     Telecrystal: 16 # Starlight-edit: 18 -> 16
   categories:
   - UplinkWeaponry
+  conditions:
+  - !type:StoreWhitelistCondition
+    whitelist:
+      tags:
+      - NukeOpsUplink
 
 - type: listing
   id: UplinkGrenadeLauncher
@@ -334,6 +328,11 @@
     Telecrystal: 20
   categories:
   - UplinkWeaponry
+  conditions:
+  - !type:StoreWhitelistCondition
+    blacklist:
+      tags:
+      - NukeOpsUplink
 
 - type: listing
   id: UplinkGrenadeLauncherBundle
@@ -348,6 +347,11 @@
     Telecrystal: 26 # Starlight-edit: 30 -> 26
   categories:
   - UplinkWeaponry
+  conditions:
+  - !type:StoreWhitelistCondition
+    whitelist:
+      tags:
+      - NukeOpsUplink
 
 - type: listing
   id: UplinkL6SawBundle
