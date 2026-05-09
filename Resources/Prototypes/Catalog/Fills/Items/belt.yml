@@ -96,7 +96,7 @@
         - id: WireBrush
 
 - type: entity
-  parent: [ ClothingBeltMedical, StealTargetMedicalBeltCollection ] # Starlight
+  parent: [ ClothingBeltMedical, StealTargetMedicalBeltCollection ] # Starlight Edit: Added StealTargetMedicalBeltCollection
   id: ClothingBeltMedicalFilled
   suffix: Filled
   components:
@@ -122,7 +122,7 @@
         - id: EmergencyMedipen # Starlight end
 
 - type: entity
-  parent: [ ClothingBeltMedicalEMT, StealTargetMedicalBeltCollection] # Starlight
+  parent: [ ClothingBeltMedicalEMT, StealTargetMedicalBeltCollection] # Starlight Edit: Added StealTargetMedicalBeltCollection
   id: ClothingBeltMedicalEMTFilled
   suffix: Paramedic, Filled
   components:
