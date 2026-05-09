@@ -763,41 +763,42 @@
 ## Departmental Communications Consoles END
 
 - type: entity
+  id: ComputerShipyard
   parent: BaseComputer
-  id: ComputerHologram
-  name: hologram console
-  description: A computer for managing hologram projection. Scans for powered blade servers within range.
+  name: shipyard console
+  description: Used to purchase shuttles.
   components:
-    - type: HologramConsole
-      searchRange: 5
-      bladeServerScanRange: 15
-    - type: ActivatableUI
-      key: enum.HologramConsoleUiKey.Key
-    - type: UserInterface
-      interfaces:
-        enum.HologramConsoleUiKey.Key:
-          type: HologramConsoleBoundUserInterface
-    - type: Sprite
-      layers:
+  - type: Sprite
+    layers:
       - map: ["computerLayerBody"]
-        sprite: Structures/Machines/computers.rsi
         state: computer
       - map: ["computerLayerKeyboard"]
-        sprite: Structures/Machines/computers.rsi
         state: generic_keyboard
       - map: ["computerLayerScreen"]
+        state: shipyard
         sprite: _Starlight/Structures/Machines/computers.rsi
-        state: holo
       - map: ["computerLayerKeys"]
-        sprite: Structures/Machines/computers.rsi
         state: generic_keys
-    - type: Computer
-      board: ComputerHologramCircuitboard
-    - type: PointLight
-      radius: 1.5
-      energy: 1.6
-      color: "#4cc9f0"
+      - map: [ "enum.WiresVisualLayers.MaintenancePanel" ]
+        state: generic_panel_open
+  - type: ShipyardConsole
+  - type: AccessReader
+    access:
+    - [ Captain ]
+  - type: ActivatableUI
+    key: enum.ShipyardConsoleUiKey.Shipyard
+  - type: UserInterface
+    interfaces:
+      enum.ShipyardConsoleUiKey.Shipyard:
+        type: ShipyardConsoleBoundUserInterface
+  - type: Computer
+    board: ShipyardComputerCircuitboard
+  - type: PointLight
+    radius: 1.5
+    energy: 1.6
+    color: "#b89f25"
 
+# Hologram Computer
 - type: entity
   parent: BaseComputer
   id: ComputerHologram
