@@ -134,8 +134,10 @@ public sealed partial class InnerBodyAnomalySystem : SharedInnerBodyAnomalySyste
 
     private void OnAnomalySupercritical(Entity<InnerBodyAnomalyComponent> ent, ref AnomalySupercriticalEvent args)
     {
+        // Starlight Start
         if (!TryComp<BodyComponent>(ent, out var body))
             return;
+        // Starlight End
 
         _gibbing.Gib(ent.Owner);
     }
