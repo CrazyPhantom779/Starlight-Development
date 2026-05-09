@@ -70,6 +70,9 @@
 - type: playTimeTracker
   id: JobNanotrasenCareerTrainer
 
+- type: playTimeTracker
+  id: JobHologram
+
 # Other ghosts
 
 - type: playTimeTracker

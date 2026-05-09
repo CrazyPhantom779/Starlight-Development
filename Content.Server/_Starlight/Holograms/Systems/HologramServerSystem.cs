@@ -12,18 +12,33 @@ public sealed partial class HologramServerSystem : EntitySystem
         base.Initialize();
 
         SubscribeLocalEvent<HologramServerComponent, PowerChangedEvent>(ServerOnPowerChanged);
+        SubscribeLocalEvent<HologramServerComponent, ComponentShutdown>(OnServerShutdown);
     }
 
-    /// <summary>
-    ///     Called when the server's power state changes
-    /// </summary>
     private void ServerOnPowerChanged(EntityUid uid, HologramServerComponent component, ref PowerChangedEvent args)
     {
-        // If the server loses power, kill the hologram
-        if (!args.Powered && Exists(component.LinkedHologram))
+        if (args.Powered)
+            return;
+
+        KillAllHolograms(component);
+    }
+
+    private void OnServerShutdown(EntityUid uid, HologramServerComponent component, ComponentShutdown args)
+        => KillAllHolograms(component);
+
+    private void KillAllHolograms(HologramServerComponent component)
+    {
+        foreach (var hologram in component.ActiveHolograms.Values)
         {
-            _hologram.DoKillHologram(component.LinkedHologram.Value);
-            component.LinkedHologram = null;
+            if (Exists(hologram))
+                _hologram.DoKillHologram(hologram);
         }
+
+        component.ActiveHolograms.Clear();
+
+        if (component.LinkedHologram != null && Exists(component.LinkedHologram.Value))
+            _hologram.DoKillHologram(component.LinkedHologram.Value);
+
+        component.LinkedHologram = null;
     }
 }

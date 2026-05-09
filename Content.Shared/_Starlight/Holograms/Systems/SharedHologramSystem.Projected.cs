@@ -25,7 +25,7 @@ public partial class SharedHologramSystem
             // Skip client-side entities (like spawn menu previews)
             if (_entityManager.IsClientSide(hologram))
                 continue;
-                
+
             ProjectedUpdate(hologram, hologramProjectedComp);
         }
     }
@@ -84,7 +84,8 @@ public partial class SharedHologramSystem
         result = null;
 
         // Sort all projectors in distance increasing order.
-        var nearProjList = new SortedList<float, EntityUid>();
+        // Use a list instead of SortedList so two projectors at the same distance do not discard one another.
+        var nearProjList = new List<(float Distance, EntityUid Projector)>();
 
         var query = _entityManager.EntityQueryEnumerator<HologramProjectorComponent>();
         while (query.MoveNext(out var projector, out var projComp))
@@ -92,17 +93,19 @@ public partial class SharedHologramSystem
             // Skip inactive projectors
             if (!projComp.IsActive)
                 continue;
-                
+
             var dist = (_transform.GetWorldPosition(projector) - coords.Position).LengthSquared();
-            nearProjList.TryAdd(dist, projector);
+            nearProjList.Add((dist, projector));
         }
 
+        nearProjList.Sort((a, b) => a.Distance.CompareTo(b.Distance));
+
         // Find the nearest, valid projector.
-        foreach (var nearProj in nearProjList)
+        foreach (var (Distance, Projector) in nearProjList)
         {
-            if (!IsHoloProjectorValid(coords, nearProj.Value, occlude, whiteList))
+            if (!IsHoloProjectorValid(coords, Projector, occlude, whiteList))
                 continue;
-            result = nearProj.Value;
+            result = Projector;
             return true;
         }
         return false;

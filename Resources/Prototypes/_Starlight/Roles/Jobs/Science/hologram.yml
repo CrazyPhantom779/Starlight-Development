@@ -8,7 +8,7 @@
     time: 10h
   weight: 10
   canBeAntag: false
-  icon: JobIconHologram
+  # icon: JobIconHologram
   supervisors: job-supervisors-rd
   jobEntity: HologramJobBrainChip
   jobPreviewEntity: MobHologramHardlight

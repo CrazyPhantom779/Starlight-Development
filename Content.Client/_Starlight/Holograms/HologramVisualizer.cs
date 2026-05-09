@@ -11,20 +11,23 @@ public sealed class HologramVisualizerSystem : EntitySystem
     [Dependency] private readonly IPrototypeManager _prototype = default!;
     [Dependency] private readonly SpriteSystem _sprite = default!;
 
+    private const string ShaderName = "StarlightHologram";
+    private const float HologramHue = 0.64f;
+
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeLocalEvent<HologramComponent, ComponentStartup>(OnHologramStartup);
+        SubscribeLocalEvent<HologramComponent, ComponentInit>(OnHologramInit);
         SubscribeLocalEvent<HologramComponent, ComponentShutdown>(OnHologramShutdown);
     }
 
-    private void OnHologramStartup(Entity<HologramComponent> ent, ref ComponentStartup args)
+    private void OnHologramInit(Entity<HologramComponent> ent, ref ComponentInit args)
     {
         if (!TryComp<SpriteComponent>(ent.Owner, out var sprite))
             return;
 
-        ApplyHologramShader(ent.Owner, ent.Comp, sprite);
+        ApplyHologramShader(ent.Owner, sprite);
     }
 
     private void OnHologramShutdown(Entity<HologramComponent> ent, ref ComponentShutdown args)
@@ -36,12 +39,13 @@ public sealed class HologramVisualizerSystem : EntitySystem
         sprite.RaiseShaderEvent = false;
     }
 
-    private void ApplyHologramShader(EntityUid uid, HologramComponent component, SpriteComponent sprite)
+    private void ApplyHologramShader(EntityUid uid, SpriteComponent sprite)
     {
-        if (!sprite.AllLayers.Any())
+        var layers = sprite.AllLayers.ToArray();
+        if (layers.Length == 0)
             return;
 
-        for (var i = 0; i < sprite.AllLayers.Count(); i++)
+        for (var i = 0; i < layers.Length; i++)
         {
             if (!_sprite.TryGetLayer((uid, sprite), i, out var layer, false))
                 continue;
@@ -52,11 +56,11 @@ public sealed class HologramVisualizerSystem : EntitySystem
             sprite.LayerSetShader(i, "unshaded");
         }
 
-        var textureHeight = sprite.AllLayers.Max(x => x.PixelSize.Y);
+        var textureHeight = layers.Max(x => x.PixelSize.Y);
 
-        var shader = _prototype.Index<ShaderPrototype>(component.ShaderName).InstanceUnique();
+        var shader = _prototype.Index<ShaderPrototype>(ShaderName).InstanceUnique();
         shader.SetParameter("textureHeight", textureHeight);
-        shader.SetParameter("hue", component.HologramHue);
+        shader.SetParameter("hue", HologramHue);
 
         sprite.PostShader = shader;
         sprite.RaiseShaderEvent = false;

@@ -36,8 +36,8 @@ public sealed class HologramConsoleBoundUserInterface : BoundUserInterface
     private void OnProjectHologram(NetEntity bladeServerUid, NetEntity projectorUid) =>
         SendMessage(new HologramConsoleProjectHologramMessage(bladeServerUid, projectorUid));
 
-    private void OnRecallHologram() =>
-        SendMessage(new HologramConsoleRecallMessage());
+    private void OnRecallHologram(NetEntity? bladeServerUid) =>
+        SendMessage(new HologramConsoleRecallMessage(bladeServerUid));
 
     private void OnEjectBladeServer(NetEntity bladeServerUid) =>
         SendMessage(new HologramConsoleEjectBladeServerMessage(bladeServerUid));
