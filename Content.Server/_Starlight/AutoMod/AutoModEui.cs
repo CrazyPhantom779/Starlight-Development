@@ -4,6 +4,8 @@ using Content.Shared._Starlight.AutoMod;
 using Content.Shared.Eui;
 using Content.Shared.Starlight.CCVar;
 using Robust.Shared.Configuration;
+using Robust.Shared.GameObjects;
+using Robust.Shared.IoC;
 
 namespace Content.Server._Starlight.AutoMod;
 
@@ -12,10 +14,12 @@ public sealed class AutoModEui : BaseEui
     [Dependency] private readonly IEntityManager _ent = default!;
     [Dependency] private readonly IConfigurationManager _cfg = default!;
 
-    private AutoModSystem _autoMod => _ent.System<AutoModSystem>();
+    private AutoModSystem AutoMod => _ent.System<AutoModSystem>();
 
     public AutoModEui()
-        => IoCManager.InjectDependencies(this);
+    {
+        IoCManager.InjectDependencies(this);
+    }
 
     public override void Opened()
     {
@@ -34,13 +38,13 @@ public sealed class AutoModEui : BaseEui
                 break;
 
             case AutoModTestRuleMessage test:
-                SendMessage(new AutoModTestRuleResultMessage(_autoMod.Test(test.Text, test.Channel, test.RuleId, test.MockPoints)));
+                SendMessage(new AutoModTestRuleResultMessage(AutoMod.Test(test.Text, test.Channel, test.RuleId, test.MockPoints)));
                 break;
 
             case AutoModMarkFalsePositiveMessage fp:
                 if (Player?.UserId is { } admin)
                 {
-                    var changed = _autoMod.MarkFalsePositive(fp.IncidentId, admin, fp.Reason);
+                    var changed = AutoMod.MarkFalsePositive(fp.IncidentId, admin, fp.Reason);
                     SendMessage(new AutoModOperationResultMessage(changed, changed ? "Marked false positive." : "Incident was not found."));
                 }
 
@@ -50,7 +54,7 @@ public sealed class AutoModEui : BaseEui
             case AutoModCreateTemplateRuleMessage create:
                 if (Player?.UserId is { } createAdmin)
                 {
-                    var rule = _autoMod.CreateTemplateRule(createAdmin, create.Reason);
+                    var rule = AutoMod.CreateTemplateRule(createAdmin, create.Reason);
                     SendMessage(new AutoModOperationResultMessage(true, $"Created disabled template rule {rule.ID}. Edit it, save it, then enable it."));
                 }
 
@@ -60,7 +64,7 @@ public sealed class AutoModEui : BaseEui
             case AutoModSaveRuleMessage save:
                 if (Player?.UserId is { } saveAdmin)
                 {
-                    var ok = _autoMod.SaveRule(save.Rule, saveAdmin, save.Reason, out var error);
+                    var ok = AutoMod.SaveRule(save.Rule, saveAdmin, save.Reason, out var error);
                     SendMessage(new AutoModOperationResultMessage(ok, ok ? $"Saved rule {save.Rule.ID}." : error));
                 }
 
@@ -70,7 +74,7 @@ public sealed class AutoModEui : BaseEui
             case AutoModSaveRuleJsonMessage saveJson:
                 if (Player?.UserId is { } saveJsonAdmin)
                 {
-                    var ok = _autoMod.SaveRuleJson(saveJson.Json, saveJsonAdmin, saveJson.Reason, out var error);
+                    var ok = AutoMod.SaveRuleJson(saveJson.Json, saveJsonAdmin, saveJson.Reason, out var error);
                     SendMessage(new AutoModOperationResultMessage(ok, ok ? "Saved rule JSON." : error));
                 }
 
@@ -80,7 +84,7 @@ public sealed class AutoModEui : BaseEui
             case AutoModDeleteRuleMessage delete:
                 if (Player?.UserId is { } deleteAdmin)
                 {
-                    var ok = _autoMod.DeleteRule(delete.RuleId, deleteAdmin, delete.Reason);
+                    var ok = AutoMod.DeleteRule(delete.RuleId, deleteAdmin, delete.Reason);
                     SendMessage(new AutoModOperationResultMessage(ok, ok ? $"Deleted rule {delete.RuleId}." : $"Rule {delete.RuleId} was not found."));
                 }
 
@@ -90,7 +94,7 @@ public sealed class AutoModEui : BaseEui
             case AutoModToggleRuleMessage toggle:
                 if (Player?.UserId is { } toggleAdmin)
                 {
-                    var ok = _autoMod.SetRuleEnabled(toggle.RuleId, toggle.Enabled, toggleAdmin, toggle.Reason);
+                    var ok = AutoMod.SetRuleEnabled(toggle.RuleId, toggle.Enabled, toggleAdmin, toggle.Reason);
                     SendMessage(new AutoModOperationResultMessage(ok, ok ? $"Rule {toggle.RuleId} enabled={toggle.Enabled}." : $"Rule {toggle.RuleId} was not found."));
                 }
 
@@ -101,7 +105,7 @@ public sealed class AutoModEui : BaseEui
 
     public override EuiStateBase GetNewState()
     {
-        var autoMod = _autoMod;
+        var autoMod = AutoMod;
         return new AutoModUiState(
             autoMod.RulesetVersion,
             _cfg.GetCVar(StarlightCCVars.AutoModEnabled),

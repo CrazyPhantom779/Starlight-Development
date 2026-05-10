@@ -8,8 +8,7 @@ using Content.Shared._Starlight.AutoMod;
 namespace Content.Client._Starlight.AutoMod.UI;
 
 /// <summary>
-/// Client-only lightweight formatter for the rule editor.
-/// The server remains authoritative for parsing and saving rule text.
+/// Client-only lightweight formatter for the rule editor. The server remains authoritative for parsing and saving rule text.
 /// </summary>
 public static class AutoModRuleJsonFormatter
 {
@@ -35,7 +34,7 @@ public static class AutoModRuleJsonFormatter
 
         sb.AppendLine(Indent(1) + "\"Match\": {");
         Prop(sb, 2, "Kind", rule.Match.Kind.ToString(), comma: true);
-        NullableProp(sb, 2, "WordSet", rule.Match.WordSet, comma: true);
+        NullableProp(sb, 2, "WordSet", null, comma: true);
         NullableProp(sb, 2, "Pattern", rule.Match.Pattern, comma: true);
         ArrayProp(sb, 2, "Words", rule.Match.Words, comma: true);
         ArrayProp(sb, 2, "AllowList", rule.Match.AllowList, comma: true);

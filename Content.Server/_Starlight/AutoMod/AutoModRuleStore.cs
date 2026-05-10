@@ -1,170 +1,318 @@
 using System;
 using System.Collections.Generic;
-using System.Globalization;
+using System.IO;
 using System.Linq;
-using System.Text;
+using System.Text.Json;
+using Content.Server.Administration.Logs;
 using Content.Shared._Starlight.AutoMod;
+using Content.Shared.Chat;
+using Content.Shared.Database;
 
-namespace Content.Client._Starlight.AutoMod.UI;
+namespace Content.Server._Starlight.AutoMod;
 
 /// <summary>
-/// Client-only lightweight formatter for the rule editor.
-/// The server remains authoritative for parsing and saving rule text.
+/// Persistent runtime store for AutoMod rules.
+///
+/// This intentionally does not read YAML/prototypes. The saved runtime JSON document is the only rule source
+/// so admins can create, edit, disable, and delete every rule from the in-game AutoMod UI without touching the codebase.
 /// </summary>
-public static class AutoModRuleJsonFormatter
+internal sealed class AutoModRuleStore
 {
-    public static string ToJson(AutoModEditableRule rule)
+    private const string DirectoryName = "data";
+    private const string FileName = "automod_rules.json";
+    private const int CurrentSchemaVersion = 1;
+
+    private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        var sb = new StringBuilder();
-        sb.AppendLine("{");
-        Prop(sb, 1, "ID", rule.ID, comma: true);
-        Prop(sb, 1, "Name", rule.Name, comma: true);
-        Prop(sb, 1, "Description", rule.Description ?? string.Empty, comma: true);
-        Prop(sb, 1, "Enabled", rule.Enabled, comma: true);
-        Prop(sb, 1, "Priority", rule.Priority, comma: true);
-        Prop(sb, 1, "Category", rule.Category, comma: true);
-        Prop(sb, 1, "Severity", rule.Severity.ToString(), comma: true);
+        WriteIndented = true,
+        IncludeFields = false,
+    };
 
-        ArrayProp(sb, 1, "Channels", rule.Channels, comma: true);
+    private readonly IAdminLogManager _adminLog;
+    private readonly string _path;
+    private List<AutoModEditableRule> _rules = new();
 
-        sb.AppendLine(Indent(1) + "\"AdminPolicy\": {");
-        Prop(sb, 2, "AdminedUsers", rule.AdminPolicy.AdminedUsers.ToString(), comma: true);
-        Prop(sb, 2, "DeadminnedUsers", rule.AdminPolicy.DeadminnedUsers.ToString(), comma: true);
-        Prop(sb, 2, "IgnoreAdminChannels", rule.AdminPolicy.IgnoreAdminChannels, comma: false);
-        sb.AppendLine(Indent(1) + "},");
-
-        sb.AppendLine(Indent(1) + "\"Match\": {");
-        Prop(sb, 2, "Kind", rule.Match.Kind.ToString(), comma: true);
-        NullableProp(sb, 2, "WordSet", rule.Match.WordSet, comma: true);
-        NullableProp(sb, 2, "Pattern", rule.Match.Pattern, comma: true);
-        ArrayProp(sb, 2, "Words", rule.Match.Words, comma: true);
-        ArrayProp(sb, 2, "AllowList", rule.Match.AllowList, comma: true);
-        Prop(sb, 2, "Normalization", rule.Match.Normalization.ToString(), comma: true);
-        Prop(sb, 2, "RequireWordBoundary", rule.Match.RequireWordBoundary, comma: true);
-        Prop(sb, 2, "Window", rule.Match.Window.ToString(), comma: true);
-        Prop(sb, 2, "MaxMessages", rule.Match.MaxMessages, comma: true);
-        Prop(sb, 2, "SimilarityThreshold", rule.Match.SimilarityThreshold.ToString(CultureInfo.InvariantCulture), raw: true, comma: false);
-        sb.AppendLine(Indent(1) + "},");
-
-        sb.AppendLine(Indent(1) + "\"Evidence\": {");
-        Prop(sb, 2, "Mode", rule.Evidence.Mode.ToString(), comma: true);
-        Prop(sb, 2, "MaxPreviewLength", rule.Evidence.MaxPreviewLength, comma: true);
-        Prop(sb, 2, "ShowMatchedTokenToAdmins", rule.Evidence.ShowMatchedTokenToAdmins, comma: false);
-        sb.AppendLine(Indent(1) + "},");
-
-        sb.AppendLine(Indent(1) + "\"Escalation\": {");
-        Prop(sb, 2, "Scope", rule.Escalation.Scope.ToString(), comma: true);
-        NullableProp(sb, 2, "ScopeKey", rule.Escalation.ScopeKey, comma: true);
-        Prop(sb, 2, "PointsPerIncident", rule.Escalation.PointsPerIncident, comma: true);
-        Prop(sb, 2, "Decay", rule.Escalation.Decay.ToString(), comma: true);
-        Prop(sb, 2, "IncludeFalsePositives", rule.Escalation.IncludeFalsePositives, comma: true);
-        Prop(sb, 2, "IncludeDecayed", rule.Escalation.IncludeDecayed, comma: false);
-        sb.AppendLine(Indent(1) + "},");
-
-        sb.AppendLine(Indent(1) + "\"Discord\": {");
-        Prop(sb, 2, "LogMode", rule.Discord.LogMode.ToString(), comma: true);
-        Prop(sb, 2, "MinimumAction", rule.Discord.MinimumAction.ToString(), comma: true);
-        ArrayProp(sb, 2, "PingRolesOn", rule.Discord.PingRolesOn.Select(x => x.ToString()), comma: false);
-        sb.AppendLine(Indent(1) + "},");
-
-        sb.AppendLine(Indent(1) + "\"Levels\": [");
-        for (var i = 0; i < rule.Levels.Count; i++)
-        {
-            var level = rule.Levels[i];
-            sb.AppendLine(Indent(2) + "{");
-            Prop(sb, 3, "MinPoints", level.MinPoints, comma: true);
-            Prop(sb, 3, "CancelSpeech", level.CancelSpeech, comma: true);
-            Prop(sb, 3, "NotifyAdmins", level.NotifyAdmins, comma: true);
-            Prop(sb, 3, "ActionMode", level.ActionMode.ToString(), comma: true);
-
-            sb.AppendLine(Indent(3) + "\"Approval\": {");
-            Prop(sb, 4, "Timeout", level.Approval.Timeout.ToString(), comma: true);
-            Prop(sb, 4, "RequiredPermission", level.Approval.RequiredPermission, comma: true);
-            Prop(sb, 4, "AllowSpeechWhilePending", level.Approval.AllowSpeechWhilePending, comma: false);
-            sb.AppendLine(Indent(3) + "},");
-
-            sb.AppendLine(Indent(3) + "\"Actions\": [");
-            for (var actionIndex = 0; actionIndex < level.Actions.Count; actionIndex++)
-            {
-                var action = level.Actions[actionIndex];
-                sb.AppendLine(Indent(4) + "{");
-                Prop(sb, 5, "Type", action.Type.ToString(), comma: true);
-                NullableProp(sb, 5, "Message", action.Message, comma: true);
-                NullableProp(sb, 5, "Reason", action.Reason, comma: true);
-                Prop(sb, 5, "Duration", action.Duration.ToString(), comma: true);
-                Prop(sb, 5, "Severity", action.Severity.ToString(), comma: true);
-                Prop(sb, 5, "Expiry", action.Expiry.ToString(), comma: true);
-                Prop(sb, 5, "Appealable", action.Appealable, comma: false);
-                sb.AppendLine(Indent(4) + "}" + (actionIndex == level.Actions.Count - 1 ? string.Empty : ","));
-            }
-
-            sb.AppendLine(Indent(3) + "]");
-            sb.AppendLine(Indent(2) + "}" + (i == rule.Levels.Count - 1 ? string.Empty : ","));
-        }
-
-        sb.AppendLine(Indent(1) + "],");
-        Prop(sb, 1, "Source", "RuntimeUI", comma: false);
-        sb.AppendLine("}");
-        return sb.ToString();
+    public AutoModRuleStore(IAdminLogManager adminLog)
+    {
+        _adminLog = adminLog;
+        _path = System.IO.Path.Combine(AppContext.BaseDirectory, DirectoryName, FileName);
     }
 
-    private static void Prop(StringBuilder sb, int indent, string name, string value, bool comma, bool raw = false)
-        => sb.AppendLine(Indent(indent) + $"\"{Escape(name)}\": " + (raw ? value : $"\"{Escape(value)}\"") + (comma ? "," : string.Empty));
+    public IReadOnlyList<AutoModEditableRule> Rules => _rules;
+    public string Path => _path;
 
-    private static void Prop(StringBuilder sb, int indent, string name, bool value, bool comma)
-        => sb.AppendLine(Indent(indent) + $"\"{Escape(name)}\": " + (value ? "true" : "false") + (comma ? "," : string.Empty));
-
-    private static void Prop(StringBuilder sb, int indent, string name, int value, bool comma)
-        => sb.AppendLine(Indent(indent) + $"\"{Escape(name)}\": {value}" + (comma ? "," : string.Empty));
-
-    private static void NullableProp(StringBuilder sb, int indent, string name, string? value, bool comma)
-        => sb.AppendLine(Indent(indent) + $"\"{Escape(name)}\": " + (value == null ? "null" : $"\"{Escape(value)}\"") + (comma ? "," : string.Empty));
-
-    private static void ArrayProp(StringBuilder sb, int indent, string name, IEnumerable<string> values, bool comma)
+    public void Load()
     {
-        sb.AppendLine(Indent(indent) + $"\"{Escape(name)}\": [");
+        Directory.CreateDirectory(System.IO.Path.GetDirectoryName(_path)!);
 
-        var list = values.ToList();
-        for (var i = 0; i < list.Count; i++)
-            sb.AppendLine(Indent(indent + 1) + $"\"{Escape(list[i])}\"" + (i == list.Count - 1 ? string.Empty : ","));
-
-        sb.AppendLine(Indent(indent) + "]" + (comma ? "," : string.Empty));
-    }
-
-    private static string Indent(int count) => new(' ', count * 2);
-
-    private static string Escape(string value)
-    {
-        var sb = new StringBuilder(value.Length + 8);
-
-        foreach (var c in value)
+        if (!File.Exists(_path))
         {
-            switch (c)
-            {
-                case '\\':
-                    sb.Append("\\\\");
-                    break;
-                case '"':
-                    sb.Append("\\\"");
-                    break;
-                case '\n':
-                    sb.Append("\\n");
-                    break;
-                case '\r':
-                    sb.Append("\\r");
-                    break;
-                case '\t':
-                    sb.Append("\\t");
-                    break;
-                default:
-                    if (char.IsControl(c))
-                        sb.Append("\\u" + ((int)c).ToString("x4", CultureInfo.InvariantCulture));
-                    else
-                        sb.Append(c);
-                    break;
-            }
+            _rules = new List<AutoModEditableRule>();
+            Save("created empty AutoMod runtime rule store");
+            return;
         }
 
-        return sb.ToString();
+        try
+        {
+            var json = File.ReadAllText(_path);
+            var document = JsonSerializer.Deserialize<AutoModRuleStoreDocument>(json, JsonOptions);
+            if (document == null || document.SchemaVersion != CurrentSchemaVersion)
+            {
+                ResetInvalidStore("rule store was missing or used an unsupported schema version");
+                return;
+            }
+
+            _rules = Sanitize(document.Rules ?? new List<AutoModEditableRule>());
+        }
+        catch (Exception e)
+        {
+            ResetInvalidStore($"failed to load saved rules: {e.Message}");
+        }
+    }
+
+    public List<AutoModEditableRule> GetClonedRules()
+    {
+        return _rules.Select(x => x.Clone()).ToList();
+    }
+
+    public string ToJson(AutoModEditableRule rule)
+    {
+        return JsonSerializer.Serialize(rule, JsonOptions);
+    }
+
+    public bool TryFromJson(string json, out AutoModEditableRule? rule, out string error)
+    {
+        rule = null;
+        error = string.Empty;
+
+        try
+        {
+            rule = JsonSerializer.Deserialize<AutoModEditableRule>(json, JsonOptions);
+            if (rule == null)
+            {
+                error = "Rule JSON did not deserialize into a rule.";
+                return false;
+            }
+
+            rule = Sanitize(rule);
+            return true;
+        }
+        catch (Exception e)
+        {
+            error = $"Invalid rule JSON: {e.Message}";
+            return false;
+        }
+    }
+
+    public AutoModEditableRule CreateTemplate(string admin, string reason)
+    {
+        var id = $"automod-rule-{DateTime.UtcNow:yyyyMMddHHmmss}";
+        var rule = CreateTemplateRule(id);
+        _rules.Add(rule);
+        Save($"template rule {id} created by {admin}: {reason}");
+        return rule.Clone();
+    }
+
+    public bool Upsert(AutoModEditableRule rule, string admin, string reason, out string error)
+    {
+        error = string.Empty;
+        rule = Sanitize(rule);
+
+        if (string.IsNullOrWhiteSpace(rule.ID))
+        {
+            error = "Rule ID cannot be empty.";
+            return false;
+        }
+
+        var existing = _rules.FindIndex(x => string.Equals(x.ID, rule.ID, StringComparison.OrdinalIgnoreCase));
+        if (existing >= 0)
+            _rules[existing] = rule;
+        else
+            _rules.Add(rule);
+
+        Save($"rule {rule.ID} saved by {admin}: {reason}");
+        return true;
+    }
+
+    public bool Delete(string id, string admin, string reason)
+    {
+        var removed = _rules.RemoveAll(x => string.Equals(x.ID, id, StringComparison.OrdinalIgnoreCase));
+        if (removed == 0)
+            return false;
+
+        Save($"rule {id} deleted by {admin}: {reason}");
+        return true;
+    }
+
+    public bool SetEnabled(string id, bool enabled, string admin, string reason)
+    {
+        var rule = _rules.FirstOrDefault(x => string.Equals(x.ID, id, StringComparison.OrdinalIgnoreCase));
+        if (rule == null)
+            return false;
+
+        rule.Enabled = enabled;
+        Save($"rule {id} enabled={enabled} by {admin}: {reason}");
+        return true;
+    }
+
+    private void Save(string audit)
+    {
+        Directory.CreateDirectory(System.IO.Path.GetDirectoryName(_path)!);
+        var document = new AutoModRuleStoreDocument
+        {
+            SchemaVersion = CurrentSchemaVersion,
+            SavedAt = DateTime.UtcNow,
+            Rules = _rules,
+        };
+
+        File.WriteAllText(_path, JsonSerializer.Serialize(document, JsonOptions));
+        _adminLog.Add(LogType.AdminMessage, LogImpact.Medium, $"AutoMod rules saved: {audit}");
+    }
+
+    private void ResetInvalidStore(string reason)
+    {
+        _rules = new List<AutoModEditableRule>();
+        Save($"reset invalid AutoMod runtime rule store: {reason}");
+        _adminLog.Add(LogType.AdminMessage, LogImpact.High,
+            $"AutoMod rule store at {_path} was reset to an empty clean schema. Reason: {reason}");
+    }
+
+    private static List<AutoModEditableRule> Sanitize(IEnumerable<AutoModEditableRule> rules)
+    {
+        return rules.Select(Sanitize)
+            .Where(x => !string.IsNullOrWhiteSpace(x.ID))
+            .GroupBy(x => x.ID, StringComparer.OrdinalIgnoreCase)
+            .Select(x => x.Last())
+            .OrderByDescending(x => x.Priority)
+            .ThenBy(x => x.ID)
+            .ToList();
+    }
+
+    private static AutoModEditableRule Sanitize(AutoModEditableRule rule)
+    {
+        rule.ID = rule.ID.Trim();
+        rule.Name = string.IsNullOrWhiteSpace(rule.Name) ? rule.ID : rule.Name.Trim();
+        rule.Description = rule.Description?.Trim() ?? string.Empty;
+        rule.Category = string.IsNullOrWhiteSpace(rule.Category) ? "General" : rule.Category.Trim();
+        rule.Channels = rule.Channels
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(x => x.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        rule.Match.WordSet = null;
+        rule.Match.Pattern = string.IsNullOrWhiteSpace(rule.Match.Pattern) ? null : rule.Match.Pattern.Trim();
+        rule.Match.Words = rule.Match.Words
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(x => x.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+        rule.Match.AllowList = rule.Match.AllowList
+            .Where(x => !string.IsNullOrWhiteSpace(x))
+            .Select(x => x.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        rule.Evidence.MaxPreviewLength = Math.Clamp(rule.Evidence.MaxPreviewLength, 8, 1000);
+        rule.Escalation.PointsPerIncident = Math.Max(0, rule.Escalation.PointsPerIncident);
+        rule.Levels = rule.Levels.OrderBy(x => x.MinPoints).ToList();
+        rule.Source = "RuntimeUI";
+        return rule;
+    }
+
+    private static AutoModEditableRule CreateTemplateRule(string id)
+    {
+        return new AutoModEditableRule
+        {
+            ID = id,
+            Name = "New AutoMod Rule",
+            Description = "Created in-game. Fill in match words/regex, levels, actions, and enable when ready.",
+            Enabled = false,
+            Priority = 100,
+            Category = "General",
+            Severity = AutoModSeverity.Low,
+            Channels = new List<string> { ChatChannel.OOC.ToString(), ChatChannel.LOOC.ToString() },
+            AdminPolicy = new AutoModEditableAdminPolicy
+            {
+                AdminedUsers = AutoModAdminedPolicy.Ignore,
+                DeadminnedUsers = AutoModAdminedPolicy.Moderate,
+                IgnoreAdminChannels = true,
+            },
+            Match = new AutoModEditableMatch
+            {
+                Kind = AutoModMatchKind.WordSet,
+                WordSet = null,
+                Words = new List<string>(),
+                AllowList = new List<string>(),
+                Normalization = AutoModNormalizationMode.Basic,
+                RequireWordBoundary = true,
+                Window = TimeSpan.FromSeconds(10),
+                MaxMessages = 5,
+                SimilarityThreshold = 0.85f,
+            },
+            Evidence = new AutoModEditableEvidence
+            {
+                Mode = AutoModEvidenceMode.RedactedPreview,
+                MaxPreviewLength = 160,
+                ShowMatchedTokenToAdmins = true,
+            },
+            Escalation = new AutoModEditableEscalation
+            {
+                Scope = AutoModEscalationScopeKind.Rule,
+                ScopeKey = null,
+                PointsPerIncident = 1,
+                Decay = TimeSpan.FromDays(30),
+                IncludeFalsePositives = false,
+                IncludeDecayed = false,
+            },
+            Discord = new AutoModEditableDiscord
+            {
+                LogMode = AutoModDiscordLogMode.PunishmentsOnly,
+                MinimumAction = AutoModActionType.CreateNote,
+                PingRolesOn = new List<AutoModActionType> { AutoModActionType.Ban },
+            },
+            Levels = new List<AutoModEditableLevel>
+            {
+                new()
+                {
+                    MinPoints = 1,
+                    CancelSpeech = true,
+                    NotifyAdmins = true,
+                    ActionMode = AutoModActionMode.Immediate,
+                    Approval = new AutoModEditableApproval
+                    {
+                        Timeout = TimeSpan.FromMinutes(3),
+                        RequiredPermission = "AutoModAuthorizeAction",
+                        AllowSpeechWhilePending = false,
+                    },
+                    Actions = new List<AutoModEditableAction>
+                    {
+                        new()
+                        {
+                            Type = AutoModActionType.Warn,
+                            Message = "Your message was blocked by AutoMod.",
+                            Severity = AutoModSeverity.Low,
+                            Expiry = TimeSpan.FromDays(30),
+                            Appealable = true,
+                        },
+                        new()
+                        {
+                            Type = AutoModActionType.CreateNote,
+                            Severity = AutoModSeverity.Low,
+                            Expiry = TimeSpan.FromDays(30),
+                            Appealable = true,
+                        },
+                    },
+                },
+            },
+            Source = "RuntimeUI",
+        };
+    }
+
+    private sealed class AutoModRuleStoreDocument
+    {
+        public int SchemaVersion { get; set; }
+        public DateTime SavedAt { get; set; }
+        public List<AutoModEditableRule>? Rules { get; set; }
     }
 }

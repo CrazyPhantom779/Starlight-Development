@@ -165,8 +165,11 @@ public sealed partial class AutoModWindow : DefaultWindow
 
     private static void SetText(TextEdit edit, string text)
     {
-        edit.TextRope = string.IsNullOrEmpty(text)
-            ? Rope.Leaf.Empty
-            : new Rope.Leaf(text);
+        edit.TextRope = Rope.Leaf.Empty;
+        edit.CursorPosition = default;
+        edit.SelectionStart = default;
+
+        if (!string.IsNullOrEmpty(text))
+            edit.InsertAtCursor(text);
     }
 }
