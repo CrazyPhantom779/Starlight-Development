@@ -76,7 +76,12 @@ public sealed record AutoModRuleSummary(
     string EscalationScope,
     string ActionSummary,
     AutoModDiscordLogMode DiscordLogMode,
-    string Source);
+    string Source)
+{
+    // Existing code in this branch has used both Id and ID at different points.
+    // Keep Id as the serialized constructor property and expose ID as a convenience alias.
+    public string ID => Id;
+}
 
 [Serializable, NetSerializable]
 public sealed record AutoModTestResult(

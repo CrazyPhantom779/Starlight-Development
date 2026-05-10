@@ -13,7 +13,7 @@ public sealed class AutoModBoundUserInterface : BoundUserInterface
     public AutoModBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
     {
     }
-CreateTemplateRuleRequested    protected override void Open()
+    protected override void Open()
     {
         base.Open();
         _window = this.CreateWindow<AutoModWindow>();

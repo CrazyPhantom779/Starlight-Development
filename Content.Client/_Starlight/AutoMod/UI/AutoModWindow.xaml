@@ -2,31 +2,61 @@
                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                x:Class="Content.Client._Starlight.AutoMod.UI.AutoModWindow"
                Title="AutoMod"
-               MinSize="900 620">
-    <BoxContainer Orientation="Vertical" SeparationOverride="6" Margin="8">
-        <Label Name="StatusLabel" Text="AutoMod" />
+               MinSize="1050 720"
+               SetSize="1200 780">
+    <BoxContainer Orientation="Vertical" Margin="8">
+        <Label Name="StatusLabel" Text="AutoMod loading..." Margin="0 0 0 8" />
 
-        <BoxContainer Orientation="Horizontal" SeparationOverride="8" VerticalExpand="True" HorizontalExpand="True">
-            <BoxContainer Orientation="Vertical" MinWidth="180" SeparationOverride="4" VerticalExpand="True">
-                <Button Name="DashboardButton" Text="Dashboard" />
-                <Button Name="IncidentsButton" Text="Incident Log" />
-                <Button Name="ApprovalsButton" Text="Approval Queue" />
-                <Button Name="PlayersButton" Text="Player Lookup" />
-                <Button Name="RulesButton" Text="Rules" />
-                <Button Name="TesterButton" Text="Tester" />
-                <Button Name="DiscordButton" Text="Discord Logs" />
-                <Button Name="HealthButton" Text="Sync / Health" />
-                <Button Name="SettingsButton" Text="Settings" />
-            </BoxContainer>
-
-            <PanelContainer HorizontalExpand="True" VerticalExpand="True">
-                <BoxContainer Name="MainContent" Orientation="Vertical" SeparationOverride="4" Margin="8" HorizontalExpand="True" VerticalExpand="True">
-                    <Label Name="MainTitle" Text="Dashboard" StyleClasses="LabelHeading" />
-                    <RichTextLabel Name="MainText" VerticalExpand="True" HorizontalExpand="True" />
-                    <LineEdit Name="TesterInput" PlaceHolder="Tester message" Visible="False" HorizontalExpand="True" />
-                    <Button Name="RunTesterButton" Text="Run Tester" Visible="False" />
+        <BoxContainer Orientation="Horizontal" VerticalExpand="True">
+            <PanelContainer MinWidth="210" Margin="0 0 8 0">
+                <BoxContainer Orientation="Vertical" Margin="6">
+                    <Label Text="AutoMod" StyleClasses="LabelHeading" Margin="0 0 0 8" />
+                    <Button Name="DashboardButton" Text="Dashboard" />
+                    <Button Name="IncidentsButton" Text="Incident Log" />
+                    <Button Name="ApprovalsButton" Text="Approval Queue" />
+                    <Button Name="PlayersButton" Text="Player Lookup" />
+                    <Button Name="RulesButton" Text="Rules" />
+                    <Button Name="TesterButton" Text="Tester" />
+                    <Button Name="DiscordButton" Text="Discord Logs" />
+                    <Button Name="HealthButton" Text="Sync / Health" />
+                    <Button Name="SettingsButton" Text="Settings" />
                 </BoxContainer>
             </PanelContainer>
+
+            <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True">
+                <Label Name="MainTitle" Text="Dashboard" StyleClasses="LabelHeading" Margin="0 0 0 8" />
+
+                <PanelContainer VerticalExpand="True">
+                    <BoxContainer Orientation="Vertical" Margin="8">
+                        <ScrollContainer VerticalExpand="True">
+                            <Label Name="MainText"
+                                   Text="Loading AutoMod state..."
+                                   HorizontalExpand="True"
+                                   VerticalExpand="True" />
+                        </ScrollContainer>
+
+                        <BoxContainer Name="TesterControls" Orientation="Horizontal" Visible="False" Margin="0 8 0 0">
+                            <LineEdit Name="TesterInput" HorizontalExpand="True" PlaceHolder="Message to test..." />
+                            <Button Name="RunTesterButton" Text="Run Test" Margin="8 0 0 0" />
+                        </BoxContainer>
+
+                        <BoxContainer Name="RuleEditorControls" Orientation="Vertical" Visible="False" Margin="0 8 0 0">
+                            <BoxContainer Orientation="Horizontal" Margin="0 0 0 4">
+                                <Button Name="CreateRuleButton" Text="Create Rule" />
+                                <Button Name="SaveRuleButton" Text="Save JSON" Margin="8 0 0 0" />
+                                <Button Name="EnableRuleButton" Text="Enable" Margin="8 0 0 0" />
+                                <Button Name="DisableRuleButton" Text="Disable" Margin="8 0 0 0" />
+                                <Button Name="DeleteRuleButton" Text="Delete" Margin="8 0 0 0" />
+                            </BoxContainer>
+                            <BoxContainer Orientation="Horizontal" Margin="0 0 0 4">
+                                <LineEdit Name="SelectedRuleId" HorizontalExpand="True" PlaceHolder="Rule ID" />
+                                <LineEdit Name="RuleEditReason" HorizontalExpand="True" PlaceHolder="Reason for save/delete/toggle" Margin="8 0 0 0" />
+                            </BoxContainer>
+                            <TextEdit Name="RuleJsonEditor" MinHeight="220" HorizontalExpand="True" />
+                        </BoxContainer>
+                    </BoxContainer>
+                </PanelContainer>
+            </BoxContainer>
         </BoxContainer>
     </BoxContainer>
 </DefaultWindow>

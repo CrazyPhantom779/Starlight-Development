@@ -14,6 +14,9 @@ public sealed class AutoModEui : BaseEui
 
     private AutoModSystem _autoMod => _ent.System<AutoModSystem>();
 
+    public AutoModEui()
+        => IoCManager.InjectDependencies(this);
+
     public override void Opened()
     {
         base.Opened();
@@ -40,6 +43,7 @@ public sealed class AutoModEui : BaseEui
                     var changed = _autoMod.MarkFalsePositive(fp.IncidentId, admin, fp.Reason);
                     SendMessage(new AutoModOperationResultMessage(changed, changed ? "Marked false positive." : "Incident was not found."));
                 }
+
                 StateDirty();
                 break;
 
@@ -47,8 +51,9 @@ public sealed class AutoModEui : BaseEui
                 if (Player?.UserId is { } createAdmin)
                 {
                     var rule = _autoMod.CreateTemplateRule(createAdmin, create.Reason);
-                    SendMessage(new AutoModOperationResultMessage(true, $"Created disabled template rule {rule.ID}. Edit it, then enable it."));
+                    SendMessage(new AutoModOperationResultMessage(true, $"Created disabled template rule {rule.ID}. Edit it, save it, then enable it."));
                 }
+
                 StateDirty();
                 break;
 
@@ -58,6 +63,7 @@ public sealed class AutoModEui : BaseEui
                     var ok = _autoMod.SaveRule(save.Rule, saveAdmin, save.Reason, out var error);
                     SendMessage(new AutoModOperationResultMessage(ok, ok ? $"Saved rule {save.Rule.ID}." : error));
                 }
+
                 StateDirty();
                 break;
 
@@ -67,6 +73,7 @@ public sealed class AutoModEui : BaseEui
                     var ok = _autoMod.SaveRuleJson(saveJson.Json, saveJsonAdmin, saveJson.Reason, out var error);
                     SendMessage(new AutoModOperationResultMessage(ok, ok ? "Saved rule JSON." : error));
                 }
+
                 StateDirty();
                 break;
 
@@ -76,6 +83,7 @@ public sealed class AutoModEui : BaseEui
                     var ok = _autoMod.DeleteRule(delete.RuleId, deleteAdmin, delete.Reason);
                     SendMessage(new AutoModOperationResultMessage(ok, ok ? $"Deleted rule {delete.RuleId}." : $"Rule {delete.RuleId} was not found."));
                 }
+
                 StateDirty();
                 break;
 
@@ -85,23 +93,27 @@ public sealed class AutoModEui : BaseEui
                     var ok = _autoMod.SetRuleEnabled(toggle.RuleId, toggle.Enabled, toggleAdmin, toggle.Reason);
                     SendMessage(new AutoModOperationResultMessage(ok, ok ? $"Rule {toggle.RuleId} enabled={toggle.Enabled}." : $"Rule {toggle.RuleId} was not found."));
                 }
+
                 StateDirty();
                 break;
         }
     }
 
     public override EuiStateBase GetNewState()
-    => new AutoModUiState(
-        _autoMod.RulesetVersion,
-        _cfg.GetCVar(StarlightCCVars.AutoModEnabled),
-        _cfg.GetCVar(StarlightCCVars.AutoModShadowMode),
-        _cfg.GetCVar(StarlightCCVars.AutoModNullLinkEnabled),
-        _autoMod.NullLinkHealthy,
-        _cfg.GetCVar(StarlightCCVars.AutoModDiscordEnabled),
-        0,
-        _autoMod.UnsyncedCount,
-        _autoMod.RecentIncidents.ToList(),
-        _autoMod.GetRuleSummaries(),
-        _autoMod.GetEditableRules().Select(x => x.Clone()).ToList(),
-        _autoMod.RuleStorePath);
+    {
+        var autoMod = _autoMod;
+        return new AutoModUiState(
+            autoMod.RulesetVersion,
+            _cfg.GetCVar(StarlightCCVars.AutoModEnabled),
+            _cfg.GetCVar(StarlightCCVars.AutoModShadowMode),
+            _cfg.GetCVar(StarlightCCVars.AutoModNullLinkEnabled),
+            autoMod.NullLinkHealthy,
+            _cfg.GetCVar(StarlightCCVars.AutoModDiscordEnabled),
+            0,
+            autoMod.UnsyncedCount,
+            autoMod.RecentIncidents.ToList(),
+            autoMod.GetRuleSummaries(),
+            autoMod.GetEditableRules().Select(x => x.Clone()).ToList(),
+            autoMod.RuleStorePath);
+    }
 }
