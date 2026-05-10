@@ -15,9 +15,9 @@ public sealed class AutoModEui : BaseEui
     {
         _window = new AutoModWindow();
         _window.TabSelected += tab => _window.ShowTab(tab, _state);
-        _window.TesterSubmitted += text => SendMessage(new AutoModTestRuleMessage(text, "OOC", null, 0));
-        _window.CreateTemplateRuleRequested += () => SendMessage(new AutoModCreateTemplateRuleMessage("admin UI create template"));
-        _window.SaveRuleJsonRequested += (json, reason) => SendMessage(new AutoModSaveRuleJsonMessage(json, reason));
+        _window.TesterSubmitted += (text, channel, ruleId, points) => SendMessage(new AutoModTestRuleMessage(text, channel, ruleId, points));
+        _window.CreateTemplateRuleRequested += () => SendMessage(new AutoModCreateTemplateRuleMessage("Created from AutoMod UI"));
+        _window.SaveRuleRequested += (rule, reason) => SendMessage(new AutoModSaveRuleMessage(rule, reason));
         _window.DeleteRuleRequested += (ruleId, reason) => SendMessage(new AutoModDeleteRuleMessage(ruleId, reason));
         _window.ToggleRuleRequested += (ruleId, enabled, reason) => SendMessage(new AutoModToggleRuleMessage(ruleId, enabled, reason));
         _window.OnClose += () => SendMessage(new CloseEuiMessage());
@@ -49,6 +49,7 @@ public sealed class AutoModEui : BaseEui
     public override void HandleMessage(EuiMessageBase msg)
     {
         base.HandleMessage(msg);
+
         switch (msg)
         {
             case AutoModTestRuleResultMessage result:

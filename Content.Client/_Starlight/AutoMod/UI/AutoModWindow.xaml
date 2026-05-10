@@ -2,15 +2,19 @@
                xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                x:Class="Content.Client._Starlight.AutoMod.UI.AutoModWindow"
                Title="AutoMod"
-               MinSize="1050 720"
-               SetSize="1200 780">
-    <BoxContainer Orientation="Vertical" Margin="8">
-        <Label Name="StatusLabel" Text="AutoMod loading..." Margin="0 0 0 8" />
+               MinSize="860 620"
+               SetSize="980 680">
+    <BoxContainer Orientation="Vertical" Margin="8" SeparationOverride="6">
+        <PanelContainer>
+            <BoxContainer Orientation="Vertical" Margin="6" SeparationOverride="2">
+                <Label Text="AutoMod" StyleClasses="LabelHeading" />
+                <Label Name="StatusLabel" Text="Loading AutoMod state..." />
+            </BoxContainer>
+        </PanelContainer>
 
-        <BoxContainer Orientation="Horizontal" VerticalExpand="True">
-            <PanelContainer MinWidth="210" Margin="0 0 8 0">
-                <BoxContainer Orientation="Vertical" Margin="6">
-                    <Label Text="AutoMod" StyleClasses="LabelHeading" Margin="0 0 0 8" />
+        <BoxContainer Orientation="Horizontal" VerticalExpand="True" SeparationOverride="8">
+            <PanelContainer MinWidth="190">
+                <BoxContainer Orientation="Vertical" Margin="6" SeparationOverride="4">
                     <Button Name="DashboardButton" Text="Dashboard" />
                     <Button Name="IncidentsButton" Text="Incident Log" />
                     <Button Name="ApprovalsButton" Text="Approval Queue" />
@@ -23,40 +27,177 @@
                 </BoxContainer>
             </PanelContainer>
 
-            <BoxContainer Orientation="Vertical" HorizontalExpand="True" VerticalExpand="True">
-                <Label Name="MainTitle" Text="Dashboard" StyleClasses="LabelHeading" Margin="0 0 0 8" />
+            <PanelContainer HorizontalExpand="True" VerticalExpand="True">
+                <BoxContainer Orientation="Vertical" Margin="8" SeparationOverride="6">
+                    <Label Name="MainTitle" Text="Dashboard" StyleClasses="LabelHeading" />
 
-                <PanelContainer VerticalExpand="True">
-                    <BoxContainer Orientation="Vertical" Margin="8">
-                        <ScrollContainer VerticalExpand="True">
-                            <Label Name="MainText"
-                                   Text="Loading AutoMod state..."
-                                   HorizontalExpand="True"
-                                   VerticalExpand="True" />
-                        </ScrollContainer>
+                    <ScrollContainer Name="InfoPanel" VerticalExpand="True">
+                        <Label Name="MainText"
+                               HorizontalExpand="True"
+                               VerticalExpand="True"
+                               Text="Loading..." />
+                    </ScrollContainer>
 
-                        <BoxContainer Name="TesterControls" Orientation="Horizontal" Visible="False" Margin="0 8 0 0">
-                            <LineEdit Name="TesterInput" HorizontalExpand="True" PlaceHolder="Message to test..." />
-                            <Button Name="RunTesterButton" Text="Run Test" Margin="8 0 0 0" />
-                        </BoxContainer>
-
-                        <BoxContainer Name="RuleEditorControls" Orientation="Vertical" Visible="False" Margin="0 8 0 0">
-                            <BoxContainer Orientation="Horizontal" Margin="0 0 0 4">
-                                <Button Name="CreateRuleButton" Text="Create Rule" />
-                                <Button Name="SaveRuleButton" Text="Save JSON" Margin="8 0 0 0" />
-                                <Button Name="EnableRuleButton" Text="Enable" Margin="8 0 0 0" />
-                                <Button Name="DisableRuleButton" Text="Disable" Margin="8 0 0 0" />
-                                <Button Name="DeleteRuleButton" Text="Delete" Margin="8 0 0 0" />
-                            </BoxContainer>
-                            <BoxContainer Orientation="Horizontal" Margin="0 0 0 4">
-                                <LineEdit Name="SelectedRuleId" HorizontalExpand="True" PlaceHolder="Rule ID" />
-                                <LineEdit Name="RuleEditReason" HorizontalExpand="True" PlaceHolder="Reason for save/delete/toggle" Margin="8 0 0 0" />
-                            </BoxContainer>
-                            <TextEdit Name="RuleJsonEditor" MinHeight="220" HorizontalExpand="True" />
-                        </BoxContainer>
+                    <BoxContainer Name="TesterControls" Orientation="Vertical" Visible="False" SeparationOverride="4">
+                        <Label Text="Rule tester" StyleClasses="LabelHeading" />
+                        <Label Text="This is safe. It never creates incidents, notes, kicks, bans, or Discord logs." />
+                        <GridContainer Columns="2" HorizontalExpand="True">
+                            <Label Text="Channel" />
+                            <LineEdit Name="TesterChannel" Text="OOC" />
+                            <Label Text="Rule ID (optional)" />
+                            <LineEdit Name="TesterRuleId" PlaceHolder="Leave blank to test all rules" />
+                            <Label Text="Existing points" />
+                            <LineEdit Name="TesterMockPoints" Text="0" />
+                        </GridContainer>
+                        <LineEdit Name="TesterInput" HorizontalExpand="True" PlaceHolder="Message to test..." />
+                        <Button Name="RunTesterButton" Text="Run Test" HorizontalExpand="True" />
                     </BoxContainer>
-                </PanelContainer>
-            </BoxContainer>
+
+                    <BoxContainer Name="RuleEditorControls" Orientation="Horizontal" Visible="False" VerticalExpand="True" SeparationOverride="8">
+                        <PanelContainer MinWidth="300">
+                            <BoxContainer Orientation="Vertical" Margin="6" SeparationOverride="4">
+                                <Label Text="Rules" StyleClasses="LabelHeading" />
+                                <Label Text="Pick a rule by ID, edit the friendly fields, then save." />
+                                <ScrollContainer MinHeight="150" VerticalExpand="True">
+                                    <Label Name="RuleListLabel" Text="No rules loaded." />
+                                </ScrollContainer>
+                                <LineEdit Name="SelectedRuleId" PlaceHolder="Rule ID to load" />
+                                <Button Name="LoadRuleButton" Text="Load Rule ID" />
+                                <Button Name="CreateRuleButton" Text="Create New Disabled Rule" />
+                                <Button Name="EnableRuleButton" Text="Enable Loaded Rule" />
+                                <Button Name="DisableRuleButton" Text="Disable Loaded Rule" />
+                                <Button Name="DeleteRuleButton" Text="Delete Loaded Rule" />
+                                <LineEdit Name="RuleEditReason" Text="Updated from AutoMod UI" PlaceHolder="Reason for save/delete/toggle" />
+                            </BoxContainer>
+                        </PanelContainer>
+
+                        <ScrollContainer HorizontalExpand="True" VerticalExpand="True">
+                            <BoxContainer Orientation="Vertical" SeparationOverride="8">
+                                <PanelContainer>
+                                    <BoxContainer Orientation="Vertical" Margin="6" SeparationOverride="4">
+                                        <Label Text="Basic rule info" StyleClasses="LabelHeading" />
+                                        <GridContainer Columns="2" HorizontalExpand="True">
+                                            <Label Text="Rule ID" />
+                                            <LineEdit Name="RuleId" PlaceHolder="automod-example-rule" />
+                                            <Label Text="Name" />
+                                            <LineEdit Name="RuleName" PlaceHolder="Human readable name" />
+                                            <Label Text="Description" />
+                                            <LineEdit Name="RuleDescription" PlaceHolder="What this catches and why" />
+                                            <Label Text="Category" />
+                                            <LineEdit Name="RuleCategory" Text="General" />
+                                            <Label Text="Priority" />
+                                            <LineEdit Name="RulePriority" Text="100" />
+                                            <Label Text="Channels" />
+                                            <LineEdit Name="RuleChannels" Text="OOC, LOOC" PlaceHolder="OOC, LOOC, Local, Radio" />
+                                        </GridContainer>
+                                        <BoxContainer Orientation="Horizontal" SeparationOverride="4">
+                                            <Button Name="ToggleEnabledButton" Text="Enabled: No" />
+                                            <Button Name="SeverityButton" Text="Severity: Low" />
+                                        </BoxContainer>
+                                    </BoxContainer>
+                                </PanelContainer>
+
+                                <PanelContainer>
+                                    <BoxContainer Orientation="Vertical" Margin="6" SeparationOverride="4">
+                                        <Label Text="What should this rule catch?" StyleClasses="LabelHeading" />
+                                        <Label Text="For normal word filters, use Word Set and put one word or phrase per line. Regex is for advanced staff only." />
+                                        <BoxContainer Orientation="Horizontal" SeparationOverride="4">
+                                            <Button Name="MatchKindButton" Text="Match: WordSet" />
+                                            <Button Name="NormalizationButton" Text="Normalize: Basic" />
+                                            <Button Name="BoundaryButton" Text="Whole words: Yes" />
+                                        </BoxContainer>
+                                        <GridContainer Columns="2" HorizontalExpand="True">
+                                            <Label Text="Regex pattern" />
+                                            <LineEdit Name="PatternEdit" PlaceHolder="Only used when Match is Regex" />
+                                            <Label Text="Spam window" />
+                                            <LineEdit Name="SpamWindowSeconds" Text="10" />
+                                            <Label Text="Max messages" />
+                                            <LineEdit Name="SpamMaxMessages" Text="5" />
+                                        </GridContainer>
+                                        <Label Text="Blocked words / phrases" />
+                                        <TextEdit Name="WordsEdit" MinHeight="95" HorizontalExpand="True" />
+                                        <Label Text="Allowed exceptions" />
+                                        <TextEdit Name="AllowListEdit" MinHeight="65" HorizontalExpand="True" />
+                                    </BoxContainer>
+                                </PanelContainer>
+
+                                <PanelContainer>
+                                    <BoxContainer Orientation="Vertical" Margin="6" SeparationOverride="4">
+                                        <Label Text="Escalation and evidence" StyleClasses="LabelHeading" />
+                                        <BoxContainer Orientation="Horizontal" SeparationOverride="4">
+                                            <Button Name="ScopeButton" Text="Scope: Rule" />
+                                            <Button Name="EvidenceModeButton" Text="Evidence: RedactedPreview" />
+                                            <Button Name="ShowTokenButton" Text="Show match: Yes" />
+                                        </BoxContainer>
+                                        <GridContainer Columns="2" HorizontalExpand="True">
+                                            <Label Text="Scope key" />
+                                            <LineEdit Name="ScopeKey" PlaceHolder="Optional. Leave blank for rule/category default." />
+                                            <Label Text="Points per incident" />
+                                            <LineEdit Name="PointsPerIncident" Text="1" />
+                                            <Label Text="Decay days" />
+                                            <LineEdit Name="DecayDays" Text="30" />
+                                            <Label Text="Evidence preview chars" />
+                                            <LineEdit Name="EvidencePreview" Text="160" />
+                                        </GridContainer>
+                                    </BoxContainer>
+                                </PanelContainer>
+
+                                <PanelContainer>
+                                    <BoxContainer Orientation="Vertical" Margin="6" SeparationOverride="4">
+                                        <Label Text="Action levels" StyleClasses="LabelHeading" />
+                                        <Label Text="A rule can have multiple levels. Load a level number, edit it, then save the rule." />
+                                        <BoxContainer Orientation="Horizontal" SeparationOverride="4">
+                                            <LineEdit Name="LevelNumber" Text="1" MinWidth="80" />
+                                            <Button Name="LoadLevelButton" Text="Load Level" />
+                                            <Button Name="AddLevelButton" Text="Add Level" />
+                                            <Button Name="RemoveLevelButton" Text="Remove Level" />
+                                        </BoxContainer>
+                                        <GridContainer Columns="2" HorizontalExpand="True">
+                                            <Label Text="Minimum points" />
+                                            <LineEdit Name="LevelMinPoints" Text="1" />
+                                            <Label Text="Warning/player message" />
+                                            <LineEdit Name="WarnMessage" Text="Your message was blocked by AutoMod." />
+                                            <Label Text="Kick/ban reason" />
+                                            <LineEdit Name="KickBanReason" PlaceHolder="Shown for kicks/bans" />
+                                            <Label Text="Ban duration minutes" />
+                                            <LineEdit Name="DurationMinutes" Text="0" />
+                                            <Label Text="Note expiry days" />
+                                            <LineEdit Name="NoteExpiryDays" Text="30" />
+                                            <Label Text="Approval timeout minutes" />
+                                            <LineEdit Name="ApprovalTimeoutMinutes" Text="3" />
+                                        </GridContainer>
+                                        <BoxContainer Orientation="Horizontal" SeparationOverride="4">
+                                            <Button Name="CancelSpeechButton" Text="Block speech: Yes" />
+                                            <Button Name="NotifyAdminsButton" Text="Notify admins: Yes" />
+                                            <Button Name="ActionModeButton" Text="Mode: Immediate" />
+                                        </BoxContainer>
+                                        <BoxContainer Orientation="Horizontal" SeparationOverride="4">
+                                            <Button Name="ActionTypeButton" Text="Action: Warn" />
+                                            <Button Name="CreateNoteButton" Text="Create note: Yes" />
+                                            <Button Name="ActionSeverityButton" Text="Note severity: Low" />
+                                            <Button Name="AppealableButton" Text="Appealable: Yes" />
+                                            <Button Name="ApprovalSpeechPendingButton" Text="Allow speech pending: No" />
+                                        </BoxContainer>
+                                    </BoxContainer>
+                                </PanelContainer>
+
+                                <PanelContainer>
+                                    <BoxContainer Orientation="Vertical" Margin="6" SeparationOverride="4">
+                                        <Label Text="Discord logging" StyleClasses="LabelHeading" />
+                                        <BoxContainer Orientation="Horizontal" SeparationOverride="4">
+                                            <Button Name="DiscordModeButton" Text="Discord: PunishmentsOnly" />
+                                            <Button Name="DiscordMinimumButton" Text="Min action: CreateNote" />
+                                        </BoxContainer>
+                                        <Label Text="Discord pings currently use rule defaults/server config. Severe actions should still notify admins in-game." />
+                                    </BoxContainer>
+                                </PanelContainer>
+
+                                <Button Name="SaveRuleButton" Text="Save Loaded Rule" HorizontalExpand="True" />
+                            </BoxContainer>
+                        </ScrollContainer>
+                    </BoxContainer>
+                </BoxContainer>
+            </PanelContainer>
         </BoxContainer>
     </BoxContainer>
 </DefaultWindow>
