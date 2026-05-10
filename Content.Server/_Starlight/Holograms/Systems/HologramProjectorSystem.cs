@@ -7,12 +7,33 @@ namespace Content.Server._Starlight.Holograms.Systems;
 
 public sealed class HologramProjectorSystem : EntitySystem
 {
+    private float _accumulator;
+
     public override void Initialize()
     {
         base.Initialize();
 
-        SubscribeLocalEvent((EntityUid ent, HologramProjectorComponent comp, ref PowerChangedEvent _) => CheckState(ent, comp));
-        SubscribeLocalEvent<HologramProjectorComponent, MapInitEvent>((ent, comp, args) => CheckState(ent, comp));
+        SubscribeLocalEvent<HologramProjectorComponent, PowerChangedEvent>(OnPowerChanged);
+    }
+
+    private void OnPowerChanged(EntityUid uid, HologramProjectorComponent component, ref PowerChangedEvent args)
+        => CheckState(uid, component);
+
+    public override void Update(float frameTime)
+    {
+        base.Update(frameTime);
+
+        _accumulator += frameTime;
+        if (_accumulator < 1f)
+            return;
+
+        _accumulator = 0f;
+
+        var query = EntityQueryEnumerator<HologramProjectorComponent>();
+        while (query.MoveNext(out var uid, out var projector))
+        {
+            CheckState(uid, projector);
+        }
     }
 
     public void CheckState(EntityUid projector, HologramProjectorComponent? projComp = null)
@@ -21,12 +42,12 @@ public sealed class HologramProjectorSystem : EntitySystem
             return;
 
         var shouldBeActive = !((TryComp<ApcPowerReceiverComponent>(projector, out var powerComp) && !powerComp.Powered) ||
-            (TryComp<SurveillanceCameraComponent>(projector, out var cameraComp) && !cameraComp.Active));
+                               (TryComp<SurveillanceCameraComponent>(projector, out var cameraComp) && !cameraComp.Active));
 
-        if (projComp.IsActive != shouldBeActive)
-        {
-            projComp.IsActive = shouldBeActive;
-            Dirty(projector, projComp);
-        }
+        if (projComp.IsActive == shouldBeActive)
+            return;
+
+        projComp.IsActive = shouldBeActive;
+        Dirty(projector, projComp);
     }
 }

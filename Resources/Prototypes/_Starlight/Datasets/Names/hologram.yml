@@ -1,0 +1,5 @@
+- type: localizedDataset
+  id: NamesHologramJob
+  values:
+    prefix: names-hologram-job-dataset-
+    count: 45

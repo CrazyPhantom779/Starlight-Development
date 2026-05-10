@@ -11,7 +11,6 @@ public sealed partial class HologramServerComponent : Component
 
     /// <summary>
     /// Legacy single-hologram field kept so old maps/saves and older code paths do not explode.
-    /// New code should use <see cref="ActiveHolograms"/> instead.
     /// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
     public EntityUid? LinkedHologram;

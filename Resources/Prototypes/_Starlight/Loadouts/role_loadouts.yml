@@ -252,6 +252,11 @@
   - BoxerJobTrinkets
   - GroupSpeciesBreathTool
 
+- type: roleLoadout
+  id: JobHologram
+  nameDataset: NamesHologram
+  canCustomizeName: true
+
 # Antagonist Loadouts
 - type: roleLoadout
   id: AntagXenoborg

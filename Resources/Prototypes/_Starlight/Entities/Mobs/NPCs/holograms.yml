@@ -30,14 +30,13 @@
   - type: Fixtures
     fixtures:
       fix1:
-        shape:
-          !type:PhysShapeCircle
+        shape: !type:PhysShapeCircle
           radius: 0.35
         density: 50
         mask:
         - MobMask
         layer:
-        - BulletImpassable
+        - MobLayer
   - type: Body
     prototype: HologramAnimal
     requiredLegs: 1
@@ -73,8 +72,8 @@
     factions:
     - PetsNT
   - type: MovementSpeedModifier
-    baseWalkSpeed : 4.5
-    baseSprintSpeed : 3
+    baseWalkSpeed: 4.5
+    baseSprintSpeed: 3
   - type: Sprite
     noRot: true
     drawdepth: Mobs
@@ -82,7 +81,7 @@
     layers:
     - map: ["enum.DamageStateVisualLayers.Base"]
       state: holo-corgi
-    netsync: false
+      netsync: false
   - type: ReplacementAccent
     accent: dog
   - type: InteractionPopup
@@ -92,8 +91,6 @@
   - type: Grammar
     attributes:
       gender: epicene
-  # - type: DogVision # TODO: These, can steal from park station
-  # - type: RandomBark
   - type: Polymorphable
   - type: HologramProjected
     gracePeriod: 0.08

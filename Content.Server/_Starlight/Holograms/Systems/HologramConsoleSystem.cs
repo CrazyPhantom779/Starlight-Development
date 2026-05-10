@@ -14,7 +14,6 @@ using Content.Shared.PowerCell.Components;
 using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
-using Content.Shared.Mind.Components;
 
 namespace Content.Server._Starlight.Holograms.Systems;
 
@@ -59,7 +58,7 @@ public sealed class HologramConsoleSystem : EntitySystem
     }
 
     private void OnBladeShutdown(EntityUid uid, HologramBladeServerComponent component, ComponentShutdown args)
-        => KillBladeHologram(component);
+        => KillBladeHologram(uid, component);
 
     private void OnUIOpened(EntityUid uid, HologramConsoleComponent component, BoundUIOpenedEvent args)
     {
@@ -88,7 +87,7 @@ public sealed class HologramConsoleSystem : EntitySystem
             _hologram.DoKillHologram(portableHologram);
 
         if (TryComp<HologramBladeServerComponent>(args.Entity, out var blade))
-            KillBladeHologram(blade);
+            KillBladeHologram(args.Entity, blade);
 
         UpdateBriefcaseAppearance(uid, component);
         UpdateUserInterface(uid, component);
@@ -319,7 +318,7 @@ public sealed class HologramConsoleSystem : EntitySystem
         if (parent == EntityUid.Invalid)
             return false;
 
-        if (!TryComp(parent, out BladeServerRackComponent? rackComp))
+        if (!TryComp<BladeServerRackComponent>(parent, out var rackComp))
             return false;
 
         if (!TryComp<ApcPowerReceiverComponent>(parent, out var rackPower) || !rackPower.Powered)
@@ -424,7 +423,7 @@ public sealed class HologramConsoleSystem : EntitySystem
 
         if (brainChipComp.HoloMind is { } mind)
         {
-            if (!_hologram.TryGenerateHumanoidHologram(mind, coords, out var generatedHologram) ||
+            if (!_hologram.TryGenerateHumanoidHologram(mind, bodyChipComp, coords, out var generatedHologram) ||
                 generatedHologram is not { } generated)
                 return false;
 
@@ -458,7 +457,7 @@ public sealed class HologramConsoleSystem : EntitySystem
         {
             var bladeServer = GetEntity(bladeServerNetEntity);
             if (TryComp<HologramBladeServerComponent>(bladeServer, out var bladeComp))
-                KillBladeHologram(bladeComp);
+                KillBladeHologram(bladeServer, bladeComp);
         }
         else if (IsPortable(console))
         {
@@ -469,7 +468,7 @@ public sealed class HologramConsoleSystem : EntitySystem
             foreach (var bladeServer in CollectBladeServers(console))
             {
                 if (TryComp<HologramBladeServerComponent>(bladeServer, out var bladeComp))
-                    KillBladeHologram(bladeComp);
+                    KillBladeHologram(bladeServer, bladeComp);
             }
         }
 
@@ -545,12 +544,37 @@ public sealed class HologramConsoleSystem : EntitySystem
         bladeComp.ActiveHologram = null;
     }
 
-    private void KillBladeHologram(HologramBladeServerComponent bladeComp)
+    private void KillBladeHologram(EntityUid bladeServerUid, HologramBladeServerComponent bladeComp)
     {
         if (bladeComp.ActiveHologram is { } hologram && Exists(hologram))
-            _hologram.DoKillHologram(hologram);
+            ReturnMindAndKill(bladeServerUid, bladeComp, hologram);
 
         bladeComp.ActiveHologram = null;
+    }
+
+    private void ReturnMindAndKill(EntityUid bladeServerUid, HologramBladeServerComponent bladeComp, EntityUid hologram)
+    {
+        if (TryGetBrainChip(bladeServerUid, bladeComp, out var brainChip))
+            _hologram.TryReturnMindToBrainChip(hologram, brainChip);
+
+        _hologram.DoKillHologram(hologram);
+    }
+
+    private bool TryGetBrainChip(EntityUid bladeServerUid, HologramBladeServerComponent bladeComp, out EntityUid brainChip)
+    {
+        brainChip = default;
+
+        if (!TryComp<ItemSlotsComponent>(bladeServerUid, out var slots))
+            return false;
+
+        if (!_itemSlots.TryGetSlot(bladeServerUid, bladeComp.BrainChipSlot, out var brainSlot, slots) ||
+            brainSlot.Item is not { } chip)
+        {
+            return false;
+        }
+
+        brainChip = chip;
+        return true;
     }
 
     private void CleanupPortableHolograms(Dictionary<EntityUid, EntityUid> activeHolograms)
@@ -566,9 +590,14 @@ public sealed class HologramConsoleSystem : EntitySystem
 
     private void KillAllPortableHolograms(Dictionary<EntityUid, EntityUid> activeHolograms)
     {
-        foreach (var hologram in activeHolograms.Values)
+        foreach (var (blade, hologram) in activeHolograms.ToArray())
         {
-            if (Exists(hologram))
+            if (!Exists(hologram))
+                continue;
+
+            if (Exists(blade) && TryComp<HologramBladeServerComponent>(blade, out var bladeComp))
+                ReturnMindAndKill(blade, bladeComp, hologram);
+            else
                 _hologram.DoKillHologram(hologram);
         }
 

@@ -1,28 +1,47 @@
 - type: entity
   id: HologramJobBrainChip
-  parent: HologramBrainChip
-  name: hologram neural image
+  parent: BaseItem
+  name: hologram
+  description: A stored crew consciousness waiting to be projected into hardlight.
   suffix: Job
   categories: [ HideSpawnMenu, DoNotMap ]
   components:
-  - type: MindContainer
-
-  # Safety only. This prevents the hard crash if the job ever falls back to
-  # spawning the chip directly, but that fallback should not happen once the
-  # rack insertion is fixed.
+  - type: Sprite
+    sprite: Objects/Misc/module.rsi
+    state: generic
+    visible: false
+  - type: Item
+    size: Tiny
+  # Defensive fallback: if generic spawning briefly puts the player on this chip,
+  # mover will not hard-crash before HologramJobSpawnSystem installs it into a blade.
   - type: Physics
     bodyType: KinematicController
+  - type: MindContainer
+  - type: HologramBrainChip
+  - type: Tag
+    tags:
+    - HologramBrainChip
+    - HideContextMenu
 
 - type: entity
   id: HologramJobBodyChip
-  parent: HologramBodyChip
+  parent: BaseItem
   name: hologram body profile
+  description: Stored body projection data for a hologram.
   suffix: Job
   categories: [ HideSpawnMenu, DoNotMap ]
   components:
+  - type: Sprite
+    sprite: Objects/Misc/module.rsi
+    state: generic
+  - type: Item
+    size: Tiny
   - type: HologramBodyChip
     hologramPrototype: MobHologramHardlight
     hologramName: hologram
+  - type: Tag
+    tags:
+    - HologramBodyChip
 
 - type: entity
   id: HologramJobBladeServer
@@ -31,16 +50,19 @@
   suffix: Hologram job spawn
   categories: [ HideSpawnMenu, DoNotMap ]
   components:
-  # REQUIRED. If this is missing, the real BladeServerRack rejects it,
-  # and the blade appears on the floor beside/on top of the rack.
+  # Required by the real Moffstation BladeServerRack whitelist.
   - type: BladeServer
     stripeColor: "#45f3ffff"
+
   - type: HologramJobSpawn
-    spawnOnJoin: true
+    spawnOnJoin: false
+
+  # Allows both round-start and runtime/latejoin testing.
   - type: ContainerSpawnPoint
     containerId: hologram_brain_chip
     job: Hologram
-    spawnType: Job
+    spawnType: Unset
+
   - type: ItemSlots
     slots:
       hologram_brain_chip:
@@ -55,14 +77,20 @@
           - HologramBodyChip
         startingItem: HologramJobBodyChip
 
+  - type: ContainerContainer
+    containers:
+      hologram_brain_chip: !type:ContainerSlot
+      hologram_body_chip: !type:ContainerSlot
+
 - type: entity
   id: BladeServerRackHologramJob
   parent: BladeServerRack
   name: hologram blade server rack
+  description: A rack of blade servers that stores hologram crew until they are projected.
   suffix: Hologram job spawn
   components:
   - type: BladeServerRack
-    bladeServerVisualsOffset: 0, -4
+    bladeServerVisualsOffset: 0, 0
     startingContents:
     - HologramJobBladeServer
     - HologramJobBladeServer
@@ -82,3 +110,15 @@
     table: !type:GroupSelector
       children:
       - id: BladeServerRackHologramJob
+
+# Compatibility IDs for maps/admin muscle memory from earlier iterations.
+- type: entity
+  id: HologramJobServerRack
+  parent: BladeServerRackHologramJob
+  suffix: Hologram job spawn, compatibility
+
+- type: entity
+  id: HologramJobServerRackSpawner
+  parent: BladeServerRackHologramJobSpawner
+  name: hologram blade server rack spawner
+  suffix: Hologram job spawn, compatibility

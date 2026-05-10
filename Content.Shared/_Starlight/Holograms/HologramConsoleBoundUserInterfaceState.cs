@@ -25,7 +25,6 @@ public sealed class HologramConsoleBoundUserInterfaceState(
     public NetEntity? ActiveHologram { get; init; } = activeHologram;
     public List<ProjectorInfo> Projectors { get; init; } = projectors;
     public Dictionary<NetEntity, NetCoordinates> ProjectorCoordinates { get; init; } = projectorCoordinates;
-
     public bool IsPortable { get; init; } = isPortable;
     public float? BatteryPercent { get; init; } = batteryPercent;
     public bool AllowCarry { get; init; } = allowCarry;
@@ -40,26 +39,42 @@ public sealed class HologramConsoleBoundUserInterfaceState(
 }
 
 [Serializable, NetSerializable]
-public sealed class BladeServerInfo(
-    NetEntity uid,
-    string hologramName,
-    bool isActive,
-    NetEntity? activeHologram = null,
-    NetEntity? currentProjector = null)
+public sealed class BladeServerInfo
 {
-    public NetEntity Uid { get; init; } = uid;
-    public string HologramName { get; init; } = hologramName;
-    public bool IsActive { get; init; } = isActive;
-    public NetEntity? ActiveHologram { get; init; } = activeHologram;
-    public NetEntity? CurrentProjector { get; init; } = currentProjector;
+    public NetEntity Uid { get; init; }
+    public string HologramName { get; init; }
+    public bool IsActive { get; init; }
+    public NetEntity? ActiveHologram { get; init; }
+    public NetEntity? CurrentProjector { get; init; }
+
+    public BladeServerInfo(
+        NetEntity uid,
+        string hologramName,
+        bool isActive,
+        NetEntity? activeHologram = null,
+        NetEntity? currentProjector = null)
+    {
+        Uid = uid;
+        HologramName = hologramName;
+        IsActive = isActive;
+        ActiveHologram = activeHologram;
+        CurrentProjector = currentProjector;
+    }
 }
 
 [Serializable, NetSerializable]
-public sealed class ProjectorInfo(NetEntity uid, string name, string location)
+public sealed class ProjectorInfo
 {
-    public NetEntity Uid { get; init; } = uid;
-    public string Name { get; init; } = name;
-    public string Location { get; init; } = location;
+    public NetEntity Uid { get; init; }
+    public string Name { get; init; }
+    public string Location { get; init; }
+
+    public ProjectorInfo(NetEntity uid, string name, string location)
+    {
+        Uid = uid;
+        Name = name;
+        Location = location;
+    }
 }
 
 [Serializable, NetSerializable]

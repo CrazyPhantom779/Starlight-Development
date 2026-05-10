@@ -33,15 +33,15 @@ public sealed class HologramConsoleBoundUserInterface : BoundUserInterface
         _window?.UpdateState(castState);
     }
 
-    private void OnProjectHologram(NetEntity bladeServerUid, NetEntity projectorUid) =>
-        SendMessage(new HologramConsoleProjectHologramMessage(bladeServerUid, projectorUid));
+    private void OnProjectHologram(NetEntity bladeServerUid, NetEntity projectorUid)
+        => SendMessage(new HologramConsoleProjectHologramMessage(bladeServerUid, projectorUid));
 
-    private void OnRecallHologram(NetEntity? bladeServerUid) =>
-        SendMessage(new HologramConsoleRecallMessage(bladeServerUid));
+    private void OnRecallHologram(NetEntity? bladeServerUid)
+        => SendMessage(new HologramConsoleRecallMessage(bladeServerUid));
 
-    private void OnEjectBladeServer(NetEntity bladeServerUid) =>
-        SendMessage(new HologramConsoleEjectBladeServerMessage(bladeServerUid));
+    private void OnEjectBladeServer(NetEntity bladeServerUid)
+        => SendMessage(new HologramConsoleEjectBladeServerMessage(bladeServerUid));
 
-    private void OnToggleCarry(bool allowCarry) =>
-        SendMessage(new HologramConsoleToggleCarryMessage(allowCarry));
+    private void OnToggleCarry(bool allowCarry)
+        => SendMessage(new HologramConsoleToggleCarryMessage(allowCarry));
 }

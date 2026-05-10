@@ -8,13 +8,13 @@ namespace Content.Server._Starlight.Holograms;
 public sealed partial class HologramBladeServerComponent : Component
 {
     /// <summary>
-    /// Slot ID for the mind/brain chip.
+    /// Slot ID for the brain chip.
     /// </summary>
     [DataField]
     public string BrainChipSlot = "hologram_brain_chip";
 
     /// <summary>
-    /// Slot ID for the body/profile chip.
+    /// Slot ID for the body chip.
     /// </summary>
     [DataField]
     public string BodyChipSlot = "hologram_body_chip";
@@ -23,10 +23,11 @@ public sealed partial class HologramBladeServerComponent : Component
     /// Whether this blade server is currently powered and functional.
     /// </summary>
     [ViewVariables]
-    public bool IsPowered;
+    public bool IsPowered = false;
 
     /// <summary>
-    /// The currently projected hologram owned by this blade server, if any.
+    /// The currently projected hologram for this blade, if any.
+    /// Null means the mind is stored in the chip but not currently projected.
     /// </summary>
     [ViewVariables]
     public EntityUid? ActiveHologram;

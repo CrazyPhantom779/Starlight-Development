@@ -1,4 +1,6 @@
+using Content.Server.Humanoid;
 using Content.Server.Mind;
+using Content.Shared.Humanoid;
 using Content.Shared.Interaction;
 using Content.Shared.Mind.Components;
 using Content.Shared.Popups;
@@ -16,6 +18,7 @@ public sealed class HologramBodyScannerSystem : EntitySystem
     [Dependency] private readonly IGameTiming _timing = default!;
     [Dependency] private readonly SharedPopupSystem _popup = default!;
     [Dependency] private readonly MindSystem _mind = default!;
+    [Dependency] private readonly HumanoidAppearanceSystem _humanoid = default!;
 
     private static readonly EntProtoId _defaultHologramPrototype = "MobHologramHardlight";
 
@@ -64,8 +67,12 @@ public sealed class HologramBodyScannerSystem : EntitySystem
 
         if (TryComp<HologramBodyChipComponent>(args.Used, out var bodyChip))
         {
+            bodyChip.SourceBody = scannedEntity;
             bodyChip.HologramName = MetaData(scannedEntity).EntityName;
             bodyChip.HologramPrototype = _defaultHologramPrototype;
+
+            if (TryComp<HumanoidAppearanceComponent>(scannedEntity, out var appearance))
+                bodyChip.HologramProfile = _humanoid.GetBaseProfile((scannedEntity, appearance));
 
             _popup.PopupEntity("Body data saved to the hologram body chip.", uid, args.User);
             wroteData = true;
@@ -100,4 +107,3 @@ public sealed class HologramBodyScannerSystem : EntitySystem
         return false;
     }
 }
-
