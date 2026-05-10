@@ -44,6 +44,8 @@ public sealed class BladeServerInfo
     public NetEntity Uid { get; init; }
     public string HologramName { get; init; }
     public bool IsActive { get; init; }
+    public bool HasBody { get; init; }
+    public bool IsEmagged { get; init; }
     public NetEntity? ActiveHologram { get; init; }
     public NetEntity? CurrentProjector { get; init; }
 
@@ -51,12 +53,16 @@ public sealed class BladeServerInfo
         NetEntity uid,
         string hologramName,
         bool isActive,
+        bool hasBody,
+        bool isEmagged = false,
         NetEntity? activeHologram = null,
         NetEntity? currentProjector = null)
     {
         Uid = uid;
         HologramName = hologramName;
         IsActive = isActive;
+        HasBody = hasBody;
+        IsEmagged = isEmagged;
         ActiveHologram = activeHologram;
         CurrentProjector = currentProjector;
     }

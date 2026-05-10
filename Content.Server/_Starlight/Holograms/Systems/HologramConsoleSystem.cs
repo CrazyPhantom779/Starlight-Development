@@ -8,12 +8,15 @@ using Content.Shared._Starlight.Holograms;
 using Content.Shared._Starlight.Holograms.Components;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Item;
-using Content.Shared.Mind;
+using Content.Shared.Mind.Components;
 using Content.Shared.PowerCell;
 using Content.Shared.PowerCell.Components;
+using Content.Shared.Silicons.Laws.Components;
 using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
+using Content.Server._Starlight.Holograms;
+using Content.Shared.Mind;
 
 namespace Content.Server._Starlight.Holograms.Systems;
 
@@ -23,6 +26,7 @@ public sealed class HologramConsoleSystem : EntitySystem
 
     [Dependency] private readonly UserInterfaceSystem _ui = default!;
     [Dependency] private readonly HologramSystem _hologram = default!;
+    [Dependency] private readonly HologramBladeLawSystem _bladeLaws = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
     [Dependency] private readonly SharedTransformSystem _transform = default!;
     [Dependency] private readonly PowerCellSystem _powerCell = default!;
@@ -44,7 +48,15 @@ public sealed class HologramConsoleSystem : EntitySystem
         SubscribeLocalEvent<HologramBladeServerComponent, ComponentShutdown>(OnBladeShutdown);
     }
 
-    public bool IsPortable(EntityUid uid) => HasComp<ItemComponent>(uid);
+    public bool IsPortable(EntityUid uid)
+    {
+        if (!HasComp<ItemComponent>(uid))
+            return false;
+
+        return TryComp<ItemSlotsComponent>(uid, out var slots) &&
+               slots.Slots.ContainsKey(PortableBladeSlot);
+    }
+
     public bool IsBatteryPowered(EntityUid uid) => HasComp<PowerCellSlotComponent>(uid);
 
     private void OnBatteryEmpty(EntityUid uid, HologramConsoleComponent component, ref PowerCellSlotEmptyEvent args)
@@ -137,7 +149,7 @@ public sealed class HologramConsoleSystem : EntitySystem
             if (!TryGetBladeServerData(bladeServerUid, out var bladeComp, out var brainComp, out var bodyChip, out var bodyComp))
                 continue;
 
-            if (brainComp.HoloMind == null && bodyComp.HologramPrototype == null)
+            if (brainComp.HoloMind == null && bodyComp == null)
                 continue;
 
             CleanupBladeHologram(bladeComp);
@@ -156,10 +168,13 @@ public sealed class HologramConsoleSystem : EntitySystem
                     currentProjector = projected.CurProjector;
             }
 
+            var hasBody = bodyComp?.HologramPrototype != null;
             bladeServerList.Add(new BladeServerInfo(
                 GetNetEntity(bladeServerUid),
                 GetHologramName(brainComp, bodyChip, bodyComp),
                 isActive,
+                hasBody,
+                bladeComp.Emagged,
                 activeNet,
                 currentProjector));
         }
@@ -213,7 +228,7 @@ public sealed class HologramConsoleSystem : EntitySystem
             component.ShowProjectButton,
             component.ShowRecallButton,
             component.ShowBladeServerPanel,
-            isPortable || Transform(console).GridUid != null);
+            isPortable || Transform(console).GridUid != null || HasComp<HologramBladeServerComponent>(console));
 
         _ui.SetUiState(console, HologramConsoleUiKey.Key, state);
     }
@@ -221,6 +236,12 @@ public sealed class HologramConsoleSystem : EntitySystem
     private HashSet<EntityUid> CollectBladeServers(EntityUid console)
     {
         var bladeServers = new HashSet<EntityUid>();
+
+        if (HasComp<HologramBladeServerComponent>(console))
+        {
+            bladeServers.Add(console);
+            return bladeServers;
+        }
 
         if (IsPortable(console))
         {
@@ -257,12 +278,12 @@ public sealed class HologramConsoleSystem : EntitySystem
         EntityUid bladeServer,
         [NotNullWhen(true)] out HologramBladeServerComponent? bladeComp,
         [NotNullWhen(true)] out HologramBrainChipComponent? brainComp,
-        out EntityUid bodyChip,
-        [NotNullWhen(true)] out HologramBodyChipComponent? bodyComp)
+        out EntityUid? bodyChip,
+        out HologramBodyChipComponent? bodyComp)
     {
         bladeComp = null;
         brainComp = null;
-        bodyChip = default;
+        bodyChip = null;
         bodyComp = null;
 
         if (!TryComp<HologramBladeServerComponent>(bladeServer, out var bladeServerComp))
@@ -278,35 +299,34 @@ public sealed class HologramConsoleSystem : EntitySystem
             brainSlot.Item is not { } brainChip)
             return false;
 
-        if (!_itemSlots.TryGetSlot(bladeServer, bladeServerComp.BodyChipSlot, out var bodySlot, itemSlots) ||
-            bodySlot.Item is not { } bodyChipUid)
-            return false;
-
         if (!TryComp<HologramBrainChipComponent>(brainChip, out var brainChipComp))
             return false;
 
-        if (!TryComp<HologramBodyChipComponent>(bodyChipUid, out var bodyChipComp))
-            return false;
+        if (_itemSlots.TryGetSlot(bladeServer, bladeServerComp.BodyChipSlot, out var bodySlot, itemSlots) &&
+            bodySlot.Item is { } bodyChipUid &&
+            TryComp<HologramBodyChipComponent>(bodyChipUid, out var bodyChipComp))
+        {
+            bodyChip = bodyChipUid;
+            bodyComp = bodyChipComp;
+        }
 
         bladeComp = bladeServerComp;
         brainComp = brainChipComp;
-        bodyChip = bodyChipUid;
-        bodyComp = bodyChipComp;
         return true;
     }
 
-    private string GetHologramName(HologramBrainChipComponent brainComp, EntityUid bodyChip, HologramBodyChipComponent bodyComp)
+    private string GetHologramName(HologramBrainChipComponent brainComp, EntityUid? bodyChip, HologramBodyChipComponent? bodyComp)
     {
         if (brainComp.HoloMind is { } holoMind && TryComp<MindComponent>(holoMind, out var mindComp))
             return mindComp.CharacterName ?? "Unknown";
 
-        if (!string.IsNullOrWhiteSpace(bodyComp.HologramName))
+        if (!string.IsNullOrWhiteSpace(bodyComp?.HologramName))
             return bodyComp.HologramName;
 
-        if (bodyComp.HologramPrototype != null)
-            return MetaData(bodyChip).EntityName;
+        if (bodyChip != null)
+            return MetaData(bodyChip.Value).EntityName;
 
-        return "Unknown";
+        return "Missing Body";
     }
 
     private bool IsBladeServerPowered(EntityUid bladeServerUid)
@@ -352,8 +372,14 @@ public sealed class HologramConsoleSystem : EntitySystem
         if (!Exists(bladeServer) || !TryGetBladeServerData(bladeServer, out var bladeComp, out var brainChipComp, out _, out var bodyChipComp))
             return;
 
-        if (brainChipComp.HoloMind == null && bodyChipComp.HologramPrototype == null)
+        if (brainChipComp.HoloMind == null)
             return;
+
+        if (bodyChipComp?.HologramPrototype == null)
+        {
+            UpdateUserInterface(console, component);
+            return;
+        }
 
         if (IsPortable(console))
         {
@@ -378,6 +404,7 @@ public sealed class HologramConsoleSystem : EntitySystem
             component.ActiveHolograms[bladeServer] = hologram;
             bladeComp.ActiveHologram = hologram;
             SetProjection(hologram, console, true);
+            _bladeLaws.ApplyBladeLaws(bladeServer, bladeComp, hologram);
         }
         else
         {
@@ -395,6 +422,7 @@ public sealed class HologramConsoleSystem : EntitySystem
             {
                 _hologram.MoveHologramToProjector(existing, projector);
                 SetProjection(existing, projector, false);
+                _bladeLaws.ApplyBladeLaws(bladeServer, bladeComp, existing);
                 UpdateUserInterface(console, component);
                 return;
             }
@@ -407,6 +435,7 @@ public sealed class HologramConsoleSystem : EntitySystem
 
             bladeComp.ActiveHologram = hologram;
             SetProjection(hologram, projector, false);
+            _bladeLaws.ApplyBladeLaws(bladeServer, bladeComp, hologram);
         }
 
         UpdateUserInterface(console, component);
@@ -555,7 +584,10 @@ public sealed class HologramConsoleSystem : EntitySystem
     private void ReturnMindAndKill(EntityUid bladeServerUid, HologramBladeServerComponent bladeComp, EntityUid hologram)
     {
         if (TryGetBrainChip(bladeServerUid, bladeComp, out var brainChip))
+        {
             _hologram.TryReturnMindToBrainChip(hologram, brainChip);
+            _bladeLaws.ApplyBladeLaws(bladeServerUid, bladeComp, brainChip);
+        }
 
         _hologram.DoKillHologram(hologram);
     }

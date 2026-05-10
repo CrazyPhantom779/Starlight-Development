@@ -1,3 +1,5 @@
+using Robust.Shared.Prototypes;
+
 namespace Content.Server._Starlight.Holograms;
 
 /// <summary>
@@ -23,7 +25,7 @@ public sealed partial class HologramBladeServerComponent : Component
     /// Whether this blade server is currently powered and functional.
     /// </summary>
     [ViewVariables]
-    public bool IsPowered = false;
+    public bool IsPowered;
 
     /// <summary>
     /// The currently projected hologram for this blade, if any.
@@ -31,4 +33,22 @@ public sealed partial class HologramBladeServerComponent : Component
     /// </summary>
     [ViewVariables]
     public EntityUid? ActiveHologram;
+
+    /// <summary>
+    /// Whether this blade has been emagged. Laws belong to the blade, not the body projection.
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public bool Emagged;
+
+    /// <summary>
+    /// Default lawset for a non-emagged hologram.
+    /// </summary>
+    [DataField]
+    public string NormalLawset = "DroneLawset";
+
+    /// <summary>
+    /// Lawset used once the blade/rack has been emagged.
+    /// </summary>
+    [DataField]
+    public string EmaggedLawset = "SyndicateLawset";
 }

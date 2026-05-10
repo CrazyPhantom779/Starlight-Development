@@ -18,6 +18,9 @@
     bodyType: KinematicController
   - type: MindContainer
   - type: HologramBrainChip
+  - type: SiliconLawBound
+  - type: SiliconLawProvider
+    laws: DroneLawset
   - type: Tag
     tags:
     - HologramBrainChip
@@ -53,16 +56,28 @@
   # Required by the real Moffstation BladeServerRack whitelist.
   - type: BladeServer
     stripeColor: "#45f3ffff"
-
   - type: HologramJobSpawn
     spawnOnJoin: false
-
+  - type: HologramBladeServer
+    normalLawset: DroneLawset
+    emaggedLawset: SyndicateLawset
+  - type: HologramConsole
+    maxActiveHolograms: 1
+    showMap: true
+    showProjectButton: true
+    showRecallButton: true
+    showBladeServerPanel: true
+  - type: ActivatableUI
+    key: enum.HologramConsoleUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.HologramConsoleUiKey.Key:
+        type: HologramConsoleBoundUserInterface
   # Allows both round-start and runtime/latejoin testing.
   - type: ContainerSpawnPoint
     containerId: hologram_brain_chip
     job: Hologram
     spawnType: Unset
-
   - type: ItemSlots
     slots:
       hologram_brain_chip:
@@ -76,7 +91,6 @@
           tags:
           - HologramBodyChip
         startingItem: HologramJobBodyChip
-
   - type: ContainerContainer
     containers:
       hologram_brain_chip: !type:ContainerSlot

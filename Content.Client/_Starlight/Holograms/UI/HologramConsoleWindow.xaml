@@ -1,22 +1,27 @@
-<BaseWindow xmlns="https://spacestation14.io"
-            xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-            xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
-            xmlns:ui="clr-namespace:Content.Client._Starlight.Holograms.UI"
-            x:Class="Content.Client._Starlight.Holograms.UI.HologramConsoleWindow"
-            Resizable="False">
+<DefaultWindow xmlns="https://spacestation14.io"
+               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+               xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
+               xmlns:ui="clr-namespace:Content.Client._Starlight.Holograms.UI"
+               x:Class="Content.Client._Starlight.Holograms.UI.HologramConsoleWindow"
+               Resizable="False"
+               SetSize="900 650">
   <PanelContainer>
     <PanelContainer.PanelOverride>
       <gfx:StyleBoxFlat BackgroundColor="#0f172a" BorderColor="#3b82f6" BorderThickness="2"/>
     </PanelContainer.PanelOverride>
+
     <BoxContainer Orientation="Vertical" Margin="8" SeparationOverride="8">
       <BoxContainer Orientation="Horizontal" Margin="12 8" SeparationOverride="8">
-        <BoxContainer Orientation="Vertical" VerticalAlignment="Center">
+        <BoxContainer Orientation="Vertical" VerticalAlignment="Center" HorizontalExpand="True">
+          <Label Text="HOLOGRAM NETWORK"/>
           <Label Name="StatusLabel" Text="System Ready" StyleClasses="LabelSmall"/>
         </BoxContainer>
+
         <BoxContainer Orientation="Vertical" VerticalAlignment="Center">
           <Label Name="ActiveIndicator" Text="● INACTIVE"/>
           <Label Name="ModeLabel" StyleClasses="LabelSmall" Visible="False"/>
         </BoxContainer>
+
         <PanelContainer Name="BatteryPanel" Visible="False" MinSize="120 0">
           <PanelContainer.PanelOverride>
             <gfx:StyleBoxFlat BackgroundColor="#0a1628" BorderColor="#1e3a5f" BorderThickness="2"/>
@@ -45,6 +50,7 @@
       <BoxContainer Orientation="Horizontal" SeparationOverride="8">
         <BoxContainer Name="LeftPanel" Orientation="Vertical" SetWidth="420" SeparationOverride="6">
           <Label Text="HOLOGRAMS" StyleClasses="LabelSmall" HorizontalAlignment="Center"/>
+
           <PanelContainer VerticalExpand="True">
             <PanelContainer.PanelOverride>
               <gfx:StyleBoxFlat BackgroundColor="#1a2a45" BorderColor="#3a5a8f" BorderThickness="2"/>
@@ -90,6 +96,7 @@
             <Label Text="PROJECTION MAP"/>
             <Label Name="ProjectorCountLabel" Text="0 Projectors"/>
           </BoxContainer>
+
           <PanelContainer VerticalExpand="True">
             <PanelContainer.PanelOverride>
               <gfx:StyleBoxFlat BackgroundColor="#1a2a45" BorderColor="#3a5a8f" BorderThickness="2"/>
@@ -110,4 +117,4 @@
       </BoxContainer>
     </BoxContainer>
   </PanelContainer>
-</BaseWindow>
+</DefaultWindow>

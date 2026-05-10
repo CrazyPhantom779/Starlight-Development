@@ -9,6 +9,9 @@ using Content.Shared.Roles.Jobs;
 using Content.Shared.Preferences;
 using Robust.Shared.Containers;
 using Content.Shared.Mind;
+using Content.Server._Starlight.Holograms;
+using Content.Server.Power.Components;
+using Content.Shared._Moffstation.BladeServer;
 
 namespace Content.Server._Starlight.Holograms.Systems;
 
@@ -20,7 +23,7 @@ public sealed class HologramJobSpawnSystem : EntitySystem
 {
     private const string HologramJobId = "Hologram";
 
-    [Dependency] private readonly HologramSystem _hologram = default!;
+    [Dependency] private readonly HologramBladeLawSystem _bladeLaws = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly StationSystem _station = default!;
@@ -32,7 +35,7 @@ public sealed class HologramJobSpawnSystem : EntitySystem
     {
         base.Initialize();
 
-        SubscribeLocalEvent<PlayerSpawningEvent>(OnPlayerSpawning, before: new []{ typeof(ContainerSpawnPointSystem) });
+        SubscribeLocalEvent<PlayerSpawningEvent>(OnPlayerSpawning, before: new[] { typeof(ContainerSpawnPointSystem) });
         SubscribeLocalEvent<HologramJobSpawnComponent, ContainerSpawnEvent>(OnContainerSpawn);
         SubscribeLocalEvent<HologramBladeServerComponent, PowerChangedEvent>(OnBladePowerChanged);
     }
@@ -100,8 +103,8 @@ public sealed class HologramJobSpawnSystem : EntitySystem
     }
 
     private bool TryInstallStrayJobChip(EntityUid chip, HologramBrainChipComponent brainChip, EntityUid mindId)
-    => TryInstallStrayJobChip(chip, brainChip, mindId, sameGridOnly: true) ||
-        TryInstallStrayJobChip(chip, brainChip, mindId, sameGridOnly: false);
+        => TryInstallStrayJobChip(chip, brainChip, mindId, sameGridOnly: true) ||
+           TryInstallStrayJobChip(chip, brainChip, mindId, sameGridOnly: false);
 
     private bool TryInstallStrayJobChip(EntityUid chip, HologramBrainChipComponent brainChip, EntityUid mindId, bool sameGridOnly)
     {
@@ -155,7 +158,7 @@ public sealed class HologramJobSpawnSystem : EntitySystem
     private void SetupInstalledChip(
         EntityUid bladeServerUid,
         HologramBladeServerComponent bladeServer,
-        EntityUid _,
+        EntityUid brainChipUid,
         HologramBrainChipComponent brainChip,
         EntityUid mindId,
         HumanoidCharacterProfile? profile)
@@ -163,13 +166,53 @@ public sealed class HologramJobSpawnSystem : EntitySystem
         brainChip.HoloMind = mindId;
         brainChip.IsPowered = IsBladeServerPowered(bladeServerUid);
         profile ??= ResolveProfileForMind(mindId);
+
         EnsureBodyChip(bladeServerUid, bladeServer, mindId, profile);
+        _bladeLaws.ApplyBladeLaws(bladeServerUid, bladeServer, brainChipUid);
+    }
 
-        // Do not spawn a hologram here. The mind stays in the chip until projected.
-        if (bladeServer.ActiveHologram is { } active && Exists(active))
-            ReturnMindAndKill(bladeServerUid, bladeServer, active);
+    private void EnsureBodyChip(EntityUid bladeServerUid, HologramBladeServerComponent bladeServer, EntityUid mindId, HumanoidCharacterProfile? profile)
+    {
+        if (!TryComp<ItemSlotsComponent>(bladeServerUid, out var slots))
+            return;
 
-        bladeServer.ActiveHologram = null;
+        if (!_itemSlots.TryGetSlot(bladeServerUid, bladeServer.BodyChipSlot, out var bodySlot, slots))
+            return;
+
+        EntityUid chip;
+        if (bodySlot.Item is { } existing)
+        {
+            chip = existing;
+        }
+        else
+        {
+            chip = Spawn("HologramJobBodyChip", Transform(bladeServerUid).Coordinates);
+            if (!_itemSlots.TryInsert(bladeServerUid, bodySlot, chip, user: null))
+            {
+                Del(chip);
+                return;
+            }
+        }
+
+        NameBodyChip(chip, mindId, profile);
+    }
+
+    private void NameBodyChip(EntityUid bodyChip, EntityUid mindId, HumanoidCharacterProfile? profile)
+    {
+        if (!TryComp<HologramBodyChipComponent>(bodyChip, out var bodyComp))
+            return;
+
+        if (profile != null)
+        {
+            bodyComp.HologramProfile = profile;
+            bodyComp.HologramName = profile.Name;
+        }
+
+        if (!string.IsNullOrWhiteSpace(bodyComp.HologramName))
+            return;
+
+        if (TryComp<MindComponent>(mindId, out var mind))
+            bodyComp.HologramName = mind.CharacterName;
     }
 
     private HumanoidCharacterProfile? ResolveProfileForMind(EntityUid mindId)
@@ -191,55 +234,29 @@ public sealed class HologramJobSpawnSystem : EntitySystem
         if (_job.MindTryGetJob(mindId, out var jobPrototype))
             return prefs.SelectProfileForJob(jobPrototype.ID);
 
-        return null;
-    }
-
-    private void EnsureBodyChip(EntityUid bladeServerUid, HologramBladeServerComponent bladeServer, EntityUid mindId, HumanoidCharacterProfile? profile)
-    {
-        if (!TryComp<ItemSlotsComponent>(bladeServerUid, out var slots))
-            return;
-
-        if (!_itemSlots.TryGetSlot(bladeServerUid, bladeServer.BodyChipSlot, out var bodySlot, slots))
-            return;
-
-        if (bodySlot.Item is { } existing)
-        {
-            SetupBodyChip(existing, mindId, profile);
-            return;
-        }
-
-        var chip = Spawn("HologramJobBodyChip", Transform(bladeServerUid).Coordinates);
-        if (!_itemSlots.TryInsert(bladeServerUid, bodySlot, chip, user: null))
-        {
-            Del(chip);
-            return;
-        }
-
-        SetupBodyChip(chip, mindId, profile);
-    }
-
-    private void SetupBodyChip(EntityUid bodyChip, EntityUid mindId, HumanoidCharacterProfile? profile)
-    {
-        if (!TryComp<HologramBodyChipComponent>(bodyChip, out var bodyComp))
-            return;
-
-        if (profile != null)
-            bodyComp.HologramProfile = profile;
-
-        if (!string.IsNullOrWhiteSpace(bodyComp.HologramName) && bodyComp.HologramName != "hologram")
-            return;
-
-        if (TryComp<MindComponent>(mindId, out var mind))
-            bodyComp.HologramName = mind.CharacterName;
-
-        if (string.IsNullOrWhiteSpace(bodyComp.HologramName) && profile != null)
-            bodyComp.HologramName = profile.Name;
+        return prefs.GetRandomEnabledProfile();
     }
 
     private bool IsBladeServerPowered(EntityUid bladeServerUid)
     {
-        if (TryComp<HologramBladeServerComponent>(bladeServerUid, out var bladeServer))
-            return bladeServer.IsPowered;
+        if (TryComp<ApcPowerReceiverComponent>(bladeServerUid, out var ownPower))
+            return ownPower.Powered;
+
+        var parent = Transform(bladeServerUid).ParentUid;
+        if (parent == EntityUid.Invalid)
+            return false;
+
+        if (!TryComp<BladeServerRackComponent>(parent, out var rackComp))
+            return false;
+
+        if (!TryComp<ApcPowerReceiverComponent>(parent, out var rackPower) || !rackPower.Powered)
+            return false;
+
+        foreach (var slot in rackComp.BladeSlots)
+        {
+            if (slot.Item == bladeServerUid)
+                return slot.IsPowerEnabled;
+        }
 
         return false;
     }
@@ -247,35 +264,6 @@ public sealed class HologramJobSpawnSystem : EntitySystem
     private void OnBladePowerChanged(EntityUid uid, HologramBladeServerComponent component, ref PowerChangedEvent args)
     {
         component.IsPowered = args.Powered;
-
-        if (args.Powered)
-            return;
-
-        if (component.ActiveHologram is { } hologram && Exists(hologram))
-            ReturnMindAndKill(uid, component, hologram);
-
-        component.ActiveHologram = null;
-    }
-
-    private void ReturnMindAndKill(EntityUid bladeServerUid, HologramBladeServerComponent bladeServer, EntityUid hologram)
-    {
-        if (TryGetBrainChip(bladeServerUid, bladeServer, out var brainChip))
-            _hologram.TryReturnMindToBrainChip(hologram, brainChip);
-
-        _hologram.DoKillHologram(hologram);
-    }
-
-    private bool TryGetBrainChip(EntityUid bladeServerUid, HologramBladeServerComponent bladeServer, out EntityUid brainChip)
-    {
-        brainChip = default;
-
-        if (!TryComp<ItemSlotsComponent>(bladeServerUid, out var slots))
-            return false;
-
-        if (!_itemSlots.TryGetSlot(bladeServerUid, bladeServer.BrainChipSlot, out var brainSlot, slots) || brainSlot.Item is not { } chip)
-            return false;
-
-        brainChip = chip;
-        return true;
+        _bladeLaws.SyncBladeLawsToOccupants(uid, component);
     }
 }

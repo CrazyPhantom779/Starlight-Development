@@ -12,14 +12,15 @@ using Robust.Shared.Utility;
 namespace Content.Client._Starlight.Holograms.UI;
 
 [GenerateTypedNameReferences]
-public sealed partial class HologramConsoleWindow : BaseWindow
+public sealed partial class HologramConsoleWindow : DefaultWindow
 {
     private readonly IEntityManager _entManager;
     private readonly SpriteSystem _spriteSystem;
+    private readonly Texture? _blipTexture;
+
     private NetEntity? _selectedBladeServer;
     private NetEntity? _selectedProjector;
     private bool _isPortableMode;
-    private readonly Texture? _blipTexture;
     private HologramConsoleBoundUserInterfaceState? _currentState;
 
     public event Action<NetEntity, NetEntity>? OnProjectHologram;
@@ -164,8 +165,8 @@ public sealed partial class HologramConsoleWindow : BaseWindow
 
         if (_selectedBladeServer == null && state.BladeServers.Count > 0)
         {
-            var inactive = state.BladeServers.FirstOrDefault(x => !x.IsActive);
-            _selectedBladeServer = (inactive ?? state.BladeServers.First()).Uid;
+            var ready = state.BladeServers.FirstOrDefault(x => !x.IsActive && x.HasBody);
+            _selectedBladeServer = (ready ?? state.BladeServers.First()).Uid;
         }
 
         if (_selectedProjector is { } selectedProjector && state.Projectors.All(x => x.Uid != selectedProjector))
@@ -256,8 +257,11 @@ public sealed partial class HologramConsoleWindow : BaseWindow
             return;
         }
 
+        var missingBodies = state.BladeServers.Count(x => !x.HasBody);
         var activeText = state.ActiveCount == 1 ? "1 active" : $"{state.ActiveCount} active";
-        StatusLabel.Text = $"{state.BladeServers.Count} hologram(s) available, {activeText}";
+        StatusLabel.Text = missingBodies > 0
+            ? $"{state.BladeServers.Count} hologram(s), {activeText}, {missingBodies} missing body"
+            : $"{state.BladeServers.Count} hologram(s) available, {activeText}";
         StatusLabel.FontColorOverride = Color.FromHex("#7dd3fc");
         ActiveIndicator.Text = state.ActiveCount > 0 ? "● ACTIVE" : "● READY";
         ActiveIndicator.FontColorOverride = state.ActiveCount > 0 ? Color.FromHex("#10b981") : Color.FromHex("#fbbf24");
@@ -275,9 +279,15 @@ public sealed partial class HologramConsoleWindow : BaseWindow
 
         var selected = GetSelectedBladeInfo();
         var selectedActive = selected?.IsActive == true;
+        var selectedMissingBody = selected != null && !selected.HasBody;
         var maxed = state.MaxActive > 0 && state.ActiveCount >= state.MaxActive;
 
-        if (state.IsPortable)
+        if (selectedMissingBody)
+        {
+            ProjectButton.Disabled = true;
+            ProjectButton.Text = "▶ MISSING BODY";
+        }
+        else if (state.IsPortable)
         {
             ProjectButton.Disabled = selected == null || selectedActive || (!selectedActive && maxed);
             ProjectButton.Text = selectedActive
@@ -314,11 +324,13 @@ public sealed class BladeServerListEntry : PanelContainer
 
     private readonly PanelContainer _panel;
     private readonly bool _isActive;
+    private readonly bool _hasBody;
 
     public BladeServerListEntry(BladeServerInfo info, bool _)
     {
         BladeServerUid = info.Uid;
         _isActive = info.IsActive;
+        _hasBody = info.HasBody;
 
         _panel = new PanelContainer
         {
@@ -351,8 +363,16 @@ public sealed class BladeServerListEntry : PanelContainer
         {
             SetHeight = 16,
         };
-        statusLabel.SetMessage(FormattedMessage.FromMarkupOrThrow(
-            info.IsActive ? "[color=#10b981]ACTIVE PROJECTION[/color]" : "[color=#7dd3fc]READY[/color]"));
+
+        var status = !info.HasBody
+            ? "[color=#ef4444]MISSING BODY[/color]"
+            : info.IsEmagged
+                ? "[color=#ef4444]SUBVERTED[/color]"
+                : info.IsActive
+                    ? "[color=#10b981]ACTIVE PROJECTION[/color]"
+                    : "[color=#7dd3fc]READY[/color]";
+
+        statusLabel.SetMessage(FormattedMessage.FromMarkupOrThrow(status));
         infoContainer.AddChild(statusLabel);
 
         container.AddChild(infoContainer);
@@ -398,7 +418,7 @@ public sealed class BladeServerListEntry : PanelContainer
         return new StyleBoxFlat
         {
             BackgroundColor = _isActive ? Color.FromHex("#0f172a") : Color.FromHex("#1f2937"),
-            BorderColor = _isActive ? Color.FromHex("#10b981") : Color.FromHex("#374151"),
+            BorderColor = !_hasBody ? Color.FromHex("#ef4444") : _isActive ? Color.FromHex("#10b981") : Color.FromHex("#374151"),
             BorderThickness = new Thickness(2),
         };
     }
