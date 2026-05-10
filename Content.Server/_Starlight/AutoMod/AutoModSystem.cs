@@ -11,38 +11,45 @@ using Content.Shared.Starlight.CCVar;
 using Robust.Shared.Configuration;
 using Robust.Shared.Network;
 using Robust.Shared.Player;
-using Robust.Shared.Prototypes;
+using Robust.Shared.Log;
 
 namespace Content.Server._Starlight.AutoMod;
 
 public sealed class AutoModSystem : EntitySystem
 {
     [Dependency] private readonly IConfigurationManager _cfg = default!;
-    [Dependency] private readonly IPrototypeManager _prototypes = default!;
     [Dependency] private readonly IChatManager _chat = default!;
     [Dependency] private readonly IAdminLogManager _adminLog = default!;
     [Dependency] private readonly DiscordWebhook _discordWebhook = default!;
+    [Dependency] private readonly ILogManager _logManager = default!;
 
+    private AutoModRuleStore _ruleStore = default!;
     private AutoModRuleCompiler _compiler = default!;
     private AutoModEngine _engine = default!;
     private AutoModStateService _state = default!;
     private AutoModDiscordLogger _discord = default!;
     private AutoModNullLinkSync _nullLink = default!;
     private AutoModActionExecutor _actions = default!;
+    private ISawmill _sawmill = default!;
 
     public string RulesetVersion => _compiler.RulesetVersion;
     public IReadOnlyList<AutoModIncidentRecord> RecentIncidents => _state.GetRecent(250);
     public bool NullLinkHealthy => _nullLink.Healthy;
     public int UnsyncedCount => _state.CountUnsynced();
+    public string RuleStorePath => _ruleStore.Path;
 
     public override void Initialize()
     {
         base.Initialize();
 
-        _compiler = new AutoModRuleCompiler(_prototypes);
+        _sawmill = _logManager.GetSawmill("automod");
+        _ruleStore = new AutoModRuleStore(_adminLog);
+        _ruleStore.Load();
+
+        _compiler = new AutoModRuleCompiler(_ruleStore);
         _engine = new AutoModEngine();
         _state = new AutoModStateService();
-        _discord = new AutoModDiscordLogger(_cfg, _discordWebhook);
+        _discord = new AutoModDiscordLogger(_cfg, _discordWebhook, _sawmill);
         _nullLink = new AutoModNullLinkSync(_cfg);
         _actions = new AutoModActionExecutor(_chat, _adminLog, _discord);
 
@@ -60,7 +67,70 @@ public sealed class AutoModSystem : EntitySystem
     public void ReloadRules()
     {
         _compiler.Reload();
-        _adminLog.Add(LogType.AdminMessage, LogImpact.Low, $"AutoMod rules loaded: {_compiler.Rules.Count} rules; version={_compiler.RulesetVersion}");
+        _adminLog.Add(LogType.AdminMessage, LogImpact.Low, $"AutoMod runtime rules loaded: {_compiler.Rules.Count} enabled compiled rules; saved rules={_ruleStore.Rules.Count}; version={_compiler.RulesetVersion}");
+    }
+
+    public IReadOnlyList<AutoModEditableRule> GetEditableRules()
+    {
+        return _ruleStore.GetClonedRules();
+    }
+
+    public string GetRuleJson(string ruleId)
+    {
+        var rule = _ruleStore.GetClonedRules().FirstOrDefault(x => string.Equals(x.ID, ruleId, StringComparison.OrdinalIgnoreCase));
+        return rule == null ? string.Empty : _ruleStore.ToJson(rule);
+    }
+
+    public AutoModEditableRule CreateTemplateRule(NetUserId admin, string reason)
+    {
+        var rule = _ruleStore.CreateTemplate(admin.ToString(), reason);
+        ReloadRules();
+        return rule;
+    }
+
+    public string? ValidateRule(AutoModEditableRule rule)
+    {
+        return _compiler.Validate(rule);
+    }
+
+    public bool SaveRule(AutoModEditableRule rule, NetUserId admin, string reason, out string error)
+    {
+        var validation = ValidateRule(rule);
+        if (validation != null)
+        {
+            error = validation;
+            return false;
+        }
+
+        if (!_ruleStore.Upsert(rule, admin.ToString(), reason, out error))
+            return false;
+
+        ReloadRules();
+        return true;
+    }
+
+    public bool SaveRuleJson(string json, NetUserId admin, string reason, out string error)
+    {
+        if (!_ruleStore.TryFromJson(json, out var rule, out error) || rule == null)
+            return false;
+
+        return SaveRule(rule, admin, reason, out error);
+    }
+
+    public bool DeleteRule(string ruleId, NetUserId admin, string reason)
+    {
+        var deleted = _ruleStore.Delete(ruleId, admin.ToString(), reason);
+        if (deleted)
+            ReloadRules();
+        return deleted;
+    }
+
+    public bool SetRuleEnabled(string ruleId, bool enabled, NetUserId admin, string reason)
+    {
+        var changed = _ruleStore.SetEnabled(ruleId, enabled, admin.ToString(), reason);
+        if (changed)
+            ReloadRules();
+        return changed;
     }
 
     public bool TryCheckChat(ICommonSession player, EntityUid? speaker, string message, ChatChannel channel, out string? feedback)
@@ -87,7 +157,10 @@ public sealed class AutoModSystem : EntitySystem
             return false;
 
         var primaryAction = PrimaryAction(level.Actions, level.CancelSpeech);
-        var decaysAt = rule.Prototype.Escalation.Decay <= TimeSpan.Zero ? null : now + rule.Prototype.Escalation.Decay;
+        DateTime? decaysAt = rule.Prototype.Escalation.Decay <= TimeSpan.Zero
+            ? null
+            : now + rule.Prototype.Escalation.Decay;
+
         var incident = new AutoModIncidentRecord(
             Guid.NewGuid(),
             player.UserId,
@@ -116,7 +189,9 @@ public sealed class AutoModSystem : EntitySystem
             _cfg.GetCVar(StarlightCCVars.AutoModNullLinkEnabled) ? AutoModSyncStatus.Pending : AutoModSyncStatus.LocalOnly);
 
         _state.RecordIncident(incident);
-        _nullLink.QueueIncident(incident);
+
+        if (_cfg.GetCVar(StarlightCCVars.AutoModNullLinkEnabled))
+            _nullLink.QueueIncident(incident);
 
         var shadow = _cfg.GetCVar(StarlightCCVars.AutoModShadowMode);
         _actions.Execute(player, incident, rule, level, shadow, out feedback);
@@ -129,7 +204,10 @@ public sealed class AutoModSystem : EntitySystem
 
     public AutoModTestResult Test(string text, string channel, string? ruleId, int mockPoints)
     {
-        var rules = ruleId == null ? _compiler.Rules : _compiler.Rules.Where(x => x.Prototype.ID == ruleId).ToList();
+        var rules = ruleId == null
+            ? _compiler.Rules
+            : _compiler.Rules.Where(x => x.Prototype.ID == ruleId).ToList();
+
         var match = _engine.Evaluate(text, channel, rules);
         if (match == null)
         {
@@ -142,6 +220,7 @@ public sealed class AutoModSystem : EntitySystem
         var normalized = AutoModNormalizer.Normalize(text, rule.Prototype.Match.Normalization);
         var action = level == null ? AutoModActionType.LogOnly : PrimaryAction(level.Actions, level.CancelSpeech);
         var feedback = level?.Actions.FirstOrDefault(x => x.Type == AutoModActionType.Warn)?.Message;
+
         return new AutoModTestResult(
             true,
             level?.CancelSpeech ?? false,
@@ -162,18 +241,18 @@ public sealed class AutoModSystem : EntitySystem
 
     public List<AutoModRuleSummary> GetRuleSummaries()
     {
-        return _compiler.Rules.Select(rule => new AutoModRuleSummary(
-            rule.Prototype.ID,
-            rule.Prototype.Name,
-            rule.Prototype.Enabled,
-            rule.Prototype.Priority,
-            rule.Prototype.Category,
-            rule.Prototype.Severity,
-            rule.Prototype.Match.Kind,
-            rule.ScopeKey,
-            string.Join(" / ", rule.Prototype.Levels.Select(l => $">={l.MinPoints}:" + string.Join('+', l.Actions.Select(a => a.Type)))),
-            rule.Prototype.Discord.LogMode,
-            "Prototype"))
+        return _ruleStore.GetClonedRules().Select(rule => new AutoModRuleSummary(
+                rule.ID,
+                rule.Name,
+                rule.Enabled,
+                rule.Priority,
+                rule.Category,
+                rule.Severity,
+                rule.Match.Kind,
+                rule.Escalation.Scope == AutoModEscalationScopeKind.Rule ? $"rule:{rule.ID}" : rule.Escalation.ScopeKey ?? rule.Category,
+                string.Join(" / ", rule.Levels.Select(l => $">={l.MinPoints}:" + string.Join('+', l.Actions.Select(a => a.Type)))),
+                rule.Discord.LogMode,
+                rule.Source))
             .ToList();
     }
 
@@ -182,10 +261,11 @@ public sealed class AutoModSystem : EntitySystem
         var changed = _state.MarkFalsePositive(incidentId, admin, reason);
         if (changed)
             _adminLog.Add(LogType.AdminMessage, LogImpact.Medium, $"AutoMod incident {incidentId} marked false positive by {admin}: {reason}");
+
         return changed;
     }
 
-    private static AutoModLevelPrototype? SelectLevel(AutoModCompiledRule rule, int points)
+    private static AutoModEditableLevel? SelectLevel(AutoModCompiledRule rule, int points)
     {
         return rule.Prototype.Levels
             .Where(x => x.MinPoints <= points)
@@ -193,7 +273,7 @@ public sealed class AutoModSystem : EntitySystem
             .FirstOrDefault();
     }
 
-    private static AutoModActionType PrimaryAction(List<AutoModActionPrototype> actions, bool cancelSpeech)
+    private static AutoModActionType PrimaryAction(List<AutoModEditableAction> actions, bool cancelSpeech)
     {
         if (actions.Any(x => x.Type == AutoModActionType.Ban)) return AutoModActionType.Ban;
         if (actions.Any(x => x.Type == AutoModActionType.Kick)) return AutoModActionType.Kick;
@@ -202,7 +282,7 @@ public sealed class AutoModSystem : EntitySystem
         return cancelSpeech ? AutoModActionType.BlockMessage : AutoModActionType.LogOnly;
     }
 
-    private static string? BuildEvidence(string message, AutoModEvidencePrototype evidence)
+    private static string? BuildEvidence(string message, AutoModEditableEvidence evidence)
     {
         return evidence.Mode switch
         {

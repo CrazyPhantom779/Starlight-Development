@@ -2,10 +2,8 @@ using System.Linq;
 using Content.Server.Administration.Logs;
 using Content.Server.Chat.Managers;
 using Content.Shared._Starlight.AutoMod;
-using Content.Shared.Chat;
 using Content.Shared.Database;
 using Robust.Shared.Player;
-using Robust.Shared.Utility;
 
 namespace Content.Server._Starlight.AutoMod;
 
@@ -23,15 +21,19 @@ internal sealed class AutoModActionExecutor
         _discord = discord;
     }
 
-    public void Execute(ICommonSession player, AutoModIncidentRecord incident, AutoModCompiledRule rule, AutoModLevelPrototype level, bool shadow, out string? feedback)
+    public void Execute(ICommonSession player, AutoModIncidentRecord incident, AutoModCompiledRule rule, AutoModEditableLevel level, bool shadow, out string? feedback)
     {
         feedback = null;
+
         var executionKey = $"{incident.IncidentId}:{rule.Prototype.ID}:{incident.ActionTaken}";
         if (!_executed.Add(executionKey))
             return;
 
         var actionText = DescribeActions(level.Actions);
-        _adminLog.Add(LogType.AdminMessage, LogImpact.Medium, $"AutoMod {rule.Prototype.ID} matched {player:Player}: {actionText}; incident={incident.IncidentId}; evidence={incident.EvidencePreview}");
+        var target = $"{player.Name} ({player.UserId})";
+
+        _adminLog.Add(LogType.AdminMessage, LogImpact.Medium,
+            $"AutoMod {rule.Prototype.ID} matched {target}: {actionText}; incident={incident.IncidentId}; evidence={incident.EvidencePreview}");
 
         if (level.NotifyAdmins)
         {
@@ -45,41 +47,62 @@ internal sealed class AutoModActionExecutor
                 case AutoModActionType.Warn:
                     feedback ??= action.Message ?? Loc.GetString("automod-player-warning-generic");
                     break;
+
                 case AutoModActionType.CreateNote:
-                    // Real admin-note APIs vary across Starlight branches. This logs the note body now and keeps the text deterministic.
-                    _adminLog.Add(LogType.AdminMessage, LogImpact.Medium, BuildNoteBody(incident, rule, action));
+                    // TODO: Wire this into the branch's real admin-note manager.
+                    // This remains as an admin-log mirror until the exact note API is connected.
+                    var noteBody = BuildNoteBody(
+                        incident,
+                        rule,
+                        action.Type,
+                        action.Severity,
+                        action.Expiry,
+                        action.Appealable);
+                    _adminLog.Add(LogType.AdminMessage, LogImpact.Medium, $"{noteBody}");
                     break;
+
                 case AutoModActionType.Kick:
-                    // The actual kick should be wired through the branch's existing kick helper after local API confirmation.
                     feedback ??= action.Reason ?? Loc.GetString("automod-player-kick-generic");
-                    _adminLog.Add(LogType.AdminMessage, LogImpact.High, $"AutoMod kick requested for {player:Player}: {feedback}; incident={incident.IncidentId}");
+                    _adminLog.Add(LogType.AdminMessage, LogImpact.High,
+                        $"AutoMod kick requested for {target}: {feedback}; incident={incident.IncidentId}");
                     break;
+
                 case AutoModActionType.Ban:
-                    // The actual ban should be wired through the branch's existing ban helper after local API confirmation.
                     feedback ??= action.Reason ?? Loc.GetString("automod-player-ban-generic");
-                    _adminLog.Add(LogType.AdminMessage, LogImpact.High, $"AutoMod ban requested for {player:Player}: {feedback}; duration={action.Duration}; incident={incident.IncidentId}");
+                    _adminLog.Add(LogType.AdminMessage, LogImpact.Extreme,
+                        $"AutoMod ban requested for {target}: {feedback}; duration={action.Duration}; incident={incident.IncidentId}");
                     break;
             }
         }
 
-        _discord.QueueIncident(incident, rule, level);
+        _discord.Queue(incident, rule, level, actionText);
+
+        if (shadow)
+            feedback = null;
     }
 
-    private static string DescribeActions(IEnumerable<AutoModActionPrototype> actions)
+    private static string DescribeActions(IEnumerable<AutoModEditableAction> actions)
     {
-        var list = actions.Select(x => x.Type.ToString()).Distinct().ToArray();
-        return list.Length == 0 ? "LogOnly" : string.Join("+", list);
+        var text = string.Join("+", actions.Select(x => x.Type.ToString()));
+        return string.IsNullOrWhiteSpace(text) ? "LogOnly" : text;
     }
 
-    private static string BuildNoteBody(AutoModIncidentRecord incident, AutoModCompiledRule rule, AutoModActionPrototype action)
+    private static string BuildNoteBody(
+        AutoModIncidentRecord incident,
+        AutoModCompiledRule rule,
+        AutoModActionType actionType,
+        AutoModSeverity severity,
+        TimeSpan expiry,
+        bool appealable)
     {
-        return $"[AUTOMOD {action.Severity}] {rule.Prototype.Category} / {rule.Prototype.Name}\n" +
-               $"Rule: {rule.Prototype.ID}\n" +
+        return $"[AUTOMOD {actionType}] {rule.Prototype.Category} / {rule.Prototype.Severity}\n" +
+               $"Rule: {rule.Prototype.Name} ({rule.Prototype.ID})\n" +
                $"Incident: {incident.IncidentId}\n" +
                $"Action: {incident.ActionTaken}\n" +
-               $"Expires: {incident.DecaysAtUtc:O}\n" +
-               $"Appealable: {action.Appealable}\n" +
-               $"Evidence: {incident.EvidencePreview}\n\n" +
-               "This note was generated from a structured AutoMod incident. Editing this note does not affect AutoMod escalation.";
+               $"Severity: {severity}\n" +
+               $"Expires: {(expiry <= TimeSpan.Zero ? "Never" : DateTime.UtcNow.Add(expiry).ToString("u"))}\n" +
+               $"Appealable: {(appealable ? "Yes" : "No")}\n\n" +
+               $"Evidence preview:\n{incident.EvidencePreview ?? "<none>"}\n\n" +
+               "This note was generated from a structured AutoMod incident. Editing this note does not change AutoMod escalation.";
     }
 }

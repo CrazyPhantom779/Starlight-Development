@@ -5,11 +5,12 @@ namespace Content.Server._Starlight.AutoMod;
 
 internal sealed class AutoModCompiledRule
 {
-    public required AutoModRulePrototype Prototype { get; init; }
+    public required AutoModEditableRule Prototype { get; init; }
     public required string Version { get; init; }
     public Regex? Regex { get; init; }
     public HashSet<string> WordSet { get; init; } = new(StringComparer.OrdinalIgnoreCase);
     public HashSet<string> AllowList { get; init; } = new(StringComparer.OrdinalIgnoreCase);
+
     public string ScopeKey => Prototype.Escalation.Scope switch
     {
         AutoModEscalationScopeKind.Rule => $"rule:{Prototype.ID}",
@@ -28,7 +29,7 @@ internal sealed record AutoModMatch(
 
 internal sealed record AutoModEvaluation(
     AutoModMatch? Match,
-    AutoModLevelPrototype? Level,
+    AutoModEditableLevel? Level,
     int PointsBefore,
     int PointsAfter,
     bool CancelSpeech,

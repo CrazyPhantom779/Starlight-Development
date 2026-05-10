@@ -1,45 +1,30 @@
-using System.Linq;
+using Content.Server.EUI;
 using Content.Shared.Administration;
 using Robust.Shared.Console;
 
 namespace Content.Server._Starlight.AutoMod;
 
+/// <summary>
+/// Opens the AutoMod editor/dashboard UI.
+/// All rule management is intentionally performed through this UI, not through helper commands.
+/// </summary>
 [AnyCommand]
-public sealed class AutoModReloadCommand : IConsoleCommand
+public sealed class AutoModCommand : IConsoleCommand
 {
-    [Dependency] private readonly IEntityManager _ent = default!;
+    [Dependency] private readonly EuiManager _euiManager = default!;
 
-    public string Command => "automodreload";
-    public string Description => "Reload AutoMod rules.";
-    public string Help => "automodreload";
+    public string Command => "automod";
+    public string Description => "Open the AutoMod admin UI.";
+    public string Help => "automod";
 
     public void Execute(IConsoleShell shell, string argStr, string[] args)
     {
-        _ent.System<AutoModSystem>().ReloadRules();
-        shell.WriteLine("AutoMod rules reloaded.");
-    }
-}
-
-[AnyCommand]
-public sealed class AutoModTestCommand : IConsoleCommand
-{
-    [Dependency] private readonly IEntityManager _ent = default!;
-
-    public string Command => "automodtest";
-    public string Description => "Test AutoMod against a message.";
-    public string Help => "automodtest <channel> <message>";
-
-    public void Execute(IConsoleShell shell, string argStr, string[] args)
-    {
-        if (args.Length < 2)
+        if (shell.Player is not { } player)
         {
-            shell.WriteLine(Help);
+            shell.WriteError("This command must be run by an in-game admin.");
             return;
         }
 
-        var channel = args[0];
-        var msg = string.Join(' ', args.Skip(1));
-        var result = _ent.System<AutoModSystem>().Test(msg, channel, null, 0);
-        shell.WriteLine($"Matched={result.Matched} Rule={result.RuleId} Action={result.ActionSummary} Cancel={result.CancelSpeech} Normalized={result.NormalizedText}");
+        _euiManager.OpenEui(new AutoModEui(), player);
     }
 }
