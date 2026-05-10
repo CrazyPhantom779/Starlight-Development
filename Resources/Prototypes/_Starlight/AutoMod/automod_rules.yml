@@ -1,0 +1,130 @@
+- type: automodWordSet
+  id: AutoModExampleSlurs
+  visibility: Sensitive
+  words:
+    # Populate privately server-side. These placeholders prove the pipeline.
+    - "examplebadword"
+  allowList: []
+
+- type: automodWordSet
+  id: AutoModRaidPhrases
+  visibility: Staff
+  words:
+    - "raid phrase example"
+    - "join my discord"
+  allowList: []
+
+- type: automodRule
+  id: automod-example-slur
+  name: Example Slur Filter
+  enabled: true
+  priority: 1000
+  category: Slurs
+  severity: High
+  description: Blocks and escalates configured high-severity words.
+  channels: [Local, Whisper, Radio, LOOC, OOC]
+  adminPolicy:
+    adminedUsers: Ignore
+    deadminnedUsers: Moderate
+    ignoreAdminChannels: true
+  match:
+    kind: WordSet
+    wordSet: AutoModExampleSlurs
+    normalization: Aggressive
+    requireWordBoundary: true
+  evidence:
+    mode: RedactedPreview
+    maxPreviewLength: 160
+    showMatchedTokenToAdmins: true
+  escalation:
+    scope: Category
+    scopeKey: Slurs
+    pointsPerIncident: 1
+    decay: 30d
+    includeFalsePositives: false
+    includeDecayed: false
+  discord:
+    logMode: PunishmentsOnly
+    minimumAction: CreateNote
+    pingRolesOn: [Ban]
+  levels:
+    - minPoints: 1
+      cancelSpeech: true
+      notifyAdmins: true
+      actionMode: Immediate
+      actions:
+        - type: Warn
+          message: "Your message was blocked by AutoMod: prohibited language."
+        - type: CreateNote
+          severity: Medium
+          expiry: 30d
+          appealable: true
+    - minPoints: 2
+      cancelSpeech: true
+      notifyAdmins: true
+      actionMode: Immediate
+      actions:
+        - type: Kick
+          reason: "Repeated prohibited language."
+        - type: CreateNote
+          severity: High
+          expiry: 60d
+          appealable: true
+    - minPoints: 3
+      cancelSpeech: true
+      notifyAdmins: true
+      actionMode: RequireApproval
+      approval:
+        timeout: 3m
+        requiredPermission: AutoModAuthorizeBan
+        allowSpeechWhilePending: false
+      actions:
+        - type: Ban
+          duration: 7d
+          reason: "Repeated prohibited language after AutoMod warnings."
+        - type: CreateNote
+          severity: High
+          expiry: 90d
+          appealable: true
+
+- type: automodRule
+  id: automod-raid-phrase
+  name: Raid Phrase Filter
+  enabled: true
+  priority: 900
+  category: RaidRisk
+  severity: High
+  description: Tracks phrases commonly used by raiders.
+  channels: [OOC, LOOC]
+  match:
+    kind: WordSet
+    wordSet: AutoModRaidPhrases
+    normalization: RaidResistant
+    requireWordBoundary: false
+  escalation:
+    scope: Custom
+    scopeKey: RaidRisk
+    pointsPerIncident: 1
+    decay: 2h
+  discord:
+    logMode: AllIncidents
+  levels:
+    - minPoints: 1
+      cancelSpeech: true
+      notifyAdmins: true
+      actionMode: Immediate
+      actions:
+        - type: Warn
+          message: "Your message was blocked by AutoMod."
+    - minPoints: 3
+      cancelSpeech: true
+      notifyAdmins: true
+      actionMode: RequireApproval
+      approval:
+        timeout: 2m
+        requiredPermission: AutoModAuthorizeBan
+        allowSpeechWhilePending: false
+      actions:
+        - type: Ban
+          duration: 1d
+          reason: "Raid-risk AutoMod escalation."

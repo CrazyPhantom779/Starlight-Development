@@ -5,6 +5,7 @@ using Content.Server._NullLink.PlayerData;
 using Content.Server.Administration.Logs;
 using Content.Server.Administration.Managers;
 using Content.Server.Administration.Systems;
+using Content.Server._Starlight.AutoMod;
 using Content.Server.Discord.DiscordLink;
 using Content.Server.Players.RateLimiting;
 using Content.Server.Preferences.Managers;
@@ -267,6 +268,10 @@ internal sealed partial class ChatManager : IChatManager
         }
         // Starlight-End
 
+
+        if (type == OOCChatType.OOC && TryAutoModChat(player, message, ChatChannel.OOC))
+            return;
+
         switch (type)
         {
             case OOCChatType.OOC:
@@ -281,6 +286,18 @@ internal sealed partial class ChatManager : IChatManager
     #endregion
 
     #region Private API
+
+    private bool TryAutoModChat(ICommonSession player, string message, ChatChannel channel)
+    {
+        var autoMod = _entityManager.System<AutoModSystem>();
+        if (!autoMod.TryCheckChat(player, player.AttachedEntity, message, channel, out var feedback))
+            return false;
+
+        if (!string.IsNullOrWhiteSpace(feedback))
+            DispatchServerMessage(player, feedback, suppressLog: true);
+
+        return true;
+    }
 
     private void SendOOC(ICommonSession player, string message)
     {

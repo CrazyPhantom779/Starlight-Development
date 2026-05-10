@@ -1,0 +1,28 @@
+<DefaultWindow xmlns="https://spacestation14.io"
+               Title="AutoMod"
+               MinSize="900 620">
+    <BoxContainer Orientation="Vertical" SeparationOverride="6" Margin="8">
+        <Label Name="StatusLabel" Text="AutoMod" />
+        <BoxContainer Orientation="Horizontal" SeparationOverride="8">
+            <BoxContainer Orientation="Vertical" MinWidth="180" SeparationOverride="4">
+                <Button Name="DashboardButton" Text="Dashboard" />
+                <Button Name="IncidentsButton" Text="Incident Log" />
+                <Button Name="ApprovalsButton" Text="Approval Queue" />
+                <Button Name="PlayersButton" Text="Player Lookup" />
+                <Button Name="RulesButton" Text="Rules" />
+                <Button Name="TesterButton" Text="Tester" />
+                <Button Name="DiscordButton" Text="Discord Logs" />
+                <Button Name="HealthButton" Text="Sync / Health" />
+                <Button Name="SettingsButton" Text="Settings" />
+            </BoxContainer>
+            <PanelContainer HorizontalExpand="True" VerticalExpand="True">
+                <BoxContainer Name="MainContent" Orientation="Vertical" SeparationOverride="4" Margin="8">
+                    <Label Name="MainTitle" Text="Dashboard" StyleClasses="LabelHeading" />
+                    <RichTextLabel Name="MainText" VerticalExpand="True" />
+                    <LineEdit Name="TesterInput" PlaceHolder="Tester message" Visible="False" />
+                    <Button Name="RunTesterButton" Text="Run Tester" Visible="False" />
+                </BoxContainer>
+            </PanelContainer>
+        </BoxContainer>
+    </BoxContainer>
+</DefaultWindow>

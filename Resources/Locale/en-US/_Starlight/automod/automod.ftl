@@ -1,0 +1,12 @@
+automod-player-warning-generic = Your message was blocked by AutoMod.
+automod-player-kick-generic = AutoMod action: kick.
+automod-player-ban-generic = AutoMod action: ban.
+automod-ui-title = AutoMod
+automod-ui-dashboard = Dashboard
+automod-ui-incident-log = Incident Log
+automod-ui-approval-queue = Approval Queue
+automod-ui-player-lookup = Player Lookup
+automod-ui-rules = Rules
+automod-ui-tester = Tester
+automod-ui-discord-logs = Discord Logs
+automod-ui-sync-health = Sync / Health
