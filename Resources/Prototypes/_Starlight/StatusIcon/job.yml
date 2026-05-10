@@ -299,3 +299,11 @@
     sprite: /Textures/_Starlight/Interface/Misc/job_icons.rsi
     state: MedTakBorg
   jobName: job-name-medtak-borg
+
+- type: jobIcon
+  parent: JobIcon
+  id: JobIconHologram
+  icon:
+    sprite: /Textures/_Starlight/Interface/Misc/job_icons.rsi
+    state: Hologram
+  jobName: job-name-hologram
