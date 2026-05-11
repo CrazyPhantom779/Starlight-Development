@@ -20,7 +20,7 @@
   - type: HologramBrainChip
   - type: SiliconLawBound
   - type: SiliconLawProvider
-    laws: DroneLawset
+    laws: Drone
   - type: Tag
     tags:
     - HologramBrainChip
@@ -59,8 +59,8 @@
   - type: HologramJobSpawn
     spawnOnJoin: false
   - type: HologramBladeServer
-    normalLawset: DroneLawset
-    emaggedLawset: SyndicateLawset
+    normalLawset: Drone
+    emaggedLawset: SyndicateStatic
   - type: HologramConsole
     maxActiveHolograms: 1
     showMap: true
