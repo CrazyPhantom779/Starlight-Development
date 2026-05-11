@@ -49,7 +49,12 @@ public sealed class HologramConsoleSystem : EntitySystem
     }
 
     public bool IsPortable(EntityUid uid)
-    => HasComp<ItemComponent>(uid) && _itemSlots.TryGetSlot(uid, PortableBladeSlot, out _);
+    {
+        if (!HasComp<ItemComponent>(uid))
+            return false;
+
+        return _itemSlots.TryGetSlot(uid, PortableBladeSlot, out _);
+    }
 
     public bool IsBatteryPowered(EntityUid uid) => HasComp<PowerCellSlotComponent>(uid);
 
@@ -97,6 +102,19 @@ public sealed class HologramConsoleSystem : EntitySystem
 
         UpdateBriefcaseAppearance(uid, component);
         UpdateUserInterface(uid, component);
+    }
+
+    private EntityUid? GetEffectiveGridUid(EntityUid uid)
+    {
+        var xform = Transform(uid);
+        if (xform.GridUid is { } grid)
+            return grid;
+
+        var parent = xform.ParentUid;
+        if (parent == EntityUid.Invalid || !Exists(parent))
+            return null;
+
+        return Transform(parent).GridUid;
     }
 
     private void UpdateBriefcaseAppearance(EntityUid uid, HologramConsoleComponent? component = null)
@@ -176,7 +194,9 @@ public sealed class HologramConsoleSystem : EntitySystem
         var projectors = new List<ProjectorInfo>();
         var projectorCoordinates = new Dictionary<NetEntity, NetCoordinates>();
 
-        if (!isPortable && Transform(console).GridUid is { } consoleGrid)
+        var consoleGrid = GetEffectiveGridUid(console);
+
+        if (!isPortable && consoleGrid is { } gridUid)
         {
             var query = EntityQueryEnumerator<HologramProjectorComponent>();
             while (query.MoveNext(out var projector, out var projectorComp))
@@ -185,7 +205,7 @@ public sealed class HologramConsoleSystem : EntitySystem
                     continue;
 
                 var projectorXform = Transform(projector);
-                if (projectorXform.GridUid != consoleGrid)
+                if (projectorXform.GridUid != gridUid)
                     continue;
 
                 if (HasComp<ItemComponent>(projector))
@@ -222,7 +242,7 @@ public sealed class HologramConsoleSystem : EntitySystem
             component.ShowProjectButton,
             component.ShowRecallButton,
             component.ShowBladeServerPanel,
-            isPortable || Transform(console).GridUid != null || HasComp<HologramBladeServerComponent>(console));
+            isPortable || consoleGrid != null || HasComp<HologramBladeServerComponent>(console));
 
         _ui.SetUiState(console, HologramConsoleUiKey.Key, state);
     }
@@ -248,7 +268,7 @@ public sealed class HologramConsoleSystem : EntitySystem
             return bladeServers;
         }
 
-        var consoleGrid = Transform(console).GridUid;
+        var consoleGrid = GetEffectiveGridUid(console);
         if (consoleGrid == null)
             return bladeServers;
 
@@ -406,7 +426,8 @@ public sealed class HologramConsoleSystem : EntitySystem
             if (!Exists(projector) || !HasComp<HologramProjectorComponent>(projector))
                 return;
 
-            if (Transform(console).GridUid == null || Transform(console).GridUid != Transform(projector).GridUid)
+            var consoleGrid = GetEffectiveGridUid(console);
+            if (consoleGrid == null || consoleGrid != Transform(projector).GridUid)
                 return;
 
             CleanupBladeHologram(bladeComp);

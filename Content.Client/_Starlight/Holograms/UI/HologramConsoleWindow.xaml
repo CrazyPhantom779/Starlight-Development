@@ -1,120 +1,123 @@
 <DefaultWindow xmlns="https://spacestation14.io"
-               xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-               xmlns:gfx="clr-namespace:Robust.Client.Graphics;assembly=Robust.Client"
                xmlns:ui="clr-namespace:Content.Client._Starlight.Holograms.UI"
-               x:Class="Content.Client._Starlight.Holograms.UI.HologramConsoleWindow"
-               Resizable="False"
-               SetSize="900 650">
-  <PanelContainer>
-    <PanelContainer.PanelOverride>
-      <gfx:StyleBoxFlat BackgroundColor="#0f172a" BorderColor="#3b82f6" BorderThickness="2"/>
-    </PanelContainer.PanelOverride>
+               Title="Hologram Console"
+               MinSize="980 680"
+               SetSize="1120 760"
+               Resizable="True">
 
-    <BoxContainer Orientation="Vertical" Margin="8" SeparationOverride="8">
-      <BoxContainer Orientation="Horizontal" Margin="12 8" SeparationOverride="8">
-        <BoxContainer Orientation="Vertical" VerticalAlignment="Center" HorizontalExpand="True">
-          <Label Text="HOLOGRAM NETWORK"/>
-          <Label Name="StatusLabel" Text="System Ready" StyleClasses="LabelSmall"/>
-        </BoxContainer>
+    <PanelContainer StyleClasses="PdaBackground" HorizontalExpand="True" VerticalExpand="True">
+        <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="10">
 
-        <BoxContainer Orientation="Vertical" VerticalAlignment="Center">
-          <Label Name="ActiveIndicator" Text="● INACTIVE"/>
-          <Label Name="ModeLabel" StyleClasses="LabelSmall" Visible="False"/>
-        </BoxContainer>
-
-        <PanelContainer Name="BatteryPanel" Visible="False" MinSize="120 0">
-          <PanelContainer.PanelOverride>
-            <gfx:StyleBoxFlat BackgroundColor="#0a1628" BorderColor="#1e3a5f" BorderThickness="2"/>
-          </PanelContainer.PanelOverride>
-          <BoxContainer Orientation="Horizontal" Margin="6 4" SeparationOverride="4" VerticalAlignment="Center">
-            <PanelContainer MinSize="2 12">
-              <PanelContainer.PanelOverride>
-                <gfx:StyleBoxFlat BackgroundColor="#6b7280"/>
-              </PanelContainer.PanelOverride>
-            </PanelContainer>
-            <PanelContainer MinSize="28 16">
-              <PanelContainer.PanelOverride>
-                <gfx:StyleBoxFlat BackgroundColor="#1e293b" BorderColor="#6b7280" BorderThickness="1"/>
-              </PanelContainer.PanelOverride>
-              <ProgressBar Name="BatteryBar" Value="1.0" Margin="1">
-                <ProgressBar.ForegroundStyleBoxOverride>
-                  <gfx:StyleBoxFlat BackgroundColor="#10b981"/>
-                </ProgressBar.ForegroundStyleBoxOverride>
-              </ProgressBar>
-            </PanelContainer>
-            <Label Name="BatteryLabel" Text="100%" StyleClasses="LabelSmall"/>
-          </BoxContainer>
-        </PanelContainer>
-      </BoxContainer>
-
-      <BoxContainer Orientation="Horizontal" SeparationOverride="8">
-        <BoxContainer Name="LeftPanel" Orientation="Vertical" SetWidth="420" SeparationOverride="6">
-          <Label Text="HOLOGRAMS" StyleClasses="LabelSmall" HorizontalAlignment="Center"/>
-
-          <PanelContainer VerticalExpand="True">
-            <PanelContainer.PanelOverride>
-              <gfx:StyleBoxFlat BackgroundColor="#1a2a45" BorderColor="#3a5a8f" BorderThickness="2"/>
-            </PanelContainer.PanelOverride>
-            <ScrollContainer>
-              <BoxContainer Name="BladeServersList" Orientation="Vertical" Margin="8" SeparationOverride="6"/>
-            </ScrollContainer>
-            <Label Name="NoBladeServersLabel"
-                   Text="NO HOLOGRAMS FOUND"
-                   StyleClasses="LabelSmall"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Visible="False"/>
-          </PanelContainer>
-
-          <PanelContainer Name="SettingsPanel" Visible="False">
-            <PanelContainer.PanelOverride>
-              <gfx:StyleBoxFlat BackgroundColor="#1a2a45" BorderColor="#3a5a8f" BorderThickness="2"/>
-            </PanelContainer.PanelOverride>
-            <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="8">
-              <Label Text="PORTABLE SETTINGS"/>
-              <BoxContainer Orientation="Horizontal">
-                <Label Text="Allow Hologram Carry" HorizontalExpand="True"/>
-                <CheckBox Name="AllowCarryCheckbox"/>
-              </BoxContainer>
+            <BoxContainer Orientation="Horizontal" SeparationOverride="8">
+                <Label Text="HOLOGRAM PROJECTION CONTROL"
+                       HorizontalExpand="True"
+                       FontColorOverride="#7dd3fc"/>
+                <Label Name="ModeLabel"
+                       Text="PORTABLE MODE"
+                       FontColorOverride="#fbbf24"/>
+                <Label Name="ActiveIndicator"
+                       Text="● READY"
+                       FontColorOverride="#fbbf24"/>
             </BoxContainer>
-          </PanelContainer>
 
-          <PanelContainer Name="ControlsPanel">
-            <PanelContainer.PanelOverride>
-              <gfx:StyleBoxFlat BackgroundColor="#1a2a45" BorderColor="#3a5a8f" BorderThickness="2"/>
-            </PanelContainer.PanelOverride>
-            <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="10">
-              <Button Name="ProjectButton" Text="▶ PROJECT" Disabled="True" MinSize="380 55"/>
-              <Button Name="RecallButton" Text="◾ RECALL" Disabled="True" MinSize="380 55"/>
-              <Label Name="PortableInfoLabel" Visible="False" StyleClasses="LabelSmall"/>
+            <BoxContainer Orientation="Horizontal" HorizontalExpand="True" VerticalExpand="True" SeparationOverride="10">
+
+                <BoxContainer Name="LeftPanel"
+                              Orientation="Vertical"
+                              SetWidth="380"
+                              VerticalExpand="True"
+                              SeparationOverride="8">
+
+                    <PanelContainer>
+                        <BoxContainer Orientation="Vertical" Margin="10" SeparationOverride="6">
+                            <Label Text="BLADE SERVERS" FontColorOverride="#e5e7eb"/>
+                            <Label Name="StatusLabel"
+                                   Text="No blade servers available"
+                                   FontColorOverride="#7dd3fc"/>
+                            <Label Name="NoBladeServersLabel"
+                                   Text="No same-grid blade servers detected."
+                                   FontColorOverride="#ef4444"/>
+                        </BoxContainer>
+                    </PanelContainer>
+
+                    <ScrollContainer VerticalExpand="True">
+                        <BoxContainer Name="BladeServersList"
+                                      Orientation="Vertical"
+                                      VerticalExpand="True"
+                                      SeparationOverride="6"/>
+                    </ScrollContainer>
+
+                    <PanelContainer Name="BatteryPanel">
+                        <BoxContainer Orientation="Vertical" Margin="10" SeparationOverride="6">
+                            <BoxContainer Orientation="Horizontal">
+                                <Label Text="BATTERY" HorizontalExpand="True"/>
+                                <Label Name="BatteryLabel" Text="--%"/>
+                            </BoxContainer>
+                            <ProgressBar Name="BatteryBar" MinValue="0" MaxValue="1" Value="0"/>
+                        </BoxContainer>
+                    </PanelContainer>
+
+                    <PanelContainer Name="SettingsPanel">
+                        <BoxContainer Orientation="Vertical" Margin="10" SeparationOverride="6">
+                            <CheckBox Name="AllowCarryCheckbox"
+                                      Text="Allow hologram carry mode"/>
+                            <Label Name="PortableInfoLabel"
+                                   Text="Active: 0 / 0"
+                                   FontColorOverride="#7dd3fc"/>
+                        </BoxContainer>
+                    </PanelContainer>
+
+                    <BoxContainer Name="ControlsPanel" Orientation="Vertical" SeparationOverride="8">
+                        <Button Name="ProjectButton"
+                                Text="▶ PROJECT"
+                                MinSize="340 55"/>
+                        <Button Name="RecallButton"
+                                Text="◾ RECALL"
+                                MinSize="340 55"/>
+                    </BoxContainer>
+                </BoxContainer>
+
+                <BoxContainer Name="MapPanel"
+                              Orientation="Vertical"
+                              HorizontalExpand="True"
+                              VerticalExpand="True"
+                              MinSize="700 0"
+                              SeparationOverride="8">
+
+                    <BoxContainer Orientation="Horizontal">
+                        <Label Text="PROJECTOR MAP"
+                               HorizontalExpand="True"
+                               FontColorOverride="#e5e7eb"/>
+                        <Label Name="ProjectorCountLabel"
+                               Text=" No Same-Grid Projectors "
+                               FontColorOverride="#7dd3fc"/>
+                    </BoxContainer>
+
+                    <PanelContainer VerticalExpand="True" HorizontalExpand="True" MinSize="700 590">
+                        <ui:HologramConsoleNavMapControl Name="NavMap"
+                                                         HorizontalExpand="True"
+                                                         VerticalExpand="True"
+                                                         MinSize="700 590"/>
+
+                        <PanelContainer Name="NoServerOverlay"
+                                        HorizontalExpand="True"
+                                        VerticalExpand="True">
+                            <BoxContainer Orientation="Vertical"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          SeparationOverride="8">
+                                <Label Name="NoServerMapLabel"
+                                       Text="NO SAME-GRID PROJECTORS"
+                                       HorizontalAlignment="Center"
+                                       FontColorOverride="#ef4444"/>
+                                <Label Text="Select a blade server and a projector on this grid."
+                                       HorizontalAlignment="Center"
+                                       FontColorOverride="#94a3b8"/>
+                            </BoxContainer>
+                        </PanelContainer>
+                    </PanelContainer>
+                </BoxContainer>
             </BoxContainer>
-          </PanelContainer>
         </BoxContainer>
-
-        <BoxContainer Name="MapPanel" Orientation="Vertical" SeparationOverride="6" HorizontalExpand="True">
-          <BoxContainer Orientation="Horizontal">
-            <Label Text="PROJECTION MAP"/>
-            <Label Name="ProjectorCountLabel" Text="0 Projectors"/>
-          </BoxContainer>
-
-          <PanelContainer VerticalExpand="True">
-            <PanelContainer.PanelOverride>
-              <gfx:StyleBoxFlat BackgroundColor="#1a2a45" BorderColor="#3a5a8f" BorderThickness="2"/>
-            </PanelContainer.PanelOverride>
-            <ui:HologramConsoleNavMapControl Name="NavMap"/>
-            <PanelContainer Name="NoServerOverlay" Visible="False">
-              <PanelContainer.PanelOverride>
-                <gfx:StyleBoxFlat BackgroundColor="#1a2a45"/>
-              </PanelContainer.PanelOverride>
-              <Label Name="NoServerMapLabel"
-                     Text="NO SERVER CONNECTED"
-                     StyleClasses="LabelSmall"
-                     HorizontalAlignment="Center"
-                     VerticalAlignment="Center"/>
-            </PanelContainer>
-          </PanelContainer>
-        </BoxContainer>
-      </BoxContainer>
-    </BoxContainer>
-  </PanelContainer>
+    </PanelContainer>
 </DefaultWindow>
