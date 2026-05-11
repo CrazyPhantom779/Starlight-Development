@@ -1,16 +1,16 @@
 using Content.Server._Starlight.Holograms.Components;
+using Content.Server.Power.Components;
 using Content.Server.Preferences.Managers;
 using Content.Server.Spawners.EntitySystems;
 using Content.Server.Station.Systems;
+using Content.Shared._Moffstation.BladeServer;
 using Content.Shared.Containers.ItemSlots;
+using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
 using Content.Shared.Power;
-using Content.Shared.Roles.Jobs;
 using Content.Shared.Preferences;
+using Content.Shared.Roles.Jobs;
 using Robust.Shared.Containers;
-using Content.Shared.Mind;
-using Content.Server.Power.Components;
-using Content.Shared._Moffstation.BladeServer;
 
 namespace Content.Server._Starlight.Holograms.Systems;
 
@@ -136,7 +136,7 @@ public sealed class HologramJobSpawnSystem : EntitySystem
             if (station != null && _station.GetOwningStation(uid, xform) != station)
                 continue;
 
-            if (grid != null && xform.GridUid != grid)
+            if (grid != null && GetEffectiveGridUid(uid, xform) != grid)
                 continue;
 
             if (!_itemSlots.TryGetSlot(uid, bladeComp.BrainChipSlot, out var slot, slots))
@@ -154,6 +154,19 @@ public sealed class HologramJobSpawnSystem : EntitySystem
         return false;
     }
 
+    private EntityUid? GetEffectiveGridUid(EntityUid uid, TransformComponent? xform = null)
+    {
+        xform ??= Transform(uid);
+        if (xform.GridUid is { } grid)
+            return grid;
+
+        var parent = xform.ParentUid;
+        if (parent == EntityUid.Invalid || !Exists(parent))
+            return null;
+
+        return Transform(parent).GridUid;
+    }
+
     private void SetupInstalledChip(
         EntityUid bladeServerUid,
         HologramBladeServerComponent bladeServer,
@@ -164,6 +177,7 @@ public sealed class HologramJobSpawnSystem : EntitySystem
     {
         brainChip.HoloMind = mindId;
         brainChip.IsPowered = IsBladeServerPowered(bladeServerUid);
+
         profile ??= ResolveProfileForMind(mindId);
 
         EnsureBodyChip(bladeServerUid, bladeServer, mindId, profile);
@@ -238,31 +252,30 @@ public sealed class HologramJobSpawnSystem : EntitySystem
 
     private bool IsBladeServerPowered(EntityUid bladeServerUid)
     {
+        var parent = Transform(bladeServerUid).ParentUid;
+        if (parent != EntityUid.Invalid && TryComp<BladeServerRackComponent>(parent, out var rackComp))
+        {
+            if (!TryComp<ApcPowerReceiverComponent>(parent, out var rackPower) || !rackPower.Powered)
+                return false;
+
+            foreach (var slot in rackComp.BladeSlots)
+            {
+                if (slot.Item == bladeServerUid)
+                    return slot.IsPowerEnabled;
+            }
+
+            return false;
+        }
+
         if (TryComp<ApcPowerReceiverComponent>(bladeServerUid, out var ownPower))
             return ownPower.Powered;
-
-        var parent = Transform(bladeServerUid).ParentUid;
-        if (parent == EntityUid.Invalid)
-            return false;
-
-        if (!TryComp<BladeServerRackComponent>(parent, out var rackComp))
-            return false;
-
-        if (!TryComp<ApcPowerReceiverComponent>(parent, out var rackPower) || !rackPower.Powered)
-            return false;
-
-        foreach (var slot in rackComp.BladeSlots)
-        {
-            if (slot.Item == bladeServerUid)
-                return slot.IsPowerEnabled;
-        }
 
         return false;
     }
 
     private void OnBladePowerChanged(EntityUid uid, HologramBladeServerComponent component, ref PowerChangedEvent args)
     {
-        component.IsPowered = args.Powered;
+        component.IsPowered = IsBladeServerPowered(uid);
         _bladeLaws.SyncBladeLawsToOccupants(uid, component);
     }
 }

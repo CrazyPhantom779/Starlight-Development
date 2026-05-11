@@ -1,7 +1,7 @@
 - type: entity
   id: HologramJobBrainChip
   parent: BaseItem
-  name: hologram
+  name: hologram brain chip
   description: A stored crew consciousness waiting to be projected into hardlight.
   suffix: Job
   categories: [ HideSpawnMenu, DoNotMap ]
@@ -9,14 +9,13 @@
   - type: Sprite
     sprite: Objects/Misc/module.rsi
     state: generic
-    visible: false
+    color: "#45f3ff"
   - type: Item
     size: Tiny
-  # Defensive fallback: if generic spawning briefly puts the player on this chip,
-  # mover will not hard-crash before HologramJobSpawnSystem installs it into a blade.
   - type: Physics
     bodyType: KinematicController
   - type: MindContainer
+  - type: Actions
   - type: HologramBrainChip
   - type: SiliconLawBound
   - type: SiliconLawProvider
@@ -37,6 +36,7 @@
   - type: Sprite
     sprite: Objects/Misc/module.rsi
     state: generic
+    color: "#7dd3fc"
   - type: Item
     size: Tiny
   - type: HologramBodyChip
@@ -53,7 +53,7 @@
   suffix: Hologram job spawn
   categories: [ HideSpawnMenu, DoNotMap ]
   components:
-  # Required by the real Moffstation BladeServerRack whitelist.
+  # Required by the real Moffstation BladeServerRack whitelist and rack visuals.
   - type: BladeServer
     stripeColor: "#45f3ffff"
   - type: HologramJobSpawn

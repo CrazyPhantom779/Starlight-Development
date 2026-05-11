@@ -1,10 +1,12 @@
 - type: entity
   id: ActionOpenHologramConsole
+  parent: BaseAction
   name: Open Hologram Console
-  description: Open the Hologram projection menu.
+  description: Open the hologram projection menu.
   categories: [ HideSpawnMenu ]
   components:
   - type: InstantAction
+    itemIconStyle: NoItem
     icon:
       sprite: Interface/Actions/actions_ai.rsi
       state: ai_camera
