@@ -1,5 +1,4 @@
 using Content.Server._Starlight.Holograms.Components;
-using Content.Shared.Dataset;
 using Content.Shared.Random.Helpers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
@@ -21,7 +20,7 @@ public sealed class HologramRandomNameSystem : EntitySystem
 
     private void OnMapInit(EntityUid uid, HologramRandomNameComponent component, MapInitEvent args)
     {
-        var dataset = _prototype.Index<LocalizedDatasetPrototype>(component.NameDataset);
+        var dataset = _prototype.Index(component.NameDataset);
         _meta.SetEntityName(uid, _random.Pick(dataset));
     }
 }

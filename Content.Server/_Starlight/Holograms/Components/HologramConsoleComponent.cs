@@ -10,19 +10,19 @@ public sealed partial class HologramConsoleComponent : Component
     /// <summary>
     /// Maximum number of holograms that can be projected simultaneously.
     /// </summary>
-    [DataField("maxActiveHolograms")]
+    [DataField]
     public int MaxActiveHolograms = 2;
 
     /// <summary>
     /// Whether holograms are allowed to hold/carry this device.
     /// </summary>
-    [DataField("allowHologramCarry")]
+    [DataField]
     public bool AllowHologramCarry;
 
     /// <summary>
     /// Whether to show the projector map and selection interface.
     /// </summary>
-    [DataField("showMap")]
+    [DataField]
     public bool ShowMap = true;
 
     /// <summary>
@@ -34,19 +34,19 @@ public sealed partial class HologramConsoleComponent : Component
     /// <summary>
     /// Whether to show the recall button.
     /// </summary>
-    [DataField("showRecallButton")]
+    [DataField]
     public bool ShowRecallButton = true;
 
     /// <summary>
     /// Whether to show the blade server panel sidebar.
     /// </summary>
-    [DataField("showBladeServerPanel")]
+    [DataField]
     public bool ShowBladeServerPanel = true;
 
     /// <summary>
     /// Power draw per active hologram in watts.
     /// </summary>
-    [DataField("powerDrawPerHologram")]
+    [DataField]
     public float PowerDrawPerHologram = 50f;
 
     /// <summary>

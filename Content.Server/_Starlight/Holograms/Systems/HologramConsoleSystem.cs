@@ -49,13 +49,7 @@ public sealed class HologramConsoleSystem : EntitySystem
     }
 
     public bool IsPortable(EntityUid uid)
-    {
-        if (!HasComp<ItemComponent>(uid))
-            return false;
-
-        return TryComp<ItemSlotsComponent>(uid, out var slots) &&
-               slots.Slots.ContainsKey(PortableBladeSlot);
-    }
+    => HasComp<ItemComponent>(uid) && _itemSlots.TryGetSlot(uid, PortableBladeSlot, out _);
 
     public bool IsBatteryPowered(EntityUid uid) => HasComp<PowerCellSlotComponent>(uid);
 

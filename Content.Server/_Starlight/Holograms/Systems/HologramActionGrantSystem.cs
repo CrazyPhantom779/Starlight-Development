@@ -1,4 +1,3 @@
-using Content.Shared._Starlight.Holograms;
 using Content.Shared.Actions;
 using Content.Shared.Mind.Components;
 
@@ -42,7 +41,7 @@ public sealed class HologramActionGrantSystem : EntitySystem
         component.Action = _actions.AddAction(uid, HologramConsoleAction);
     }
 
-    private void RemoveAction(EntityUid uid, HologramConsoleActionComponent component)
+    private void RemoveAction(EntityUid _, HologramConsoleActionComponent component)
     {
         if (component.Action is { } action && Exists(action))
             _actions.RemoveAction(action);
