@@ -250,9 +250,7 @@ public sealed class HologramSystem : SharedHologramSystem
     }
 
     private void MakeHologramBreathless(EntityUid mob)
-    {
-        RemCompDeferred<RespiratorComponent>(mob);
-    }
+        => RemCompDeferred<RespiratorComponent>(mob);
 
     private HumanoidCharacterProfile? GetProfileForProjection(EntityUid mindId, MindComponent mind, HologramBodyChipComponent? bodyChip)
     {

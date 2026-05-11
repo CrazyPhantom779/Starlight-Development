@@ -45,11 +45,9 @@ public sealed class HologramBrainChipGhostRoleSystem : EntitySystem
             return;
         }
 
-        // Add this first so the role is actually take-over capable by the time it is registered.
         EnsureComp<GhostTakeoverAvailableComponent>(uid);
 
         var role = EnsureComp<GhostRoleComponent>(uid);
-
         role.RoleName = component.RoleName;
         role.RoleDescription = component.RoleDescription;
         role.RoleRules = component.RoleRules;
@@ -67,5 +65,7 @@ public sealed class HologramBrainChipGhostRoleSystem : EntitySystem
 
         if (TryComp<GhostRoleComponent>(uid, out var role))
             _ghostRole.UnregisterGhostRole((uid, role));
+
+        _popup.PopupEntity("A mind flickers to life inside the hologram brain chip.", uid);
     }
 }

@@ -1,51 +1,24 @@
 - type: entity
   id: HologramJobBrainChip
-  parent: BaseItem
+  parent: HologramBrainChip
   name: hologram brain chip
   description: A stored crew consciousness waiting to be projected into hardlight.
   suffix: Job
   categories: [ HideSpawnMenu, DoNotMap ]
   components:
-  - type: Sprite
-    sprite: Objects/Misc/module.rsi
-    state: generic
-    color: "#45f3ff"
-  - type: Item
-    size: Tiny
-  - type: Physics
-    bodyType: KinematicController
-  - type: MindContainer
-  - type: Actions
-  - type: HologramBrainChip
   - type: HologramBrainChipGhostRole
-  - type: SiliconLawBound
-  - type: SiliconLawProvider
-    laws: Drone
-  - type: Tag
-    tags:
-    - HologramBrainChip
-    - HideContextMenu
 
 - type: entity
   id: HologramJobBodyChip
-  parent: BaseItem
+  parent: HologramBodyChip
   name: hologram body profile
   description: Stored body projection data for a hologram.
   suffix: Job
   categories: [ HideSpawnMenu, DoNotMap ]
   components:
-  - type: Sprite
-    sprite: Objects/Misc/module.rsi
-    state: generic
-    color: "#7dd3fc"
-  - type: Item
-    size: Tiny
   - type: HologramBodyChip
     hologramPrototype: MobHologramHardlight
     hologramName: hologram
-  - type: Tag
-    tags:
-    - HologramBodyChip
 
 - type: entity
   id: HologramJobBladeServer
