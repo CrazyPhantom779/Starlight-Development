@@ -212,7 +212,10 @@ public sealed class HologramBladeLawSystem : EntitySystem
             return;
 
         if (!TryGetBladeForActionOwner(uid, out var bladeUid))
+        {
+            _popup.PopupEntity("This hologram brain is not linked to a blade server.", uid, uid);
             return;
+        }
 
         TryOpenBladeConsole(bladeUid, args.Performer);
         args.Handled = true;
@@ -224,7 +227,10 @@ public sealed class HologramBladeLawSystem : EntitySystem
             return;
 
         if (!TryGetBladeForActionOwner(uid, out var bladeUid))
+        {
+            _popup.PopupEntity("This projection is not linked to a blade server.", uid, args.Performer);
             return;
+        }
 
         TryOpenBladeConsole(bladeUid, args.Performer);
         args.Handled = true;
@@ -253,7 +259,10 @@ public sealed class HologramBladeLawSystem : EntitySystem
     private void TryOpenBladeConsole(EntityUid bladeUid, EntityUid user)
     {
         if (!TryComp<ActorComponent>(user, out var actor))
+        {
+            Logger.Warning($"Unable to open hologram console for {ToPrettyString(user)}: no ActorComponent.");
             return;
+        }
 
         if (_ui.HasUi(bladeUid, HologramConsoleUiKey.Key))
         {
@@ -281,6 +290,9 @@ public sealed class HologramBladeLawSystem : EntitySystem
         var query = EntityQueryEnumerator<HologramConsoleComponent>();
         while (query.MoveNext(out var uid, out _))
         {
+            if (uid == bladeUid)
+                continue;
+
             if (!_ui.HasUi(uid, HologramConsoleUiKey.Key))
                 continue;
 

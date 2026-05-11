@@ -2,7 +2,7 @@
   id: ActionOpenHologramConsole
   parent: BaseAction
   name: Open Hologram Console
-  description: Open the hologram projection menu.
+  description: Open your hologram projection menu.
   categories: [ HideSpawnMenu ]
   components:
   - type: InstantAction

@@ -1,5 +1,7 @@
 using System.Diagnostics.CodeAnalysis;
 using Content.Server.Access.Systems;
+using Content.Server.Atmos.Components;
+using Content.Server.Body.Components;
 using Content.Server.Clothing.Systems;
 using Content.Server.Humanoid;
 using Content.Server.Jobs;
@@ -158,6 +160,7 @@ public sealed class HologramSystem : SharedHologramSystem
         EnsureComp<HologramComponent>(mob);
         EnsureComp<HologramProjectedComponent>(mob);
         EnsureComp<MindContainerComponent>(mob);
+        MakeHologramBreathless(mob);
 
         ApplyPrototypeProjectedName(mob, mind, bodyChip);
         FinishProjection(mindId, mob, coords, promptConsent, client);
@@ -222,6 +225,8 @@ public sealed class HologramSystem : SharedHologramSystem
 
     private void FinishProjection(EntityUid mindId, EntityUid mob, EntityCoordinates coords, bool promptConsent, ICommonSession client)
     {
+        MakeHologramBreathless(mob);
+
         if (promptConsent)
         {
             HologramsWaitingForMind[mindId] = mob;
@@ -242,6 +247,11 @@ public sealed class HologramSystem : SharedHologramSystem
         _popup.PopupCoordinates(Loc.GetString(holoComp.PopupAppearSelf), holoPos, mob, PopupType.Large);
 
         _adminLogger.Add(LogType.Mind, LogImpact.Medium, $"Hologram {ToPrettyString(mob):mob} was generated at {coords}");
+    }
+
+    private void MakeHologramBreathless(EntityUid mob)
+    {
+        RemCompDeferred<RespiratorComponent>(mob);
     }
 
     private HumanoidCharacterProfile? GetProfileForProjection(EntityUid mindId, MindComponent mind, HologramBodyChipComponent? bodyChip)
@@ -282,6 +292,7 @@ public sealed class HologramSystem : SharedHologramSystem
 
         _humanoid.LoadProfile(mob, pref);
         _meta.SetEntityName(mob, pref.Name);
+        MakeHologramBreathless(mob);
 
         if (TryComp<GrammarComponent>(mob, out var grammar))
         {

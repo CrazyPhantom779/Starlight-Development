@@ -1,4 +1,5 @@
 using Content.Server._Starlight.Holograms.Components;
+using Content.Server.Mind;
 using Content.Server.Power.Components;
 using Content.Server.Preferences.Managers;
 using Content.Server.Spawners.EntitySystems;
@@ -15,12 +16,13 @@ using Robust.Shared.Containers;
 namespace Content.Server._Starlight.Holograms.Systems;
 
 /// <summary>
-/// Installs hologram job minds into mapped/runtime blade servers.
-/// The player job entity is the brain chip; projection is left to consoles/projectors.
+/// Installs hologram job minds into blade servers.
+/// Job racks start empty; a job blade is created only when a hologram player actually joins.
 /// </summary>
 public sealed class HologramJobSpawnSystem : EntitySystem
 {
     private const string HologramJobId = "Hologram";
+    private const string JobBladePrototype = "HologramJobBladeServer";
 
     [Dependency] private readonly HologramBladeLawSystem _bladeLaws = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
@@ -29,6 +31,7 @@ public sealed class HologramJobSpawnSystem : EntitySystem
     [Dependency] private readonly StationSpawningSystem _stationSpawning = default!;
     [Dependency] private readonly IServerPreferencesManager _prefs = default!;
     [Dependency] private readonly SharedJobSystem _job = default!;
+    [Dependency] private readonly MindSystem _mind = default!;
 
     public override void Initialize()
     {
@@ -44,7 +47,7 @@ public sealed class HologramJobSpawnSystem : EntitySystem
         if (args.SpawnResult != null || args.Job?.ToString() != HologramJobId)
             return;
 
-        if (!TryFindFreeBlade(args.Station, null, out var bladeServerUid, out var bladeServer, out var brainSlot))
+        if (!TryFindOrCreateBlade(args.Station, null, out var bladeServerUid, out var bladeServer, out var brainSlot))
             return;
 
         args.SpawnResult = _stationSpawning.SpawnPlayerMob(
@@ -86,6 +89,8 @@ public sealed class HologramJobSpawnSystem : EntitySystem
     {
         base.Update(frameTime);
 
+        // Defensive fallback for admin/runtime testing: if something still spawns a hologram
+        // job chip loose on the station, put it into a newly-created job blade instead.
         var query = EntityQueryEnumerator<HologramBrainChipComponent, MindContainerComponent>();
         while (query.MoveNext(out var chip, out var brainChip, out var mindContainer))
         {
@@ -107,7 +112,7 @@ public sealed class HologramJobSpawnSystem : EntitySystem
     {
         var chipGrid = GetEffectiveGridUid(chip);
 
-        if (!TryFindFreeBlade(null, sameGridOnly ? chipGrid : null, out var bladeServerUid, out var bladeServer, out var brainSlot))
+        if (!TryFindOrCreateBlade(null, sameGridOnly ? chipGrid : null, out var bladeServerUid, out var bladeServer, out var brainSlot))
             return false;
 
         if (!_itemSlots.TryInsert(bladeServerUid, brainSlot, chip, user: null))
@@ -117,9 +122,26 @@ public sealed class HologramJobSpawnSystem : EntitySystem
         return true;
     }
 
+    private bool TryFindOrCreateBlade(
+        EntityUid? station,
+        EntityUid? grid,
+        out EntityUid bladeServerUid,
+        out HologramBladeServerComponent bladeServer,
+        out ItemSlot brainSlot)
+    {
+        if (TryFindFreeBlade(station, grid, preferActiveBody: true, out bladeServerUid, out bladeServer, out brainSlot))
+            return true;
+
+        if (TryFindFreeBlade(station, grid, preferActiveBody: false, out bladeServerUid, out bladeServer, out brainSlot))
+            return true;
+
+        return TryCreateBladeInRack(station, grid, out bladeServerUid, out bladeServer, out brainSlot);
+    }
+
     private bool TryFindFreeBlade(
         EntityUid? station,
         EntityUid? grid,
+        bool preferActiveBody,
         out EntityUid bladeServerUid,
         out HologramBladeServerComponent bladeServer,
         out ItemSlot brainSlot)
@@ -143,10 +165,64 @@ public sealed class HologramJobSpawnSystem : EntitySystem
             if (slot.Item != null)
                 continue;
 
+            var hasActiveBody = bladeComp.ActiveHologram is { } active && Exists(active);
+            if (preferActiveBody != hasActiveBody)
+                continue;
+
             bladeServerUid = uid;
             bladeServer = bladeComp;
             brainSlot = slot;
             return true;
+        }
+
+        return false;
+    }
+
+    private bool TryCreateBladeInRack(
+        EntityUid? station,
+        EntityUid? grid,
+        out EntityUid bladeServerUid,
+        out HologramBladeServerComponent bladeServer,
+        out ItemSlot brainSlot)
+    {
+        bladeServerUid = default;
+        bladeServer = default!;
+        brainSlot = default!;
+
+        var rackQuery = EntityQueryEnumerator<HologramJobRackComponent, BladeServerRackComponent, TransformComponent>();
+        while (rackQuery.MoveNext(out var rackUid, out _, out var rack, out var xform))
+        {
+            if (station != null && _station.GetOwningStation(rackUid, xform) != station)
+                continue;
+
+            if (grid != null && GetEffectiveGridUid(rackUid) != grid)
+                continue;
+
+            foreach (var slot in rack.BladeSlots)
+            {
+                if (slot.Item != null)
+                    continue;
+
+                var blade = Spawn(JobBladePrototype, xform.Coordinates);
+                if (!_itemSlots.TryInsert(rackUid, slot.Slot, blade, user: null))
+                {
+                    Del(blade);
+                    continue;
+                }
+
+                if (!TryComp<HologramBladeServerComponent>(blade, out var bladeComp) ||
+                    !TryComp<ItemSlotsComponent>(blade, out var bladeSlots) ||
+                    !_itemSlots.TryGetSlot(blade, bladeComp.BrainChipSlot, out var chipSlot, bladeSlots))
+                {
+                    Del(blade);
+                    continue;
+                }
+
+                bladeServerUid = blade;
+                bladeServer = bladeComp;
+                brainSlot = chipSlot;
+                return true;
+            }
         }
 
         return false;
@@ -186,6 +262,19 @@ public sealed class HologramJobSpawnSystem : EntitySystem
 
         EnsureBodyChip(bladeServerUid, bladeServer, mindId, profile);
         _bladeLaws.ApplyBladeLaws(bladeServerUid, bladeServer, brainChipUid);
+
+        // If latejoin enters a blade whose body was already projected as an empty/autonomous shell,
+        // put the joining mind directly into that active projection.
+        if (bladeServer.ActiveHologram is not { } active ||
+            !Exists(active) ||
+            !TryComp<MindContainerComponent>(active, out var activeMind) ||
+            activeMind.Mind != null)
+        {
+            return;
+        }
+
+        _mind.TransferTo(mindId, active, ghostCheckOverride: true);
+        _bladeLaws.ApplyBladeLaws(bladeServerUid, bladeServer, active);
     }
 
     private void EnsureBodyChip(EntityUid bladeServerUid, HologramBladeServerComponent bladeServer, EntityUid mindId, HumanoidCharacterProfile? profile)

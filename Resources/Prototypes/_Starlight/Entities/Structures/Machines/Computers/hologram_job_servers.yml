@@ -1,7 +1,7 @@
 - type: entity
   id: HologramJobBrainChip
   parent: BaseItem
-  name: hologram
+  name: hologram brain chip
   description: A stored crew consciousness waiting to be projected into hardlight.
   suffix: Job
   categories: [ HideSpawnMenu, DoNotMap ]
@@ -17,6 +17,7 @@
   - type: MindContainer
   - type: Actions
   - type: HologramBrainChip
+  - type: HologramBrainChipGhostRole
   - type: SiliconLawBound
   - type: SiliconLawProvider
     laws: Drone
@@ -98,16 +99,13 @@
   id: BladeServerRackHologramJob
   parent: BladeServerRack
   name: hologram blade server rack
-  description: A rack of blade servers that stores hologram crew until they are projected.
+  description: A rack that creates hologram job blade servers only when hologram players actually join.
   suffix: Hologram job spawn
   components:
+  - type: HologramJobRack
   - type: BladeServerRack
     bladeServerVisualsOffset: 0, -4
-    startingContents:
-    - HologramJobBladeServer
-    - HologramJobBladeServer
-    - HologramJobBladeServer
-    - HologramJobBladeServer
+    startingContents: []
 
 - type: entity
   id: BladeServerRackHologramJobSpawner
