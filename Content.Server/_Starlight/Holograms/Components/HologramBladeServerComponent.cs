@@ -34,21 +34,18 @@ public sealed partial class HologramBladeServerComponent : Component
 
     /// <summary>
     /// Whether this blade has been emagged.
-    /// Laws belong to the blade, not the body projection.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField]
     public bool Emagged;
 
     /// <summary>
     /// Default lawset for a non-emagged hologram.
-    /// Must match a siliconLawset prototype ID.
     /// </summary>
     [DataField]
     public string NormalLawset = "Drone";
 
     /// <summary>
     /// Lawset used once the blade/rack has been emagged.
-    /// Must match a siliconLawset prototype ID.
     /// </summary>
     [DataField]
     public string EmaggedLawset = "SyndicateStatic";
