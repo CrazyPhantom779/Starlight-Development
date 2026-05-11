@@ -104,15 +104,46 @@ public sealed class HologramConsoleSystem : EntitySystem
 
     private EntityUid? GetEffectiveGridUid(EntityUid uid)
     {
-        var xform = Transform(uid);
-        if (xform.GridUid is { } grid)
-            return grid;
+        var current = uid;
 
-        var parent = xform.ParentUid;
-        if (parent == EntityUid.Invalid || !Exists(parent))
-            return null;
+        while (Exists(current))
+        {
+            var xform = Transform(current);
+            if (xform.GridUid is { } grid)
+                return grid;
 
-        return Transform(parent).GridUid;
+            if (xform.ParentUid == EntityUid.Invalid || xform.ParentUid == current)
+                return null;
+
+            current = xform.ParentUid;
+        }
+
+        return null;
+    }
+
+    private bool TryGetContainingRack(EntityUid uid, out EntityUid rackUid, out BladeServerRackComponent rack)
+    {
+        var current = uid;
+
+        while (Exists(current))
+        {
+            var xform = Transform(current);
+            if (xform.ParentUid == EntityUid.Invalid || xform.ParentUid == current)
+                break;
+
+            current = xform.ParentUid;
+
+            if (!TryComp<BladeServerRackComponent>(current, out var rackComp))
+                continue;
+
+            rackUid = current;
+            rack = rackComp;
+            return true;
+        }
+
+        rackUid = default;
+        rack = default!;
+        return false;
     }
 
     private bool TryGetStoredMind(EntityUid brainChip, HologramBrainChipComponent brainComp, out EntityUid mind)
@@ -182,10 +213,11 @@ public sealed class HologramConsoleSystem : EntitySystem
             if (!TryGetBladeServerData(bladeServerUid, out var bladeComp, out var brainChip, out var brainComp, out var bodyChip, out var bodyComp))
                 continue;
 
-            if (!TryGetStoredMind(brainChip, brainComp, out _))
-                continue;
-
             CleanupBladeHologram(bladeComp);
+
+            var hasMind = TryGetStoredMind(brainChip, brainComp, out _);
+            if (!hasMind && bodyComp == null)
+                continue;
 
             var isActive = bladeComp.ActiveHologram is { } activeHologram && Exists(activeHologram);
             NetEntity? activeNet = null;
@@ -271,8 +303,16 @@ public sealed class HologramConsoleSystem : EntitySystem
         var bladeServers = new HashSet<EntityUid>();
 
         if (HasComp<HologramBladeServerComponent>(console))
-        {
             bladeServers.Add(console);
+
+        if (TryGetContainingRack(console, out _, out var containingRack))
+        {
+            foreach (var slot in containingRack.BladeSlots)
+            {
+                if (slot.Item is { } bladeServer && HasComp<HologramBladeServerComponent>(bladeServer))
+                    bladeServers.Add(bladeServer);
+            }
+
             return bladeServers;
         }
 
@@ -294,7 +334,7 @@ public sealed class HologramConsoleSystem : EntitySystem
         var rackQuery = EntityQueryEnumerator<BladeServerRackComponent>();
         while (rackQuery.MoveNext(out var rackUid, out var rackComp))
         {
-            if (Transform(rackUid).GridUid != consoleGrid)
+            if (GetEffectiveGridUid(rackUid) != consoleGrid)
                 continue;
 
             foreach (var slot in rackComp.BladeSlots)
@@ -367,9 +407,9 @@ public sealed class HologramConsoleSystem : EntitySystem
 
     private bool IsBladeServerPowered(EntityUid bladeServerUid)
     {
-        var parent = Transform(bladeServerUid).ParentUid;
-        if (parent != EntityUid.Invalid && TryComp<BladeServerRackComponent>(parent, out var rackComp))
+        if (TryGetContainingRack(bladeServerUid, out _, out var rackComp))
         {
+            var parent = Transform(bladeServerUid).ParentUid;
             if (!TryComp<ApcPowerReceiverComponent>(parent, out var rackPower) || !rackPower.Powered)
                 return false;
 

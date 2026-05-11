@@ -86,8 +86,6 @@ public sealed class HologramJobSpawnSystem : EntitySystem
     {
         base.Update(frameTime);
 
-        // Defensive fallback for admin/runtime testing: if something still spawns the job chip
-        // at arrivals, move it into a free hologram blade instead of leaving the player as a chip.
         var query = EntityQueryEnumerator<HologramBrainChipComponent, MindContainerComponent>();
         while (query.MoveNext(out var chip, out var brainChip, out var mindContainer))
         {
@@ -107,7 +105,7 @@ public sealed class HologramJobSpawnSystem : EntitySystem
 
     private bool TryInstallStrayJobChip(EntityUid chip, HologramBrainChipComponent brainChip, EntityUid mindId, bool sameGridOnly)
     {
-        var chipGrid = Transform(chip).GridUid;
+        var chipGrid = GetEffectiveGridUid(chip);
 
         if (!TryFindFreeBlade(null, sameGridOnly ? chipGrid : null, out var bladeServerUid, out var bladeServer, out var brainSlot))
             return false;
@@ -136,7 +134,7 @@ public sealed class HologramJobSpawnSystem : EntitySystem
             if (station != null && _station.GetOwningStation(uid, xform) != station)
                 continue;
 
-            if (grid != null && GetEffectiveGridUid(uid, xform) != grid)
+            if (grid != null && GetEffectiveGridUid(uid) != grid)
                 continue;
 
             if (!_itemSlots.TryGetSlot(uid, bladeComp.BrainChipSlot, out var slot, slots))
@@ -154,17 +152,23 @@ public sealed class HologramJobSpawnSystem : EntitySystem
         return false;
     }
 
-    private EntityUid? GetEffectiveGridUid(EntityUid uid, TransformComponent? xform = null)
+    private EntityUid? GetEffectiveGridUid(EntityUid uid)
     {
-        xform ??= Transform(uid);
-        if (xform.GridUid is { } grid)
-            return grid;
+        var current = uid;
 
-        var parent = xform.ParentUid;
-        if (parent == EntityUid.Invalid || !Exists(parent))
-            return null;
+        while (Exists(current))
+        {
+            var xform = Transform(current);
+            if (xform.GridUid is { } grid)
+                return grid;
 
-        return Transform(parent).GridUid;
+            if (xform.ParentUid == EntityUid.Invalid || xform.ParentUid == current)
+                return null;
+
+            current = xform.ParentUid;
+        }
+
+        return null;
     }
 
     private void SetupInstalledChip(

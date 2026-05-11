@@ -270,11 +270,7 @@ public sealed class HologramSystem : SharedHologramSystem
         }
 
         if (_job.MindTryGetJob(mindId, out var jobPrototype))
-        {
-            var jobProfile = prefs.SelectProfileForJob(jobPrototype.ID);
-            if (jobProfile != null)
-                return jobProfile;
-        }
+            return prefs.SelectProfileForJob(jobPrototype.ID);
 
         return prefs.GetRandomEnabledProfile();
     }

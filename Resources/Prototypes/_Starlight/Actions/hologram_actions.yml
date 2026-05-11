@@ -9,5 +9,5 @@
     itemIconStyle: NoItem
     icon:
       sprite: Interface/Actions/actions_ai.rsi
-      state: ai_camera
+      state: crew_monitor
     event: !type:HologramOpenConsoleActionEvent

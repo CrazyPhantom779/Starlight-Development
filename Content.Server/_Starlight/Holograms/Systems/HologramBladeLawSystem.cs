@@ -1,3 +1,4 @@
+using Content.Server._Starlight.Holograms.Components;
 using Content.Server.Silicons.Laws;
 using Content.Shared._Moffstation.BladeServer;
 using Content.Shared._Starlight.Holograms;
@@ -5,8 +6,10 @@ using Content.Shared.Actions;
 using Content.Shared.Actions.Components;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Emag.Systems;
+using Content.Shared.Interaction.Components;
 using Content.Shared.Mind.Components;
 using Content.Shared.Popups;
+using Content.Shared.Silicons.Laws;
 using Content.Shared.Silicons.Laws.Components;
 using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
@@ -14,10 +17,6 @@ using Robust.Shared.Player;
 
 namespace Content.Server._Starlight.Holograms.Systems;
 
-/// <summary>
-/// Keeps hologram laws and the hologram console action tied to the blade server that houses the mind.
-/// The blade owns the lawset; the chip/projected body only provide those laws while tied to the blade.
-/// </summary>
 public sealed class HologramBladeLawSystem : EntitySystem
 {
     private const string HologramConsoleAction = "ActionOpenHologramConsole";
@@ -68,6 +67,7 @@ public sealed class HologramBladeLawSystem : EntitySystem
 
         EnsureComp<SiliconLawBoundComponent>(target);
         EnsureComp<ActionsComponent>(target);
+        EnsureComp<IgnoreUIRangeComponent>(target);
 
         var action = EnsureComp<HologramConsoleActionComponent>(target);
         action.BladeServer = bladeUid;
@@ -211,21 +211,8 @@ public sealed class HologramBladeLawSystem : EntitySystem
         if (args.Handled)
             return;
 
-        EntityUid bladeUid;
-        if (TryFindBladeForChip(uid, out var foundBladeUid, out _))
-        {
-            bladeUid = foundBladeUid;
-        }
-        else if (TryComp<HologramConsoleActionComponent>(uid, out var action) &&
-                 action.BladeServer is { } storedBlade &&
-                 Exists(storedBlade))
-        {
-            bladeUid = storedBlade;
-        }
-        else
-        {
+        if (!TryGetBladeForActionOwner(uid, out var bladeUid))
             return;
-        }
 
         TryOpenBladeConsole(bladeUid, args.Performer);
         args.Handled = true;
@@ -236,24 +223,31 @@ public sealed class HologramBladeLawSystem : EntitySystem
         if (args.Handled)
             return;
 
-        EntityUid bladeUid;
-        if (TryFindBladeForProjection(uid, out var foundBladeUid))
-        {
-            bladeUid = foundBladeUid;
-        }
-        else if (TryComp<HologramConsoleActionComponent>(uid, out var action) &&
-                 action.BladeServer is { } storedBlade &&
-                 Exists(storedBlade))
-        {
-            bladeUid = storedBlade;
-        }
-        else
-        {
+        if (!TryGetBladeForActionOwner(uid, out var bladeUid))
             return;
-        }
 
         TryOpenBladeConsole(bladeUid, args.Performer);
         args.Handled = true;
+    }
+
+    private bool TryGetBladeForActionOwner(EntityUid uid, out EntityUid bladeUid)
+    {
+        if (TryFindBladeForChip(uid, out bladeUid, out _))
+            return true;
+
+        if (TryFindBladeForProjection(uid, out bladeUid))
+            return true;
+
+        if (TryComp<HologramConsoleActionComponent>(uid, out var action) &&
+            action.BladeServer is { } storedBlade &&
+            Exists(storedBlade))
+        {
+            bladeUid = storedBlade;
+            return true;
+        }
+
+        bladeUid = default;
+        return false;
     }
 
     private void TryOpenBladeConsole(EntityUid bladeUid, EntityUid user)
@@ -261,7 +255,62 @@ public sealed class HologramBladeLawSystem : EntitySystem
         if (!TryComp<ActorComponent>(user, out var actor))
             return;
 
-        _ui.TryToggleUi(bladeUid, HologramConsoleUiKey.Key, actor.PlayerSession);
+        if (_ui.HasUi(bladeUid, HologramConsoleUiKey.Key))
+        {
+            _ui.TryToggleUi(bladeUid, HologramConsoleUiKey.Key, actor.PlayerSession);
+            return;
+        }
+
+        if (TryFindConsoleForBlade(bladeUid, out var consoleUid))
+        {
+            _ui.TryToggleUi(consoleUid, HologramConsoleUiKey.Key, actor.PlayerSession);
+            return;
+        }
+
+        _popup.PopupEntity("No hologram console was found for this blade server.", user, user);
+    }
+
+    private bool TryFindConsoleForBlade(EntityUid bladeUid, out EntityUid consoleUid)
+    {
+        consoleUid = default;
+
+        var bladeGrid = GetEffectiveGridUid(bladeUid);
+        if (bladeGrid == null)
+            return false;
+
+        var query = EntityQueryEnumerator<HologramConsoleComponent>();
+        while (query.MoveNext(out var uid, out _))
+        {
+            if (!_ui.HasUi(uid, HologramConsoleUiKey.Key))
+                continue;
+
+            if (GetEffectiveGridUid(uid) != bladeGrid)
+                continue;
+
+            consoleUid = uid;
+            return true;
+        }
+
+        return false;
+    }
+
+    private EntityUid? GetEffectiveGridUid(EntityUid uid)
+    {
+        var current = uid;
+
+        while (Exists(current))
+        {
+            var xform = Transform(current);
+            if (xform.GridUid is { } grid)
+                return grid;
+
+            if (xform.ParentUid == EntityUid.Invalid || xform.ParentUid == current)
+                return null;
+
+            current = xform.ParentUid;
+        }
+
+        return null;
     }
 
     private bool TryFindBladeForChip(EntityUid chip, out EntityUid bladeUid, out HologramBladeServerComponent blade)

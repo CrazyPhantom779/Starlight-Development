@@ -1,7 +1,7 @@
 - type: entity
   id: HologramJobBrainChip
   parent: BaseItem
-  name: hologram brain chip
+  name: hologram
   description: A stored crew consciousness waiting to be projected into hardlight.
   suffix: Job
   categories: [ HideSpawnMenu, DoNotMap ]
@@ -53,7 +53,6 @@
   suffix: Hologram job spawn
   categories: [ HideSpawnMenu, DoNotMap ]
   components:
-  # Required by the real Moffstation BladeServerRack whitelist and rack visuals.
   - type: BladeServer
     stripeColor: "#45f3ffff"
   - type: HologramJobSpawn
@@ -73,7 +72,6 @@
     interfaces:
       enum.HologramConsoleUiKey.Key:
         type: HologramConsoleBoundUserInterface
-  # Allows both round-start and runtime/latejoin testing.
   - type: ContainerSpawnPoint
     containerId: hologram_brain_chip
     job: Hologram
@@ -104,7 +102,7 @@
   suffix: Hologram job spawn
   components:
   - type: BladeServerRack
-    bladeServerVisualsOffset: 0, 0
+    bladeServerVisualsOffset: 0, -4
     startingContents:
     - HologramJobBladeServer
     - HologramJobBladeServer
@@ -125,7 +123,6 @@
       children:
       - id: BladeServerRackHologramJob
 
-# Compatibility IDs for maps/admin muscle memory from earlier iterations.
 - type: entity
   id: HologramJobServerRack
   parent: BladeServerRackHologramJob
