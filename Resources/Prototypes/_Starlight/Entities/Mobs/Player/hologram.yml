@@ -13,14 +13,16 @@
   - type: Grammar
     attributes:
       proper: true
-  # Keep normal human hands/interactions from MobHuman, but make the projection fragile hardlight.
+  # Hardlight body: human controls/interactions, non-biological damage.
+  # Runtime cleanup removes inherited bloodstream/respirator from MobHuman.
   - type: Damageable
     damageContainer: Inorganic
+    damageModifierSet: HologramHardlight
   - type: MobThresholds
     thresholds:
       0: Alive
-      35: Critical
-      50: Dead
+      30: Critical
+      45: Dead
   - type: Body
     prototype: Hologram
     requiredLegs: 2
@@ -56,11 +58,12 @@
     effectPrototype: EffectHologramProjectionBeam
   - type: Damageable
     damageContainer: Inorganic
+    damageModifierSet: HologramHardlight
   - type: MobThresholds
     thresholds:
       0: Alive
-      35: Critical
-      50: Dead
+      30: Critical
+      45: Dead
   - type: DamageOnHighSpeedImpact
     damage:
       types:
@@ -69,7 +72,7 @@
       path: /Audio/Effects/hit_kick.ogg
   - type: MeleeWeapon
     soundHit:
-      collection: Punch
+      collection: GlassSmack
     angle: 30
     animation: WeaponArcFist
     attackRate: 1
@@ -96,3 +99,45 @@
   components:
   - type: HologramRandomName
     nameDataset: NamesHologramJob
+
+# Used for body chips that should project a hardlight corgi without being biological.
+# If a blade currently points to MobCorgiSmartNoGalcom, the runtime cleanup still hardlight-ifies it,
+# but new chips should prefer this prototype.
+- type: entity
+  id: MobHologramCorgiHardlight
+  parent: MobCorgiSmartNoGalcom
+  name: hologram corgi
+  components:
+  - type: Hologram
+  - type: HologramProjected
+    gracePeriod: 0.08
+    validProjectorWhitelist:
+      tags:
+      - HoloProjectorServer
+      - HoloProjectorCamera
+    effectPrototype: EffectHologramProjectionBeam
+  - type: MovementIgnoreGravity
+  - type: NoSlip
+  - type: FloatingVisuals
+  - type: Damageable
+    damageContainer: Inorganic
+    damageModifierSet: HologramHardlight
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      25: Critical
+      35: Dead
+  - type: SiliconLawBound
+  - type: SiliconLawProvider
+    laws: Drone
+  - type: Stealth
+    lastVisibility: 0.90
+  - type: PointLight
+    radius: 0.6
+    softness: 0.35
+    color: "#00FFFF"
+    energy: 3
+  - type: Tag
+    tags:
+    - DoorBumpOpener
+    - FootstepSound

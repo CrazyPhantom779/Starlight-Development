@@ -93,14 +93,3 @@
     table: !type:GroupSelector
       children:
       - id: BladeServerRackHologramJob
-
-- type: entity
-  id: HologramJobServerRack
-  parent: BladeServerRackHologramJob
-  suffix: Hologram job spawn, compatibility
-
-- type: entity
-  id: HologramJobServerRackSpawner
-  parent: BladeServerRackHologramJobSpawner
-  name: hologram blade server rack spawner
-  suffix: Hologram job spawn, compatibility

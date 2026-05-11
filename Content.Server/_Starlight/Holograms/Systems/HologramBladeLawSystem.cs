@@ -1,4 +1,3 @@
-using Content.Server._Starlight.Holograms.Components;
 using Content.Server.Silicons.Laws;
 using Content.Shared._Moffstation.BladeServer;
 using Content.Shared._Starlight.Holograms;
@@ -6,10 +5,8 @@ using Content.Shared.Actions;
 using Content.Shared.Actions.Components;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Emag.Systems;
-using Content.Shared.Interaction.Components;
 using Content.Shared.Mind.Components;
 using Content.Shared.Popups;
-using Content.Shared.Silicons.Laws;
 using Content.Shared.Silicons.Laws.Components;
 using Robust.Server.GameObjects;
 using Robust.Shared.Containers;
@@ -17,6 +14,9 @@ using Robust.Shared.Player;
 
 namespace Content.Server._Starlight.Holograms.Systems;
 
+/// <summary>
+/// Keeps hologram laws and the hologram console action tied to the blade server that houses the mind.
+/// </summary>
 public sealed class HologramBladeLawSystem : EntitySystem
 {
     private const string HologramConsoleAction = "ActionOpenHologramConsole";
@@ -270,59 +270,7 @@ public sealed class HologramBladeLawSystem : EntitySystem
             return;
         }
 
-        if (TryFindConsoleForBlade(bladeUid, out var consoleUid))
-        {
-            _ui.TryToggleUi(consoleUid, HologramConsoleUiKey.Key, actor.PlayerSession);
-            return;
-        }
-
         _popup.PopupEntity("No hologram console was found for this blade server.", user, user);
-    }
-
-    private bool TryFindConsoleForBlade(EntityUid bladeUid, out EntityUid consoleUid)
-    {
-        consoleUid = default;
-
-        var bladeGrid = GetEffectiveGridUid(bladeUid);
-        if (bladeGrid == null)
-            return false;
-
-        var query = EntityQueryEnumerator<HologramConsoleComponent>();
-        while (query.MoveNext(out var uid, out _))
-        {
-            if (uid == bladeUid)
-                continue;
-
-            if (!_ui.HasUi(uid, HologramConsoleUiKey.Key))
-                continue;
-
-            if (GetEffectiveGridUid(uid) != bladeGrid)
-                continue;
-
-            consoleUid = uid;
-            return true;
-        }
-
-        return false;
-    }
-
-    private EntityUid? GetEffectiveGridUid(EntityUid uid)
-    {
-        var current = uid;
-
-        while (Exists(current))
-        {
-            var xform = Transform(current);
-            if (xform.GridUid is { } grid)
-                return grid;
-
-            if (xform.ParentUid == EntityUid.Invalid || xform.ParentUid == current)
-                return null;
-
-            current = xform.ParentUid;
-        }
-
-        return null;
     }
 
     private bool TryFindBladeForChip(EntityUid chip, out EntityUid bladeUid, out HologramBladeServerComponent blade)

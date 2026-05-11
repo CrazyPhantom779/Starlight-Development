@@ -1,6 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
 using Content.Server.Access.Systems;
-using Content.Server.Atmos.Components;
 using Content.Server.Body.Components;
 using Content.Server.Clothing.Systems;
 using Content.Server.Humanoid;
@@ -13,6 +12,7 @@ using Content.Shared._Starlight.Holograms;
 using Content.Shared._Starlight.Holograms.Components;
 using Content.Shared.Access.Components;
 using Content.Shared.Administration.Logs;
+using Content.Shared.Body.Components;
 using Content.Shared.Clothing.Components;
 using Content.Shared.Database;
 using Content.Shared.Humanoid;
@@ -157,16 +157,27 @@ public sealed class HologramSystem : SharedHologramSystem
         var mob = Spawn(prototype, coords);
         _transform.AttachToGridOrMap(mob);
 
-        EnsureComp<HologramComponent>(mob);
-        EnsureComp<HologramProjectedComponent>(mob);
-        EnsureComp<MindContainerComponent>(mob);
-        MakeHologramBreathless(mob);
+        PrepareHardlightBody(mob);
 
         ApplyPrototypeProjectedName(mob, mind, bodyChip);
         FinishProjection(mindId, mob, coords, promptConsent, client);
 
         holo = mob;
         return true;
+    }
+
+    public EntityUid SpawnAutonomousHologram(HologramBodyChipComponent bodyChip, EntityCoordinates coords)
+    {
+        var prototype = bodyChip.HologramPrototype ?? DefaultHologramPrototype;
+        var mob = Spawn(prototype, coords);
+        _transform.AttachToGridOrMap(mob);
+
+        PrepareHardlightBody(mob);
+
+        if (!string.IsNullOrWhiteSpace(bodyChip.HologramName))
+            _meta.SetEntityName(mob, bodyChip.HologramName);
+
+        return mob;
     }
 
     public bool TryReturnMindToBrainChip(EntityUid hologram, EntityUid brainChip)
@@ -198,6 +209,24 @@ public sealed class HologramSystem : SharedHologramSystem
         HologramsWaitingForMind.Remove(mindId);
     }
 
+    public void PrepareHardlightBody(EntityUid mob)
+    {
+        EnsureComp<HologramComponent>(mob);
+        EnsureComp<HologramProjectedComponent>(mob);
+        EnsureComp<MindContainerComponent>(mob);
+
+        // These are inherited from biological parents. Remove them in one place so
+        // prototype YAML can keep the useful interaction/hands/inventory parents.
+        RemCompDeferred<RespiratorComponent>(mob);
+        RemCompDeferred<BloodstreamComponent>(mob);
+
+        if (TryComp<GrammarComponent>(mob, out var grammar))
+        {
+            _grammar.SetProperNoun((mob, grammar), true);
+            _grammar.SetGender((mob, grammar), Gender.Neuter);
+        }
+    }
+
     private bool CanProjectMind(EntityUid mindId, MindComponent mind)
     {
         if (HologramsWaitingForMind.TryGetValue(mindId, out var clone))
@@ -225,7 +254,7 @@ public sealed class HologramSystem : SharedHologramSystem
 
     private void FinishProjection(EntityUid mindId, EntityUid mob, EntityCoordinates coords, bool promptConsent, ICommonSession client)
     {
-        MakeHologramBreathless(mob);
+        PrepareHardlightBody(mob);
 
         if (promptConsent)
         {
@@ -248,9 +277,6 @@ public sealed class HologramSystem : SharedHologramSystem
 
         _adminLogger.Add(LogType.Mind, LogImpact.Medium, $"Hologram {ToPrettyString(mob):mob} was generated at {coords}");
     }
-
-    private void MakeHologramBreathless(EntityUid mob)
-        => RemCompDeferred<RespiratorComponent>(mob);
 
     private HumanoidCharacterProfile? GetProfileForProjection(EntityUid mindId, MindComponent mind, HologramBodyChipComponent? bodyChip)
     {
@@ -290,13 +316,7 @@ public sealed class HologramSystem : SharedHologramSystem
 
         _humanoid.LoadProfile(mob, pref);
         _meta.SetEntityName(mob, pref.Name);
-        MakeHologramBreathless(mob);
-
-        if (TryComp<GrammarComponent>(mob, out var grammar))
-        {
-            _grammar.SetProperNoun((mob, grammar), true);
-            _grammar.SetGender((mob, grammar), Gender.Neuter);
-        }
+        PrepareHardlightBody(mob);
 
         return mob;
     }
@@ -312,12 +332,6 @@ public sealed class HologramSystem : SharedHologramSystem
             name = pref.Name;
 
         _meta.SetEntityName(mob, name);
-
-        if (TryComp<GrammarComponent>(mob, out var grammar))
-        {
-            _grammar.SetProperNoun((mob, grammar), true);
-            _grammar.SetGender((mob, grammar), Gender.Neuter);
-        }
     }
 
     private void ApplyPrototypeProjectedName(EntityUid mob, MindComponent mind, HologramBodyChipComponent bodyChip)
@@ -329,12 +343,6 @@ public sealed class HologramSystem : SharedHologramSystem
 
         if (!string.IsNullOrWhiteSpace(name))
             _meta.SetEntityName(mob, name);
-
-        if (TryComp<GrammarComponent>(mob, out var grammar))
-        {
-            _grammar.SetProperNoun((mob, grammar), true);
-            _grammar.SetGender((mob, grammar), Gender.Neuter);
-        }
     }
 
     private void ApplyHumanoidJobData(EntityUid mindId, EntityUid mob)

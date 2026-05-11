@@ -10,6 +10,7 @@ using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Item;
 using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
+using Content.Shared.Mobs;
 using Content.Shared.Popups;
 using Content.Shared.PowerCell;
 using Content.Shared.PowerCell.Components;
@@ -46,6 +47,7 @@ public sealed class HologramConsoleSystem : EntitySystem
         SubscribeLocalEvent<HologramConsoleComponent, EntInsertedIntoContainerMessage>(OnBladeInserted);
         SubscribeLocalEvent<HologramConsoleComponent, EntRemovedFromContainerMessage>(OnBladeRemoved);
         SubscribeLocalEvent<HologramBladeServerComponent, ComponentShutdown>(OnBladeShutdown);
+        SubscribeLocalEvent<HologramComponent, MobStateChangedEvent>(OnHologramMobStateChanged);
     }
 
     public bool IsPortable(EntityUid uid)
@@ -57,6 +59,25 @@ public sealed class HologramConsoleSystem : EntitySystem
     }
 
     public bool IsBatteryPowered(EntityUid uid) => HasComp<PowerCellSlotComponent>(uid);
+
+    private void OnHologramMobStateChanged(EntityUid uid, HologramComponent component, MobStateChangedEvent args)
+    {
+        if (args.NewMobState is not (MobState.Critical or MobState.Dead))
+            return;
+
+        var query = EntityQueryEnumerator<HologramBladeServerComponent>();
+        while (query.MoveNext(out var bladeUid, out var blade))
+        {
+            if (blade.ActiveHologram != uid)
+                continue;
+
+            KillBladeHologram(bladeUid, blade);
+            return;
+        }
+
+        if (Exists(uid))
+            _hologram.DoKillHologram(uid, component);
+    }
 
     private void OnBatteryEmpty(EntityUid uid, HologramConsoleComponent component, ref PowerCellSlotEmptyEvent args)
     {
@@ -310,8 +331,6 @@ public sealed class HologramConsoleSystem : EntitySystem
     {
         var bladeServers = new HashSet<EntityUid>();
 
-        // If this UI belongs to a blade directly, it is the personal/action UI.
-        // Only expose that blade to avoid projecting or recalling other occupants from your action.
         if (HasComp<HologramBladeServerComponent>(console))
         {
             bladeServers.Add(console);
@@ -473,13 +492,17 @@ public sealed class HologramConsoleSystem : EntitySystem
         var hasMind = TryGetStoredMind(brainChip, brainChipComp, out var mind);
         var bodyOnly = !hasMind;
 
+        EntityUid projector;
+        EntityCoordinates coords;
+        var lockToProjector = false;
+
         if (IsPortable(console))
         {
-            CleanupPortableHolograms(component.ActiveHolograms);
-            CleanupBladeHologram(bladeComp);
+            projector = console;
+            coords = Transform(console).Coordinates;
+            lockToProjector = true;
 
-            if (bladeComp.ActiveHologram is { } active && Exists(active))
-                return;
+            CleanupPortableHolograms(component.ActiveHolograms);
 
             if (component.ActiveHolograms.Count >= component.MaxActiveHolograms)
                 return;
@@ -489,25 +512,10 @@ public sealed class HologramConsoleSystem : EntitySystem
                  batteryNullable is not { } battery ||
                  _battery.GetCharge(battery.AsNullable()) <= 0))
                 return;
-
-            if (!TrySpawnHologram(hasMind ? mind : null, bodyChipComp, Transform(console).Coordinates, out var hologram))
-            {
-                Logger.Warning($"Hologram projection failed: could not spawn prototype {bodyChipComp.HologramPrototype}.");
-                _popup.PopupEntity("Projection failed: could not spawn the configured hologram body.", console);
-                return;
-            }
-
-            component.ActiveHolograms[bladeServer] = hologram;
-            bladeComp.ActiveHologram = hologram;
-            SetProjection(hologram, console, true);
-            _bladeLaws.ApplyBladeLaws(bladeServer, bladeComp, hologram);
-
-            if (bodyOnly)
-                _popup.PopupEntity("No mind detected. Projecting an autonomous hardlight body.", console);
         }
         else
         {
-            var projector = GetEntity(args.ProjectorUid);
+            projector = GetEntity(args.ProjectorUid);
             if (!Exists(projector) || !HasComp<HologramProjectorComponent>(projector))
             {
                 Logger.Warning("Hologram projection failed: no valid projector selected.");
@@ -523,46 +531,52 @@ public sealed class HologramConsoleSystem : EntitySystem
                 return;
             }
 
-            CleanupBladeHologram(bladeComp);
-
             var activeCount = CountActiveSameGridBladeHolograms(console);
-            if (bladeComp.ActiveHologram is { } existing && Exists(existing))
-            {
-                // Moving projections is treated as a clean unproject + reproject.
-                // This gives a fresh, healed body and prevents carried items/damage from following projectors.
-                if (!ReprojectHologram(bladeServer, bladeComp, existing, brainChip, bodyChipComp, Transform(projector).Coordinates, projector, false, out _))
-                {
-                    Logger.Warning($"Hologram reprojection failed: could not refresh prototype {bodyChipComp.HologramPrototype}.");
-                    _popup.PopupEntity("Reprojection failed: could not refresh the configured hologram body.", console);
-                }
-
-                UpdateUserInterface(console, component);
-                UpdateBriefcaseAppearance(console, component);
-                return;
-            }
-
-            if (component.MaxActiveHolograms > 0 && activeCount >= component.MaxActiveHolograms)
+            if (component.MaxActiveHolograms > 0 &&
+                bladeComp.ActiveHologram is not { } &&
+                activeCount >= component.MaxActiveHolograms)
                 return;
 
-            if (!TrySpawnHologram(hasMind ? mind : null, bodyChipComp, Transform(projector).Coordinates, out var hologram))
-            {
-                Logger.Warning($"Hologram projection failed: could not spawn prototype {bodyChipComp.HologramPrototype}.");
-                _popup.PopupEntity("Projection failed: could not spawn the configured hologram body.", console);
-                return;
-            }
-
-            bladeComp.ActiveHologram = hologram;
-            SetProjection(hologram, projector, false);
-            _bladeLaws.ApplyBladeLaws(bladeServer, bladeComp, hologram);
-
-            if (bodyOnly)
-                _popup.PopupEntity("No mind detected. Projecting an autonomous hardlight body.", projector);
+            coords = Transform(projector).Coordinates;
         }
+
+        if (bladeComp.ActiveHologram is { } existing && Exists(existing))
+        {
+            if (!ReprojectHologram(bladeServer, bladeComp, existing, brainChip, bodyChipComp, coords, projector, lockToProjector, out var refreshed))
+            {
+                Logger.Warning($"Hologram reprojection failed: could not refresh prototype {bodyChipComp.HologramPrototype}.");
+                _popup.PopupEntity("Reprojection failed: could not refresh the configured hologram body.", console);
+                return;
+            }
+
+            if (IsPortable(console))
+                component.ActiveHolograms[bladeServer] = refreshed;
+
+            UpdateUserInterface(console, component);
+            UpdateBriefcaseAppearance(console, component);
+            return;
+        }
+
+        if (!TrySpawnHologram(hasMind ? mind : null, bodyChipComp, coords, out var hologram))
+        {
+            Logger.Warning($"Hologram projection failed: could not spawn prototype {bodyChipComp.HologramPrototype}.");
+            _popup.PopupEntity("Projection failed: could not spawn the configured hologram body.", console);
+            return;
+        }
+
+        if (IsPortable(console))
+            component.ActiveHolograms[bladeServer] = hologram;
+
+        bladeComp.ActiveHologram = hologram;
+        SetProjection(hologram, projector, lockToProjector);
+        _bladeLaws.ApplyBladeLaws(bladeServer, bladeComp, hologram);
+
+        if (bodyOnly)
+            _popup.PopupEntity("No mind detected. Projecting an autonomous hardlight body.", projector);
 
         UpdateUserInterface(console, component);
         UpdateBriefcaseAppearance(console, component);
     }
-
 
     private bool ReprojectHologram(
         EntityUid bladeServerUid,
@@ -614,12 +628,7 @@ public sealed class HologramConsoleSystem : EntitySystem
             return true;
         }
 
-        if (bodyChipComp.HologramPrototype == null)
-            return false;
-
-        hologram = Spawn(bodyChipComp.HologramPrototype, coords);
-        EnsureComp<HologramComponent>(hologram);
-        EnsureComp<HologramProjectedComponent>(hologram);
+        hologram = _hologram.SpawnAutonomousHologram(bodyChipComp, coords);
         return true;
     }
 

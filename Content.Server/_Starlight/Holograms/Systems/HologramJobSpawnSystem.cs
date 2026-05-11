@@ -12,6 +12,7 @@ using Content.Shared.Power;
 using Content.Shared.Preferences;
 using Content.Shared.Roles.Jobs;
 using Robust.Shared.Containers;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server._Starlight.Holograms.Systems;
 
@@ -25,6 +26,7 @@ public sealed class HologramJobSpawnSystem : EntitySystem
     private const string JobBladePrototype = "HologramJobBladeServer";
 
     [Dependency] private readonly HologramBladeLawSystem _bladeLaws = default!;
+    [Dependency] private readonly HologramSystem _hologram = default!;
     [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
     [Dependency] private readonly SharedContainerSystem _container = default!;
     [Dependency] private readonly StationSystem _station = default!;
@@ -189,8 +191,8 @@ public sealed class HologramJobSpawnSystem : EntitySystem
         bladeServer = default!;
         brainSlot = default!;
 
-        var rackQuery = EntityQueryEnumerator<HologramJobRackComponent, BladeServerRackComponent, TransformComponent>();
-        while (rackQuery.MoveNext(out var rackUid, out _, out var rack, out var xform))
+        var rackQuery = EntityQueryEnumerator<HologramJobRackComponent, ItemSlotsComponent, BladeServerRackComponent, TransformComponent>();
+        while (rackQuery.MoveNext(out var rackUid, out _, out var rackSlots, out var rack, out var xform))
         {
             if (station != null && _station.GetOwningStation(rackUid, xform) != station)
                 continue;
@@ -198,13 +200,17 @@ public sealed class HologramJobSpawnSystem : EntitySystem
             if (grid != null && GetEffectiveGridUid(rackUid) != grid)
                 continue;
 
-            foreach (var slot in rack.BladeSlots)
+            for (var i = 0; i < rack.BladeSlots.Count; i++)
             {
+                var slot = rack.BladeSlots[i];
+
                 if (slot.Item != null)
                     continue;
 
                 var blade = Spawn(JobBladePrototype, xform.Coordinates);
-                if (!_itemSlots.TryInsert(rackUid, slot.Slot, blade, user: null))
+                var slotId = $"{rack.BladeSlotNamePrefix}-{i}";
+
+                if (!_itemSlots.TryInsert(rackUid, slotId, blade, user: null, itemSlots: rackSlots))
                 {
                     Del(blade);
                     continue;
@@ -265,16 +271,15 @@ public sealed class HologramJobSpawnSystem : EntitySystem
 
         // If latejoin enters a blade whose body was already projected as an empty/autonomous shell,
         // put the joining mind directly into that active projection.
-        if (bladeServer.ActiveHologram is not { } active ||
-            !Exists(active) ||
-            !TryComp<MindContainerComponent>(active, out var activeMind) ||
-            activeMind.Mind != null)
+        if (bladeServer.ActiveHologram is { } activeBody &&
+            Exists(activeBody) &&
+            TryComp<MindContainerComponent>(activeBody, out var activeMind) &&
+            activeMind.Mind == null)
         {
-            return;
+            _mind.TransferTo(mindId, activeBody, ghostCheckOverride: true);
+            _hologram.PrepareHardlightBody(activeBody);
+            _bladeLaws.ApplyBladeLaws(bladeServerUid, bladeServer, activeBody);
         }
-
-        _mind.TransferTo(mindId, active, ghostCheckOverride: true);
-        _bladeLaws.ApplyBladeLaws(bladeServerUid, bladeServer, active);
     }
 
     private void EnsureBodyChip(EntityUid bladeServerUid, HologramBladeServerComponent bladeServer, EntityUid mindId, HumanoidCharacterProfile? profile)
@@ -312,6 +317,11 @@ public sealed class HologramJobSpawnSystem : EntitySystem
         {
             bodyComp.HologramProfile = profile;
             bodyComp.HologramName = profile.Name;
+
+            // This is the key for Sparlight / characterforceprototype / forceproto style profiles:
+            // the body chip stores the forced mob prototype, so the projection body becomes that shape.
+            if (!string.IsNullOrWhiteSpace(profile.ForcedPrototype))
+                bodyComp.HologramPrototype = new EntProtoId(profile.ForcedPrototype);
         }
 
         if (!string.IsNullOrWhiteSpace(bodyComp.HologramName))
