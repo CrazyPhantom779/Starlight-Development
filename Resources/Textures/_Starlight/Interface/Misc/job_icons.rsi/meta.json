@@ -215,6 +215,46 @@
             "name": "MedTak_Mindshield",
             "copyright": "SevenShades",
             "delays": [ [ 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1, 0.1 ] ]
+        },
+        {
+            "name": "BorgCargo",
+            "copyright": ""
+        },
+        {
+            "name": "BorgCentralCommand",
+            "copyright": ""
+        },
+        {
+            "name": "BorgCommand",
+            "copyright": ""
+        },
+        {
+            "name": "BorgEngineering",
+            "copyright": ""
+        },
+        {
+            "name": "BorgMedical",
+            "copyright": ""
+        },
+        {
+            "name": "BorgMining",
+            "copyright": ""
+        },
+        {
+            "name": "BorgSalvage",
+            "copyright": ""
+        },
+        {
+            "name": "BorgScience",
+            "copyright": ""
+        },
+        {
+            "name": "BorgSecurity",
+            "copyright": ""
+        },
+        {
+            "name": "BorgService",
+            "copyright": ""
         }
     ]
 }

@@ -7,6 +7,9 @@ using Content.Shared.Whitelist;
 using Robust.Shared.Audio;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Utility;
+#region Starlight
+using Content.Shared.StatusIcon;
+#endregion
 
 namespace Content.Shared.Silicons.Borgs;
 
@@ -168,5 +171,8 @@ public sealed partial class BorgTypePrototype : IPrototype
 
     [DataField]
     public HashSet<JobRequirement> Requirements = new ();
+
+    [DataField]
+    public ProtoId<JobIconPrototype>? JobIconOverride;
     // Starlight-end
 }

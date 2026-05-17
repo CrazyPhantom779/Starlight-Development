@@ -137,6 +137,7 @@
 
 - type: borgType
   id: purrfus
+  jobIconOverride: JobIconBorgCommand
 
   # Description
   dummyPrototype: BorgChassisPurrfus

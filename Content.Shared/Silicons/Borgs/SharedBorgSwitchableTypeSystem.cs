@@ -125,6 +125,15 @@ public abstract class SharedBorgSwitchableTypeSystem : EntitySystem
         if (!Prototypes.Resolve(entity.Comp.SelectedBorgType, out var proto))
             return;
 
+        // Starlight Start
+        if (TryComp<BorgChassisComponent>(entity, out var chassis) &&
+            proto.JobIconOverride is { } jobIcon)
+        {
+            chassis.JobIconOverride = jobIcon;
+            Dirty(entity.Owner, chassis);
+        }
+        // Starlight End
+
         UpdateEntityAppearance(entity, proto);
     }
 
