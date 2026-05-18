@@ -1,11 +1,14 @@
 - type: entity
+  parent: BaseMentalAction
   id: ActionOpenHologramConsole
   name: Open hologram console
-  description: Access your linked hologram blade server console.
+  description: Access the hologram console interface for your current blade server hardware.
+  noSpawn: true
   components:
-  - type: InstantAction
-    itemIconStyle: BigAction
+  - type: Action
+    itemIconStyle: NoItem
     icon:
       sprite: Interface/Actions/actions_ai.rsi
-      state: camera-light
+      state: camera_light
+  - type: InstantAction
     event: !type:HologramOpenConsoleActionEvent

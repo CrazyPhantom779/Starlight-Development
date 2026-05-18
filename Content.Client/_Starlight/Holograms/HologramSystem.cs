@@ -23,7 +23,9 @@ public sealed partial class HologramSystem : SharedHologramSystem
 
     public override void Update(float frameTime)
     {
-        PredictLocalHologram();
+        // Server owns projector validation and forced returns.
+        // The client only updates purely visual/eye effects so prediction does not fight authoritative movement.
+        UpdateLocalEyeTarget();
         UpdateProjectedEffects();
     }
 
@@ -33,13 +35,12 @@ public sealed partial class HologramSystem : SharedHologramSystem
         ClearEyeTarget(uid, component);
     }
 
-    private void PredictLocalHologram()
+    private void UpdateLocalEyeTarget()
     {
         if (_player.LocalSession?.AttachedEntity is not { } player ||
             !TryComp<HologramProjectedComponent>(player, out var projected))
             return;
 
-        ProjectedUpdate(player, projected);
         UpdateEyeTarget(player, projected);
     }
 

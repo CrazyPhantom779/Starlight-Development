@@ -136,15 +136,12 @@
 - type: damageModifierSet
   id: HologramHardlight
   coefficients:
-    # Physical matter disrupts the hardlight lattice.
     Blunt: 1.25
     Slash: 0.85
     Piercing: 0.85
-    # Energy beams scatter through hardlight instead of burning it.
     Heat: 0.0
     Shock: 0.0
     Cold: 0.0
-    # They have no biological systems.
     Asphyxiation: 0.0
     Bloodloss: 0.0
     Poison: 0.0

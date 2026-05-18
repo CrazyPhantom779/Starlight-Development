@@ -11,11 +11,11 @@ public sealed partial class HologramProjectorComponent : Component
 {
     /// <summary>
     /// Maximum range before connected holograms start their return grace timer.
-    /// Keep this within normal PVS range to avoid prediction fighting the server.
+    /// Kept close to a camera-like room/nearby-hall range; visibility still requires line of sight.
     /// </summary>
-    [DataField("projectorRange")]
+    [DataField]
     [AutoNetworkedField]
-    public float ProjectorRange = 14f;
+    public float ProjectorRange = 7f;
 
     /// <summary>
     /// Tile offset of the projector effect for each direction.

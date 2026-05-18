@@ -99,13 +99,15 @@
   kind: source
   path: "/Textures/_Starlight/Shaders/hologram_projection.swsl"
   params:
+    color1: 0.376, 0.875, 1.0
+    color2: 0.09, 0.41, 0.50
     hue: 0.64
-    saturation: 0.85
-    alpha: 0.9
-    intensity: 1.25
+    saturation: 0.95
+    alpha: 0.86
+    intensity: 1.6
     textureHeight: 32
-    colorBlend: 0.45
-    scanlineOpacity: 0.32
-    noiseOpacity: 0.26
-    flickerStrength: 0.16
-    lineScrollSpeed: 0.12
+    colorBlend: 0.62
+    scanlineOpacity: 0.45
+    noiseOpacity: 0.34
+    flickerStrength: 0.2
+    lineScrollSpeed: 0.14

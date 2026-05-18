@@ -57,12 +57,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
     }
 
     public bool IsPortable(EntityUid uid)
-    {
-        if (!HasComp<ItemComponent>(uid))
-            return false;
-
-        return _itemSlots.TryGetSlot(uid, PortableBladeSlot, out _);
-    }
+        => HasComp<ItemComponent>(uid) && TryComp<ItemSlotsComponent>(uid, out var itemSlots) && _itemSlots.TryGetSlot(uid, PortableBladeSlot, out _, itemSlots);
 
     public bool IsBatteryPowered(EntityUid uid) => HasComp<PowerCellSlotComponent>(uid);
 
@@ -125,6 +120,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
 
         if (TryComp<HologramBladeServerComponent>(args.Entity, out var blade))
             KillBladeHologram(args.Entity, blade);
+
         UpdateBriefcaseAppearance(uid, component);
         UpdateUserInterface(uid, component);
     }
@@ -257,6 +253,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
 
         var isPortable = IsPortable(console);
         var consoleGrid = GetEffectiveGridUid(console);
+        var hasVirtualBlade = TryGetVirtualBlade(console, out _);
         var bladeServerList = new List<BladeServerInfo>();
         NetEntity? firstActiveHologram = null;
         var activeCount = 0;
@@ -322,7 +319,8 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         }
 
         float? batteryPercent = null;
-        if (IsBatteryPowered(console) &&
+        if (isPortable &&
+            IsBatteryPowered(console) &&
             _powerCell.TryGetBatteryFromSlot(console, out var batteryNullable) &&
             batteryNullable is { } battery)
         {
@@ -346,7 +344,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
             component.ShowProjectButton,
             component.ShowRecallButton,
             component.ShowBladeServerPanel,
-            isPortable || consoleGrid != null || HasComp<HologramBladeServerComponent>(console));
+            isPortable || consoleGrid != null || HasComp<HologramBladeServerComponent>(console) || hasVirtualBlade);
 
         _ui.SetUiState(console, HologramConsoleUiKey.Key, state);
     }
@@ -354,6 +352,12 @@ public sealed partial class HologramConsoleSystem : EntitySystem
     private HashSet<EntityUid> CollectBladeServers(EntityUid console)
     {
         var bladeServers = new HashSet<EntityUid>();
+
+        if (TryGetVirtualBlade(console, out var virtualBlade))
+        {
+            bladeServers.Add(virtualBlade);
+            return bladeServers;
+        }
 
         if (HasComp<HologramBladeServerComponent>(console))
         {
@@ -401,6 +405,22 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         }
 
         return bladeServers;
+    }
+
+    private bool TryGetVirtualBlade(EntityUid console, out EntityUid bladeServer)
+    {
+        bladeServer = default;
+
+        if (!TryComp<HologramConsoleActionComponent>(console, out var action) ||
+            action.BladeServer is not { } linkedBlade ||
+            !Exists(linkedBlade) ||
+            !HasComp<HologramBladeServerComponent>(linkedBlade))
+        {
+            return false;
+        }
+
+        bladeServer = linkedBlade;
+        return true;
     }
 
     private bool TryGetBladeServerData(
@@ -501,9 +521,9 @@ public sealed partial class HologramConsoleSystem : EntitySystem
 
         if (!CollectBladeServers(console).Contains(bladeServer))
         {
-            _sawmill.Warning($"Hologram projection failed: blade server {bladeServer} is not linked to console {ToPrettyString(console)}.");
-            _popup.PopupEntity("Projection failed: that blade server is not linked to this console.", console);
-            UpdateUserInterface(console, component);
+            _sawmill.Warning($"Hologram projection failed: blade server {bladeServer} is not available from console {ToPrettyString(console)}.");
+            _popup.PopupEntity("Projection failed: that blade server is not available from this console.", console);
+            UpdateConsoleIfAlive(console, component);
             return;
         }
 
@@ -512,7 +532,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         {
             _sawmill.Warning($"Hologram projection failed: invalid, unpowered, or incomplete blade server {bladeServer}.");
             _popup.PopupEntity("Projection failed: invalid, unpowered, or incomplete blade server.", console);
-            UpdateUserInterface(console, component);
+            UpdateConsoleIfAlive(console, component);
             return;
         }
 
@@ -520,7 +540,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         {
             _sawmill.Warning($"Hologram projection failed: blade server {ToPrettyString(bladeServer)} has no body chip.");
             _popup.PopupEntity("Projection failed: no body chip is installed.", console);
-            UpdateUserInterface(console, component);
+            UpdateConsoleIfAlive(console, component);
             return;
         }
 
@@ -530,7 +550,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         if (!hasMind && !autonomousProjection)
         {
             _popup.PopupEntity("Projection failed: no mind chip is installed.", console);
-            UpdateUserInterface(console, component);
+            UpdateConsoleIfAlive(console, component);
             return;
         }
 
@@ -570,7 +590,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
             {
                 _sawmill.Warning("Hologram projection failed: no valid same-grid projector selected.");
                 _popup.PopupEntity("Projection failed: select a valid same-grid projector.", console);
-                UpdateUserInterface(console, component);
+                UpdateConsoleIfAlive(console, component);
                 return;
             }
 
@@ -598,8 +618,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
             if (IsPortable(console))
                 component.ActiveHolograms[bladeServer] = refreshed;
 
-            UpdateUserInterface(console, component);
-            UpdateBriefcaseAppearance(console, component);
+            UpdateConsoleIfAlive(console, component);
             return;
         }
 
@@ -623,8 +642,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         SetProjection(hologram, projector, lockToProjector);
         _bladeLaws.ApplyBladeLaws(bladeServer, bladeComp, hologram);
 
-        UpdateUserInterface(console, component);
-        UpdateBriefcaseAppearance(console, component);
+        UpdateConsoleIfAlive(console, component);
     }
 
     private bool TryValidateProjector(EntityUid console, EntityUid projector)
@@ -642,7 +660,10 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         if (consoleGrid == null)
             return false;
 
-        return Transform(projector).GridUid == consoleGrid;
+        if (Transform(projector).GridUid != consoleGrid)
+            return false;
+
+        return true;
     }
 
     private bool ReprojectHologram(
@@ -750,8 +771,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
             }
         }
 
-        UpdateUserInterface(console, component);
-        UpdateBriefcaseAppearance(console, component);
+        UpdateConsoleIfAlive(console, component);
     }
 
     private void OnToggleCarry(EntityUid uid, HologramConsoleComponent component, HologramConsoleToggleCarryMessage args)
@@ -864,6 +884,9 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         var query = EntityQueryEnumerator<HologramConsoleComponent>();
         while (query.MoveNext(out var consoleUid, out var console))
         {
+            if (!IsPortable(consoleUid))
+                continue;
+
             if (!console.ActiveHolograms.Remove(bladeServerUid))
                 continue;
 
@@ -897,5 +920,14 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         }
 
         activeHolograms.Clear();
+    }
+
+    private void UpdateConsoleIfAlive(EntityUid console, HologramConsoleComponent component)
+    {
+        if (!Exists(console) || Terminating(console))
+            return;
+
+        UpdateUserInterface(console, component);
+        UpdateBriefcaseAppearance(console, component);
     }
 }

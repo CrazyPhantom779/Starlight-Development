@@ -17,7 +17,7 @@ using Robust.Shared.Player;
 namespace Content.Server._Starlight.Holograms.Systems;
 
 /// <summary>
-/// Keeps hologram laws and the hologram console link tied to the blade server that houses the mind.
+/// Keeps hologram laws and console ownership tied to the blade server that houses or projects the mind.
 /// Action entities are granted by HologramActionGrantSystem from YAML-driven HologramActionGrantComponent.
 /// </summary>
 public sealed partial class HologramBladeLawSystem : EntitySystem
@@ -80,8 +80,11 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         if (!TryComp(bladeUid, out ItemSlotsComponent? slots))
             return false;
 
-        if (!_itemSlots.TryGetSlot(bladeUid, blade.BrainChipSlot, out var brainSlot, slots) || brainSlot.Item is not { } chip)
+        if (!_itemSlots.TryGetSlot(bladeUid, blade.BrainChipSlot, out var brainSlot, slots) ||
+            brainSlot.Item is not { } chip)
+        {
             return false;
+        }
 
         brainChip = chip;
         return true;
@@ -94,8 +97,11 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         if (!TryComp(bladeUid, out ItemSlotsComponent? slots))
             return false;
 
-        if (!_itemSlots.TryGetSlot(bladeUid, blade.BodyChipSlot, out var bodySlot, slots) || bodySlot.Item is not { } chip)
+        if (!_itemSlots.TryGetSlot(bladeUid, blade.BodyChipSlot, out var bodySlot, slots) ||
+            bodySlot.Item is not { } chip)
+        {
             return false;
+        }
 
         bodyChip = chip;
         return true;
@@ -168,11 +174,12 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         var changed = false;
         foreach (var slot in component.BladeSlots)
         {
-            if (slot.Item is not { } bladeUid || !TryComp(bladeUid, out HologramBladeServerComponent? blade))
+            if (slot.Item is not { } bladeUid ||
+                !TryComp(bladeUid, out HologramBladeServerComponent? blade) ||
+                blade.Emagged)
+            {
                 continue;
-
-            if (blade.Emagged)
-                continue;
+            }
 
             blade.Emagged = true;
             SyncBladeLawsToOccupants(bladeUid, blade);
@@ -200,8 +207,11 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         if (args.Handled)
             return;
 
-        if (component.BladeServer is not { } bladeUid || !TryComp(bladeUid, out HologramBladeServerComponent? blade))
+        if (component.BladeServer is not { } bladeUid ||
+            !TryComp(bladeUid, out HologramBladeServerComponent? blade))
+        {
             return;
+        }
 
         var laws = blade.Emagged ? blade.EmaggedLawset : blade.NormalLawset;
         args.Laws = _laws.GetLawset(laws);
@@ -213,28 +223,28 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         if (args.Handled)
             return;
 
-        if (!TryGetBladeForActionOwner(uid, out var bladeUid))
+        if (!TryGetBladeForActionOwner(uid, out _))
         {
-            _popup.PopupEntity("This hologram brain is not linked to a blade server.", uid, uid);
+            _popup.PopupEntity("This hologram brain is not installed in a blade server.", uid, uid);
             return;
         }
 
-        TryOpenBladeConsole(bladeUid, args.Performer);
+        TryOpenBladeConsole(uid, args.Performer);
         args.Handled = true;
     }
 
-    private void OnOpenConsoleFromProjection(EntityUid uid, HologramComponent _, HologramOpenConsoleActionEvent args)
+    private void OnOpenConsoleFromProjection(EntityUid uid, HologramComponent component, HologramOpenConsoleActionEvent args)
     {
         if (args.Handled)
             return;
 
         if (!TryGetBladeForActionOwner(uid, out var bladeUid))
         {
-            _popup.PopupEntity("This projection is not linked to a blade server.", uid, args.Performer);
+            _popup.PopupEntity("This projection is not associated with a blade server.", uid, args.Performer);
             return;
         }
 
-        TryOpenBladeConsole(bladeUid, args.Performer);
+        TryOpenBladeConsole(uid, args.Performer);
         args.Handled = true;
     }
 
@@ -246,7 +256,9 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         if (TryFindBladeForProjection(uid, out bladeUid))
             return true;
 
-        if (TryComp(uid, out HologramConsoleActionComponent? action) && action.BladeServer is { } storedBlade && Exists(storedBlade))
+        if (TryComp(uid, out HologramConsoleActionComponent? action) &&
+            action.BladeServer is { } storedBlade &&
+            Exists(storedBlade))
         {
             bladeUid = storedBlade;
             return true;
@@ -256,7 +268,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         return false;
     }
 
-    private void TryOpenBladeConsole(EntityUid bladeUid, EntityUid user)
+    private void TryOpenBladeConsole(EntityUid uiHost, EntityUid user)
     {
         if (!TryComp(user, out ActorComponent? actor))
         {
@@ -264,81 +276,13 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
             return;
         }
 
-        if (!TryFindConsoleForBlade(bladeUid, out var consoleUid))
+        if (!_ui.HasUi(uiHost, HologramConsoleUiKey.Key))
         {
-            _popup.PopupEntity("No hologram console was found for this blade server.", user, user);
+            _popup.PopupEntity("No hologram console interface is available.", user, user);
             return;
         }
 
-        _ui.TryToggleUi(consoleUid, HologramConsoleUiKey.Key, actor.PlayerSession);
-    }
-
-    private bool TryFindConsoleForBlade(EntityUid bladeUid, out EntityUid consoleUid)
-    {
-        consoleUid = default;
-
-        var current = bladeUid;
-        while (Exists(current))
-        {
-            var parent = Transform(current).ParentUid;
-            if (parent == EntityUid.Invalid || parent == current)
-                break;
-
-            current = parent;
-
-            if (HasComp<BladeServerRackComponent>(current) && _ui.HasUi(current, HologramConsoleUiKey.Key))
-            {
-                consoleUid = current;
-                return true;
-            }
-        }
-
-        if (_ui.HasUi(bladeUid, HologramConsoleUiKey.Key))
-        {
-            consoleUid = bladeUid;
-            return true;
-        }
-
-        var bladeGrid = GetEffectiveGridUid(bladeUid);
-        if (bladeGrid == null)
-            return false;
-
-        var query = EntityQueryEnumerator<HologramConsoleComponent>();
-        while (query.MoveNext(out var uid, out _))
-        {
-            if (!_ui.HasUi(uid, HologramConsoleUiKey.Key))
-                continue;
-
-            if (GetEffectiveGridUid(uid) != bladeGrid)
-                continue;
-
-            consoleUid = uid;
-            return true;
-        }
-
-        return false;
-    }
-
-    private EntityUid? GetEffectiveGridUid(EntityUid uid)
-    {
-        var xform = Transform(uid);
-        if (xform.GridUid is { } grid)
-            return grid;
-
-        var current = xform.ParentUid;
-        while (Exists(current))
-        {
-            var parentXform = Transform(current);
-            if (parentXform.GridUid is { } parentGrid)
-                return parentGrid;
-
-            if (parentXform.ParentUid == EntityUid.Invalid || parentXform.ParentUid == current)
-                break;
-
-            current = parentXform.ParentUid;
-        }
-
-        return null;
+        _ui.TryToggleUi(uiHost, HologramConsoleUiKey.Key, actor.PlayerSession);
     }
 
     private bool TryFindBladeForChip(EntityUid chip, out EntityUid bladeUid, out HologramBladeServerComponent blade)
@@ -349,8 +293,11 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         var query = EntityQueryEnumerator<HologramBladeServerComponent, ItemSlotsComponent>();
         while (query.MoveNext(out var uid, out var bladeComp, out var slots))
         {
-            if (!_itemSlots.TryGetSlot(uid, bladeComp.BrainChipSlot, out var brainSlot, slots) || brainSlot.Item != chip)
+            if (!_itemSlots.TryGetSlot(uid, bladeComp.BrainChipSlot, out var brainSlot, slots) ||
+                brainSlot.Item != chip)
+            {
                 continue;
+            }
 
             bladeUid = uid;
             blade = bladeComp;

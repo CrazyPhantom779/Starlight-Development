@@ -46,7 +46,9 @@ public sealed partial class HologramVisualizerSystem : EntitySystem
 
         sprite.PostShader = null;
         sprite.RaiseShaderEvent = false;
-        sprite.NoRotation = false;
+
+        if (ent.Comp.ForceHolopadFacing)
+            sprite.NoRotation = false;
     }
 
     private void OnShaderRender(Entity<HologramComponent> ent, ref BeforePostShaderRenderEvent args)
@@ -76,7 +78,9 @@ public sealed partial class HologramVisualizerSystem : EntitySystem
 
         _sprite.SetColor((uid, sprite), Color.White);
         _sprite.SetOffset((uid, sprite), component.Offset);
-        sprite.NoRotation = component.ForceHolopadFacing;
+
+        if (component.ForceHolopadFacing)
+            sprite.NoRotation = true;
 
         if (!TryEnsureShader(component, sprite))
             return;

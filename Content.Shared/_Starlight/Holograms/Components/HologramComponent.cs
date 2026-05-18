@@ -5,8 +5,8 @@ namespace Content.Shared._Starlight.Holograms.Components;
 
 /// <summary>
 /// Marks the entity as a hardlight hologram.
-/// The client visualizer intentionally mirrors holopad hologram rendering while
-/// adding Starlight projection scanlines, noise, and flicker through shader data.
+/// Holograms use a dedicated projection shader, but are still real solid mobs.
+/// Keep static holopad presentation options opt-in so walking bodies stay aligned with their physics.
 /// </summary>
 [RegisterComponent]
 public sealed partial class HologramComponent : Component
@@ -31,81 +31,46 @@ public sealed partial class HologramComponent : Component
 
     /// <summary>
     /// Name of the post-shader used by projected hardlight holograms.
-    /// Use HologramProjection for Starlight hardlight mobs. The visualizer also
-    /// keeps compatibility with the upstream holopad Hologram shader.
     /// </summary>
     [DataField]
     public string ShaderName = "HologramProjection";
 
-    /// <summary>
-    /// Primary glow color for HologramProjection and holopad-compatible shaders.
-    /// </summary>
     [DataField]
     public Color Color1 = Color.FromHex("#65b8e2");
 
-    /// <summary>
-    /// Secondary shadow color for HologramProjection and holopad-compatible shaders.
-    /// </summary>
     [DataField]
     public Color Color2 = Color.FromHex("#3a6981");
 
-    /// <summary>
-    /// HSV hue used by Starlight-style projection shaders. 0.64 is blue/cyan.
-    /// </summary>
     [DataField]
     public float Hue = 0.64f;
 
-    /// <summary>
-    /// Minimum saturation pushed into the projected sprite.
-    /// </summary>
     [DataField]
-    public float Saturation = 0.85f;
+    public float Saturation = 0.95f;
 
-    /// <summary>
-    /// Final transparency multiplier.
-    /// </summary>
     [DataField]
-    public float Alpha = 0.9f;
+    public float Alpha = 0.82f;
 
-    /// <summary>
-    /// Glow/brightness multiplier.
-    /// </summary>
     [DataField]
-    public float Intensity = 1.25f;
+    public float Intensity = 1.6f;
 
-    /// <summary>
-    /// How much the shader's color ramp replaces the original sprite colors.
-    /// </summary>
     [DataField]
-    public float ColorBlend = 0.45f;
+    public float ColorBlend = 0.6f;
 
-    /// <summary>
-    /// Strength of moving scanlines.
-    /// </summary>
     [DataField]
-    public float ScanlineOpacity = 0.32f;
+    public float ScanlineOpacity = 0.45f;
 
-    /// <summary>
-    /// Strength of animated projection noise.
-    /// </summary>
     [DataField]
-    public float NoiseOpacity = 0.26f;
+    public float NoiseOpacity = 0.35f;
 
-    /// <summary>
-    /// Strength of alpha pulsing/flicker.
-    /// </summary>
     [DataField]
-    public float FlickerStrength = 0.16f;
+    public float FlickerStrength = 0.2f;
 
-    /// <summary>
-    /// Scanline scroll speed for HologramProjection.
-    /// </summary>
     [DataField]
-    public float LineScrollSpeed = 0.12f;
+    public float LineScrollSpeed = 0.14f;
 
     /// <summary>
     /// Time multiplier used by the upstream holopad-compatible Hologram shader.
-    /// HologramProjection uses shader TIME directly, but this is kept for compatibility.
+    /// HologramProjection uses shader TIME directly, but this remains for fallback compatibility.
     /// </summary>
     [DataField]
     public float ScrollRate = 0.125f;
@@ -114,17 +79,18 @@ public sealed partial class HologramComponent : Component
     /// Visibility used when the hologram has StealthComponent.
     /// </summary>
     [DataField]
-    public float DefaultVisibility = 0.8f;
+    public float DefaultVisibility = 0.9f;
 
     /// <summary>
-    /// Sprite offset used for the holopad-style projection treatment.
+    /// Visual offset for static holopad-like projections.
+    /// Walking hardlight mobs default to zero so the sprite remains centered on the body/eye/collision.
     /// </summary>
     [DataField]
-    public Vector2 Offset = new(-0.02f, 0.45f);
+    public Vector2 Offset = Vector2.Zero;
 
     /// <summary>
-    /// Holopad holograms are static and force south-facing/no-rotation.
-    /// Normal hardlight hologram mobs should keep their movement direction, so this is opt-in.
+    /// Holopad caller projections are static and force south-facing/no-rotation.
+    /// Normal hardlight mobs should keep their normal humanoid direction visuals, so this is opt-in.
     /// </summary>
     [DataField]
     public bool ForceHolopadFacing;

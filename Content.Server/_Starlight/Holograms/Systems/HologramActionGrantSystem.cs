@@ -92,7 +92,12 @@ public sealed partial class HologramActionGrantSystem : EntitySystem
         if (actionEntity is { } existing && Exists(existing))
             return;
 
-        _actions.AddAction(uid, ref actionEntity, actionPrototype);
+        if (!_actions.AddAction(uid, ref actionEntity, actionPrototype))
+        {
+            // Do not keep retrying with a bad prototype every refresh tick.
+            // The action container logs the concrete prototype error; clearing the ref prevents spam.
+            actionEntity = null;
+        }
     }
 
     private bool CanUseConsoleAction(EntityUid uid, HologramActionGrantComponent component)

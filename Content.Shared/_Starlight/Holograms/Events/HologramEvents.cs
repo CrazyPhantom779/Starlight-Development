@@ -41,6 +41,7 @@ public record struct HologramGetProjectorEvent(EntityUid? ProjectorOverride = nu
 public record struct HologramCheckProjectorValidEvent(EntityUid Projector, bool? Valid = null);
 
 /// <summary>
-/// Opens the hologram blade console UI for the blade this mind is stored in or projected from.
+/// Opens the hologram console interface for the blade this mind is stored in or projected from.
+/// Do not mark this NetSerializable: InstantActionEvent itself is not net-serializable.
 /// </summary>
 public sealed partial class HologramOpenConsoleActionEvent : InstantActionEvent;

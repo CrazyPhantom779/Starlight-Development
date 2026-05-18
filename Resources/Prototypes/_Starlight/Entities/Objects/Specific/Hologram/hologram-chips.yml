@@ -19,6 +19,12 @@
   - type: Physics
     bodyType: KinematicController
   - type: Actions
+  - type: HologramConsole
+    maxActiveHolograms: 1
+    showMap: true
+    showProjectButton: true
+    showRecallButton: true
+    showBladeServerPanel: true
   - type: HologramActionGrant
     grantConsoleAction: true
     grantLawsAction: true
@@ -28,8 +34,8 @@
     laws: Drone
   - type: UserInterface
     interfaces:
-      enum.SiliconLawsUiKey.Key:
-        type: SiliconLawBoundUserInterface
+      enum.HologramConsoleUiKey.Key:
+        type: HologramConsoleBoundUserInterface
   - type: Tag
     tags:
     - HologramBrainChip

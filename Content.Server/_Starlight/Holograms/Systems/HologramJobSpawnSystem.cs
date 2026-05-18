@@ -12,20 +12,18 @@ using Content.Shared.Power;
 using Content.Shared.Preferences;
 using Content.Shared.Roles.Jobs;
 using Robust.Shared.Containers;
-using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server._Starlight.Holograms.Systems;
 
 /// <summary>
 /// Installs hologram job minds into blade servers.
-/// Job racks start empty; a job blade is created only when a hologram player actually joins.
+/// Job racks start empty; a job blade is created only inside an existing mapped HologramJobRack.
 /// </summary>
 public sealed partial class HologramJobSpawnSystem : EntitySystem
 {
     private const string HologramJobId = "Hologram";
     private const string JobBladePrototype = "HologramJobBladeServer";
-    private const string FailedSpawnPrototype = "MobObserver";
     private const float StrayInstallInterval = 1f;
 
     private float _strayInstallAccumulator;
@@ -39,10 +37,15 @@ public sealed partial class HologramJobSpawnSystem : EntitySystem
     [Dependency] private IServerPreferencesManager _prefs = default!;
     [Dependency] private SharedJobSystem _job = default!;
     [Dependency] private MindSystem _mind = default!;
+    [Dependency] private ILogManager _logManager = default!;
+
+    private ISawmill _sawmill = default!;
 
     public override void Initialize()
     {
         base.Initialize();
+
+        _sawmill = _logManager.GetSawmill("hologram.job");
 
         SubscribeLocalEvent<PlayerSpawningEvent>(OnPlayerSpawning, before: new[] { typeof(ContainerSpawnPointSystem) });
         SubscribeLocalEvent<HologramJobSpawnComponent, ContainerSpawnEvent>(OnContainerSpawn);
@@ -54,9 +57,10 @@ public sealed partial class HologramJobSpawnSystem : EntitySystem
         if (args.SpawnResult != null || args.Job?.ToString() != HologramJobId)
             return;
 
-        if (!TryFindOrCreateBlade(args.Station, null, out var bladeServerUid, out var bladeServer, out var brainSlot))
+        if (!TryFindOrCreateBlade(args.Station, null, out var bladeServerUid, out var bladeServer, out var brainSlot) &&
+            !TryFindOrCreateBlade(null, null, out bladeServerUid, out bladeServer, out brainSlot))
         {
-            FailHologramSpawn(args);
+            _sawmill.Warning("Unable to place Hologram job: no mapped HologramJobRack with a free blade slot was found.");
             return;
         }
 
@@ -74,17 +78,13 @@ public sealed partial class HologramJobSpawnSystem : EntitySystem
             if (args.SpawnResult is { } spawnResult)
                 Del(spawnResult);
 
-            FailHologramSpawn(args);
+            args.SpawnResult = null;
+            _sawmill.Warning($"Unable to install Hologram job mind into {ToPrettyString(bladeServerUid)}.");
             return;
         }
 
         SetupInstalledChip(bladeServerUid, bladeServer, args.SpawnResult.Value, brainChip, mindId, args.HumanoidCharacterProfile);
     }
-
-    private void FailHologramSpawn(PlayerSpawningEvent args)
-        // Claim the spawn so the normal latejoin path does not place the hologram brain chip at arrivals.
-        // Hologram jobs require mapped HologramJobRack infrastructure; if none exists, leave the player as an observer.
-         => args.SpawnResult = Spawn(FailedSpawnPrototype, MapCoordinates.Nullspace);
 
     private void OnContainerSpawn(EntityUid uid, HologramJobSpawnComponent component, ref ContainerSpawnEvent args)
     {
@@ -111,7 +111,7 @@ public sealed partial class HologramJobSpawnSystem : EntitySystem
         _strayInstallAccumulator = 0f;
 
         // Defensive fallback for admin/runtime testing: if something still spawns a hologram
-        // job chip loose on the station, put it into a newly-created job blade instead.
+        // job chip loose on the station, put it into a newly-created job blade inside a mapped rack.
         // Only the Hologram job is eligible; scanned/ghost-role chips should not be stolen.
         var query = EntityQueryEnumerator<HologramBrainChipComponent, MindContainerComponent>();
         while (query.MoveNext(out var chip, out var brainChip, out var mindContainer))
@@ -336,15 +336,12 @@ public sealed partial class HologramJobSpawnSystem : EntitySystem
         if (!TryComp<HologramBodyChipComponent>(bodyChip, out var bodyComp))
             return;
 
-        bodyComp.HologramPrototype ??= HologramSystem.DefaultHologramPrototype;
-
         if (profile != null)
         {
             bodyComp.HologramProfile = profile;
             bodyComp.HologramName = profile.Name;
 
-            // This is the key for Sparlight / characterforceprototype / forceproto style profiles:
-            // the body chip stores the forced mob prototype, so the projection body becomes that shape.
+            // Forced/custom prototypes are copied into the body chip so the projected body uses that shape.
             if (!string.IsNullOrWhiteSpace(profile.ForcedPrototype))
                 bodyComp.HologramPrototype = new EntProtoId(profile.ForcedPrototype);
         }
@@ -419,7 +416,10 @@ public sealed partial class HologramJobSpawnSystem : EntitySystem
             return false;
         }
 
-        return TryComp<ApcPowerReceiverComponent>(bladeServerUid, out var ownPower) && ownPower.Powered;
+        if (TryComp<ApcPowerReceiverComponent>(bladeServerUid, out var ownPower))
+            return ownPower.Powered;
+
+        return false;
     }
 
     private void OnBladePowerChanged(EntityUid uid, HologramBladeServerComponent component, ref PowerChangedEvent args)

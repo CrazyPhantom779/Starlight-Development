@@ -2,7 +2,6 @@
   abstract: true
   parent:
   - BaseMob
-  - MobCombat
   - StripableInventoryBase
   id: BaseHologramHumanoid
   name: hologram
@@ -12,22 +11,21 @@
     color1: "#65b8e2"
     color2: "#3a6981"
     hue: 0.64
-    saturation: 0.85
-    alpha: 0.9
-    intensity: 1.25
-    colorBlend: 0.45
-    scanlineOpacity: 0.32
-    noiseOpacity: 0.26
-    flickerStrength: 0.16
-    lineScrollSpeed: 0.12
-    defaultVisibility: 0.8
-    offset: -0.02, 0.45
+    saturation: 0.95
+    alpha: 0.82
+    intensity: 1.6
+    colorBlend: 0.6
+    scanlineOpacity: 0.45
+    noiseOpacity: 0.35
+    flickerStrength: 0.2
+    lineScrollSpeed: 0.14
+    defaultVisibility: 0.9
+    offset: 0, 0
   - type: MovementIgnoreGravity
   - type: NoSlip
   - type: Stealth
-    lastVisibility: 0.8
+    lastVisibility: 0.9
   - type: AnimationPlayer
-  - type: FloatingVisuals
   - type: ReplacementAccent
     accent: silicon
   - type: Speech
@@ -51,9 +49,6 @@
     - map: ["enum.HumanoidVisualLayers.LArm"]
     - map: ["enum.HumanoidVisualLayers.RLeg"]
     - map: ["enum.HumanoidVisualLayers.LLeg"]
-    - shader: StencilClear
-      sprite: Mobs/Species/Human/parts.rsi # sprite refactor when
-      state: l_leg
     - shader: StencilMask
       map: ["enum.HumanoidVisualLayers.StencilMask"]
       sprite: Mobs/Customization/masking_helpers.rsi
@@ -113,7 +108,6 @@
     baseWalkSpeed: 3.5
     baseSprintSpeed: 5
   - type: Hands
-    showInHands: false
   - type: Inventory
   - type: InventorySlots
   - type: Body
@@ -126,6 +120,32 @@
   - type: StandingState
   - type: Crawler
   - type: Alerts
+  - type: MobState
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      100: Critical
+      200: Dead
+  - type: Stamina
+  - type: StunVisuals
+  - type: HealthExaminable
+    examinableTypes:
+    - Blunt
+    - Slash
+    - Piercing
+    - Heat
+    - Shock
+    - Cold
+    - Caustic
+  - type: DamageOnHighSpeedImpact
+    damage:
+      types:
+        Blunt: 5
+    soundHit:
+      path: /Audio/Effects/hit_kick.ogg
+  - type: LightningTarget
+    priority: 2
+    lightningExplode: false
   - type: Tag
     tags:
     - DoorBumpOpener
@@ -135,8 +155,6 @@
   - type: TypingIndicator
     proto: robot
   - type: Emoting
-  - type: BodyEmotes
-    soundsId: GeneralBodyEmotes
   - type: Grammar
     attributes:
       proper: true
@@ -155,6 +173,7 @@
   - type: CombatMode
     canDisarm: true
   - type: MeleeWeapon
+    hidden: true
     soundHit:
       collection: Punch
     angle: 30
@@ -182,6 +201,8 @@
         type: StrippableBoundUserInterface
       enum.SiliconLawsUiKey.Key:
         type: SiliconLawBoundUserInterface
+      enum.HologramConsoleUiKey.Key:
+        type: HologramConsoleBoundUserInterface
   - type: SiliconLawBound
   - type: SiliconLawProvider
     laws: Drone
@@ -192,42 +213,30 @@
       Unsexed: UnisexSilicon
     screamId: Scream
     screamAction: ActionScream
+  - type: HologramConsole
+    maxActiveHolograms: 1
+    showMap: true
+    showProjectButton: true
+    showRecallButton: true
+    showBladeServerPanel: true
 
-# Hardlight hologram
 - type: entity
   name: Urist McLight
   parent: BaseHologramHumanoid
   id: MobHologramHardlight
   components:
-  - type: Pacified
   - type: Damageable
-    damageContainer: Inorganic
-    damageModifierSet: Hardlight
-  - type: DamageOnHighSpeedImpact
-    damage:
-      types:
-        Blunt: 6
-    soundHit:
-      path: /Audio/Effects/hit_kick.ogg
+    damageContainer: Biological
+    damageModifierSet: HologramHardlight
   - type: HologramProjected
     gracePeriod: 2
+    validationInterval: 0.25
+    setEyeTarget: false
     validProjectorWhitelist:
       tags:
       - HoloProjectorServer
       - HoloProjectorCamera
     effectPrototype: EffectHologramProjectionBeam
-  - type: Fixtures
-    fixtures:
-      fix1:
-        shape: !type:PhysShapeCircle
-          radius: 0.35
-        density: 25
-        mask:
-        - MobMask
-        layer:
-        - MobLayer
-  - type: CombatMode
-  - type: CameraRecoil
   - type: NpcFactionMember
     factions:
     - NanoTrasen

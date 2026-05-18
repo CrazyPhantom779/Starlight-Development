@@ -19,18 +19,19 @@ public sealed partial class HologramProjectedComponent : Component
     public EntityWhitelist ValidProjectorWhitelist = new();
 
     /// <summary>
-    /// Grace time after leaving projector range before the hologram is returned.
+    /// Grace time after leaving projector range or line of sight before the hologram is returned.
+    /// Kept short so portals/teleports/walls snap the projection back quickly, but not instantly enough
+    /// to punish brief door movement.
     /// </summary>
     [DataField, ViewVariables(VVAccess.ReadWrite)]
     [AutoNetworkedField]
-    public TimeSpan GracePeriod = TimeSpan.FromSeconds(2);
+    public TimeSpan GracePeriod = TimeSpan.FromSeconds(0.75);
 
     /// <summary>
-    /// How often the server revalidates projector connectivity. This avoids
-    /// scanning every projector every tick while still feeling responsive.
+    /// How often the server revalidates projector connectivity.
     /// </summary>
     [DataField]
-    public TimeSpan ValidationInterval = TimeSpan.FromSeconds(0.25);
+    public TimeSpan ValidationInterval = TimeSpan.FromSeconds(0.10);
 
     /// <summary>
     /// Next server-side time this projection should revalidate its projector.
@@ -39,7 +40,7 @@ public sealed partial class HologramProjectedComponent : Component
     public TimeSpan NextProjectorCheck = TimeSpan.Zero;
 
     /// <summary>
-    /// Prototype of the client-side projection effect entity.
+    /// Prototype of the client-side projection beam/effect entity.
     /// </summary>
     [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     [AutoNetworkedField]
@@ -47,6 +48,7 @@ public sealed partial class HologramProjectedComponent : Component
 
     /// <summary>
     /// Whether the hologram's eye should snap to the projector it is emitted from.
+    /// Walking hardlight bodies should leave this false.
     /// </summary>
     [DataField]
     [AutoNetworkedField]
@@ -68,15 +70,14 @@ public sealed partial class HologramProjectedComponent : Component
     public NetEntity? ProjectorOverride;
 
     /// <summary>
-    /// Whether the hologram is currently connected to a projector.
+    /// Whether the hologram is currently connected to a valid projector.
     /// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
     [AutoNetworkedField]
     public bool CurrentlyInProjector;
 
     /// <summary>
-    /// Server-side time when the hologram should be returned if it does not
-    /// reconnect to a projector.
+    /// Server-side time when the hologram should return if it does not reconnect to a projector.
     /// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
     public TimeSpan VanishTime = TimeSpan.Zero;

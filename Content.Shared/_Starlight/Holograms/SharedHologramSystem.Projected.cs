@@ -31,8 +31,9 @@ public partial class SharedHologramSystem
     }
 
     /// <summary>
-    /// Returns a hologram to its last valid projector, or kills it if no valid
-    /// projector can be found.
+    /// Returns a hologram to its last projector, or kills it if no usable projector remains.
+    /// Return intentionally does not require line-of-sight/range: range and wall checks decide when
+    /// the projection becomes invalid; once invalid, the body is pulled back to its emitter.
     /// </summary>
     public virtual void DoReturnHologram(EntityUid hologram, HologramProjectedComponent? projected = null)
     {
@@ -43,7 +44,7 @@ public partial class SharedHologramSystem
             return;
 
         var projector = GetStoredProjector(projected);
-        if (!IsHoloProjectorValid(hologram, projector, occlude: false) &&
+        if (!IsReturnProjectorUsable(projector, projected.ValidProjectorWhitelist) &&
             !TryGetHoloProjector(hologram, out projector, projected, occlude: false))
         {
             TryKillHologram(hologram);
@@ -198,6 +199,10 @@ public partial class SharedHologramSystem
         if (projectorCoords.MapId != hologram.MapId)
             return false;
 
+        var range = projectorComp.ProjectorRange;
+        if ((projectorCoords.Position - hologram.Position).LengthSquared() > range * range)
+            return false;
+
         if (!occlude)
             return true;
 
@@ -307,6 +312,17 @@ public partial class SharedHologramSystem
             return false;
 
         return whitelist == null || _whitelist.IsValid(whitelist, projector);
+    }
+
+    private bool IsReturnProjectorUsable(EntityUid? projector, EntityWhitelist? whitelist)
+    {
+        if (projector is not { } projectorUid || !Exists(projectorUid))
+            return false;
+
+        if (!TryComp(projectorUid, out HologramProjectorComponent? projectorComp))
+            return false;
+
+        return CanUseProjector(projectorUid, projectorComp, whitelist);
     }
 
     private void StopHologramPulling(EntityUid hologram)
