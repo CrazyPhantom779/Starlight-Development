@@ -36,6 +36,15 @@
     interfaces:
       enum.HologramConsoleUiKey.Key:
         type: HologramConsoleBoundUserInterface
+      enum.SiliconLawsUiKey.Key:
+        type: SiliconLawBoundUserInterface
+  - type: Vocal
+    sounds:
+      Male: UnisexSilicon
+      Female: UnisexSilicon
+      Unsexed: UnisexSilicon
+    screamId: Scream
+    screamAction: ActionScream
   - type: Tag
     tags:
     - HologramBrainChip

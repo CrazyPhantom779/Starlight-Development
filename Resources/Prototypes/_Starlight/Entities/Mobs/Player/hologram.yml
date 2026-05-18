@@ -26,8 +26,6 @@
   - type: Stealth
     lastVisibility: 0.9
   - type: AnimationPlayer
-  - type: ReplacementAccent
-    accent: silicon
   - type: Speech
     speechVerb: Robotic
     speechSounds: Borg
