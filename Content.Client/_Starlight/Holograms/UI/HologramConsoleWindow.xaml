@@ -1,103 +1,167 @@
 <DefaultWindow xmlns="https://spacestation14.io"
                xmlns:ui="clr-namespace:Content.Client._Starlight.Holograms.UI"
                Title="Hologram Console"
-               MinSize="980 680"
-               SetSize="1120 760"
+               MinSize="1040 700"
+               SetSize="1160 780"
                Resizable="True">
 
     <PanelContainer StyleClasses="PdaBackground" HorizontalExpand="True" VerticalExpand="True">
-        <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="10">
+        <BoxContainer Orientation="Vertical" Margin="14" SeparationOverride="12">
 
-            <BoxContainer Orientation="Horizontal" SeparationOverride="8">
-                <Label Text="HOLOGRAM PROJECTION CONTROL"
-                       HorizontalExpand="True"
-                       FontColorOverride="#7dd3fc"/>
-                <Label Name="ModeLabel"
-                       Text="PORTABLE MODE"
-                       FontColorOverride="#fbbf24"/>
-                <Label Name="ActiveIndicator"
-                       Text="● READY"
-                       FontColorOverride="#fbbf24"/>
-            </BoxContainer>
+            <!-- Header -->
+            <PanelContainer HorizontalExpand="True">
+                <BoxContainer Orientation="Horizontal" Margin="12 10" SeparationOverride="12">
+                    <BoxContainer Orientation="Vertical" HorizontalExpand="True" SeparationOverride="2">
+                        <Label Text="HOLOGRAM PROJECTION CONTROL"
+                               FontColorOverride="#7dd3fc" />
+                        <Label Name="StatusLabel"
+                               Text="No blade servers available"
+                               FontColorOverride="#94a3b8" />
+                    </BoxContainer>
 
-            <BoxContainer Orientation="Horizontal" HorizontalExpand="True" VerticalExpand="True" SeparationOverride="10">
+                    <BoxContainer Orientation="Horizontal" SeparationOverride="8" VerticalAlignment="Center">
+                        <Label Name="ModeLabel"
+                               Text="STATION MODE"
+                               FontColorOverride="#fbbf24" />
+                        <Label Name="ActiveIndicator"
+                               Text="● READY"
+                               FontColorOverride="#fbbf24" />
+                    </BoxContainer>
+                </BoxContainer>
+            </PanelContainer>
 
+            <!-- Main layout -->
+            <BoxContainer Orientation="Horizontal"
+                          HorizontalExpand="True"
+                          VerticalExpand="True"
+                          SeparationOverride="12">
+
+                <!-- Left rail -->
                 <BoxContainer Name="LeftPanel"
                               Orientation="Vertical"
-                              SetWidth="380"
+                              SetWidth="410"
                               VerticalExpand="True"
-                              SeparationOverride="8">
+                              SeparationOverride="10">
 
                     <PanelContainer>
-                        <BoxContainer Orientation="Vertical" Margin="10" SeparationOverride="6">
-                            <Label Text="BLADE SERVERS" FontColorOverride="#e5e7eb"/>
-                            <Label Name="StatusLabel"
-                                   Text="No blade servers available"
-                                   FontColorOverride="#7dd3fc"/>
-                            <Label Name="NoBladeServersLabel"
-                                   Text="No same-grid blade servers detected."
-                                   FontColorOverride="#ef4444"/>
+                        <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="6">
+                            <BoxContainer Orientation="Horizontal">
+                                <Label Text="BLADE SERVERS"
+                                       HorizontalExpand="True"
+                                       FontColorOverride="#e5e7eb" />
+                                <Label Name="NoBladeServersLabel"
+                                       Text="NONE DETECTED"
+                                       FontColorOverride="#ef4444" />
+                            </BoxContainer>
+
+                            <Label Text="Select a blade server, verify its body data, then choose a projector."
+                                   FontColorOverride="#94a3b8" />
                         </BoxContainer>
                     </PanelContainer>
 
-                    <ScrollContainer VerticalExpand="True">
-                        <BoxContainer Name="BladeServersList"
-                                      Orientation="Vertical"
-                                      VerticalExpand="True"
-                                      SeparationOverride="6"/>
-                    </ScrollContainer>
+                    <PanelContainer VerticalExpand="True">
+                        <ScrollContainer VerticalExpand="True" HorizontalExpand="True" Margin="6">
+                            <BoxContainer Name="BladeServersList"
+                                          Orientation="Vertical"
+                                          HorizontalExpand="True"
+                                          VerticalExpand="True"
+                                          SeparationOverride="6" />
+                        </ScrollContainer>
+                    </PanelContainer>
+
+                    <PanelContainer Name="SelectedPanel">
+                        <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="6">
+                            <Label Text="SELECTION"
+                                   FontColorOverride="#e5e7eb" />
+                            <Label Name="SelectedBladeLabel"
+                                   Text="Blade: none"
+                                   ClipText="True"
+                                   FontColorOverride="#94a3b8" />
+                            <Label Name="SelectedProjectorLabel"
+                                   Text="Projector: none"
+                                   ClipText="True"
+                                   FontColorOverride="#94a3b8" />
+                            <Label Name="HintLabel"
+                                   Text="Select a blade server and projector."
+                                   FontColorOverride="#7dd3fc" />
+                        </BoxContainer>
+                    </PanelContainer>
 
                     <PanelContainer Name="BatteryPanel">
-                        <BoxContainer Orientation="Vertical" Margin="10" SeparationOverride="6">
-                            <BoxContainer Orientation="Horizontal">
-                                <Label Text="BATTERY" HorizontalExpand="True"/>
-                                <Label Name="BatteryLabel" Text="--%"/>
+                        <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="8">
+                            <BoxContainer Orientation="Horizontal" SeparationOverride="8">
+                                <Label Text="BATTERY"
+                                       HorizontalExpand="True"
+                                       FontColorOverride="#e5e7eb" />
+                                <Label Name="BatteryLabel"
+                                       Text="--%"
+                                       FontColorOverride="#94a3b8" />
                             </BoxContainer>
-                            <ProgressBar Name="BatteryBar" MinValue="0" MaxValue="1" Value="0"/>
+                            <ProgressBar Name="BatteryBar"
+                                         MinValue="0"
+                                         MaxValue="1"
+                                         Value="0"
+                                         HorizontalExpand="True"
+                                         MinSize="0 18" />
                         </BoxContainer>
                     </PanelContainer>
 
                     <PanelContainer Name="SettingsPanel">
-                        <BoxContainer Orientation="Vertical" Margin="10" SeparationOverride="6">
+                        <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="8">
+                            <Label Text="PORTABLE SETTINGS"
+                                   FontColorOverride="#e5e7eb" />
                             <CheckBox Name="AllowCarryCheckbox"
-                                      Text="Allow hologram carry mode"/>
+                                      Text="Allow hologram carry mode" />
                             <Label Name="PortableInfoLabel"
                                    Text="Active: 0 / 0"
-                                   FontColorOverride="#7dd3fc"/>
+                                   FontColorOverride="#7dd3fc" />
                         </BoxContainer>
                     </PanelContainer>
 
-                    <BoxContainer Name="ControlsPanel" Orientation="Vertical" SeparationOverride="8">
-                        <Button Name="ProjectButton"
-                                Text="▶ PROJECT"
-                                MinSize="340 55"/>
-                        <Button Name="RecallButton"
-                                Text="◾ RECALL"
-                                MinSize="340 55"/>
-                    </BoxContainer>
+                    <PanelContainer Name="ControlsPanel">
+                        <BoxContainer Orientation="Vertical" Margin="10" SeparationOverride="8">
+                            <Button Name="ProjectButton"
+                                    Text="▶ PROJECT"
+                                    HorizontalExpand="True"
+                                    MinSize="0 48" />
+                            <Button Name="RecallButton"
+                                    Text="◾ RECALL"
+                                    HorizontalExpand="True"
+                                    MinSize="0 44" />
+                        </BoxContainer>
+                    </PanelContainer>
                 </BoxContainer>
 
+                <!-- Map / projector area -->
                 <BoxContainer Name="MapPanel"
                               Orientation="Vertical"
                               HorizontalExpand="True"
                               VerticalExpand="True"
-                              MinSize="700 0"
-                              SeparationOverride="8">
+                              MinSize="690 0"
+                              SeparationOverride="10">
 
-                    <BoxContainer Orientation="Horizontal">
-                        <Label Text="PROJECTOR MAP"
-                               HorizontalExpand="True"
-                               FontColorOverride="#e5e7eb"/>
-                        <Label Name="ProjectorCountLabel"
-                               Text=" No Same-Grid Projectors "
-                               FontColorOverride="#7dd3fc"/>
-                    </BoxContainer>
+                    <PanelContainer HorizontalExpand="True">
+                        <BoxContainer Orientation="Horizontal" Margin="12 10" SeparationOverride="8">
+                            <BoxContainer Orientation="Vertical" HorizontalExpand="True" SeparationOverride="2">
+                                <Label Text="PROJECTOR MAP"
+                                       FontColorOverride="#e5e7eb" />
+                                <Label Text="Only active projectors on the same grid are shown."
+                                       FontColorOverride="#94a3b8" />
+                            </BoxContainer>
+                            <Label Name="ProjectorCountLabel"
+                                   Text=" No Same-Grid Projectors "
+                                   FontColorOverride="#7dd3fc"
+                                   VerticalAlignment="Center" />
+                        </BoxContainer>
+                    </PanelContainer>
 
-                    <PanelContainer VerticalExpand="True" HorizontalExpand="True" MinSize="700 590">
+                    <PanelContainer HorizontalExpand="True"
+                                    VerticalExpand="True"
+                                    MinSize="690 590">
                         <ui:HologramConsoleNavMapControl Name="NavMap"
                                                          HorizontalExpand="True"
                                                          VerticalExpand="True"
-                                                         MinSize="700 590"/>
+                                                         MinSize="690 590" />
 
                         <PanelContainer Name="NoServerOverlay"
                                         HorizontalExpand="True"
@@ -105,14 +169,14 @@
                             <BoxContainer Orientation="Vertical"
                                           HorizontalAlignment="Center"
                                           VerticalAlignment="Center"
-                                          SeparationOverride="8">
+                                          SeparationOverride="10">
                                 <Label Name="NoServerMapLabel"
                                        Text="NO SAME-GRID PROJECTORS"
                                        HorizontalAlignment="Center"
-                                       FontColorOverride="#ef4444"/>
-                                <Label Text="Select a blade server and a projector on this grid."
+                                       FontColorOverride="#ef4444" />
+                                <Label Text="Power a projector on this grid, then reopen or refresh the console."
                                        HorizontalAlignment="Center"
-                                       FontColorOverride="#94a3b8"/>
+                                       FontColorOverride="#94a3b8" />
                             </BoxContainer>
                         </PanelContainer>
                     </PanelContainer>

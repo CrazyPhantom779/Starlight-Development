@@ -1,7 +1,6 @@
 using Content.Server._Starlight.Holograms.Components;
 using Content.Server.Ghost.Roles;
 using Content.Server.Ghost.Roles.Components;
-using Content.Shared.Ghost.Roles.Components;
 using Content.Shared.Interaction;
 using Content.Shared.Mind.Components;
 using Content.Shared.Popups;
@@ -11,10 +10,10 @@ namespace Content.Server._Starlight.Holograms.Systems;
 /// <summary>
 /// Lets empty hologram brain chips be activated into a ghost role, similar to a positronic brain.
 /// </summary>
-public sealed class HologramBrainChipGhostRoleSystem : EntitySystem
+public sealed partial class HologramBrainChipGhostRoleSystem : EntitySystem
 {
-    [Dependency] private readonly GhostRoleSystem _ghostRole = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private GhostRoleSystem _ghostRole = default!;
+    [Dependency] private SharedPopupSystem _popup = default!;
 
     public override void Initialize()
     {
@@ -65,6 +64,8 @@ public sealed class HologramBrainChipGhostRoleSystem : EntitySystem
 
         if (TryComp<GhostRoleComponent>(uid, out var role))
             _ghostRole.UnregisterGhostRole((uid, role));
+
+        RemCompDeferred<GhostTakeoverAvailableComponent>(uid);
 
         _popup.PopupEntity("A mind flickers to life inside the hologram brain chip.", uid);
     }

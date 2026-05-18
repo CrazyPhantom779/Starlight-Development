@@ -8,7 +8,7 @@
   - type: Sprite
     sprite: _Starlight/Objects/Devices/cortical_stack.rsi
     layers:
-      - state: cortical-stack
+    - state: cortical-stack
   - type: Item
     size: Small
   - type: HologramBrainChip
@@ -19,12 +19,20 @@
   - type: Physics
     bodyType: KinematicController
   - type: Actions
+  - type: HologramActionGrant
+    grantConsoleAction: true
+    grantLawsAction: true
+    grantConsoleActionWhileContainedInPoweredRack: true
   - type: SiliconLawBound
   - type: SiliconLawProvider
     laws: Drone
+  - type: UserInterface
+    interfaces:
+      enum.SiliconLawsUiKey.Key:
+        type: SiliconLawBoundUserInterface
   - type: Tag
     tags:
-      - HologramBrainChip
+    - HologramBrainChip
 
 # Body Chip
 - type: entity
@@ -53,3 +61,16 @@
   - type: HologramBodyChip
     hologramPrototype: MobCorgiHolo
     hologramName: "Holo Corgi"
+
+- type: entity
+  parent: HologramBrainChip
+  id: HologramStuntedBrainChip
+  name: stunted hologram mind chip
+  description: A limited hologram processor that can project an autonomous body, but cannot store a consciousness.
+  components:
+  - type: HologramBrainChip
+    allowAutonomousProjection: true
+    preventMindStorage: true
+  - type: HologramActionGrant
+    grantConsoleAction: false
+    grantLawsAction: false

@@ -5,13 +5,15 @@ namespace Content.Server._Starlight.Holograms;
 
 /// <summary>
 /// Stores physical appearance data for holographic projection.
-/// Output by body scanners or initialized for hologram jobs.
+/// Body chips intentionally store only the projection recipe: prototype, optional humanoid profile,
+/// display name, and the source body that produced the data.
 /// </summary>
 [RegisterComponent]
 public sealed partial class HologramBodyChipComponent : Component
 {
     /// <summary>
-    /// The prototype ID of a hologram mob appearance to use.
+    /// The mob prototype used when projecting this body.
+    /// Null means the hologram system should use its normal hardlight humanoid fallback.
     /// </summary>
     [DataField]
     public EntProtoId? HologramPrototype;
@@ -24,7 +26,7 @@ public sealed partial class HologramBodyChipComponent : Component
 
     /// <summary>
     /// Runtime humanoid profile captured from the owning player/profile or scanner target.
-    /// This avoids falling back to a random enabled profile when the stored mind has no humanoid body.
+    /// This is deliberately runtime-only; scanned body data should not be serialized into maps.
     /// </summary>
     [ViewVariables]
     public HumanoidCharacterProfile? HologramProfile;
@@ -34,4 +36,12 @@ public sealed partial class HologramBodyChipComponent : Component
     /// </summary>
     [ViewVariables]
     public EntityUid? SourceBody;
+
+    /// <summary>
+    /// True once the chip has actual scanned/job body data, not merely a default prototype value from YAML.
+    /// </summary>
+    public bool HasStoredBodyData =>
+        SourceBody != null ||
+        HologramProfile != null ||
+        !string.IsNullOrWhiteSpace(HologramName);
 }

@@ -3,6 +3,10 @@ using Robust.Shared.Serialization;
 
 namespace Content.Shared._Starlight.Holograms;
 
+/// <summary>
+/// Full state for the hologram console UI. The server owns all validation; the
+/// client only displays available blades/projectors and sends intent messages.
+/// </summary>
 [Serializable, NetSerializable]
 public sealed class HologramConsoleBoundUserInterfaceState(
     List<BladeServerInfo> bladeServers,
@@ -38,6 +42,9 @@ public sealed class HologramConsoleBoundUserInterfaceState(
     public bool HasServer { get; init; } = hasServer;
 }
 
+/// <summary>
+/// A single blade server row in the hologram console.
+/// </summary>
 [Serializable, NetSerializable]
 public sealed class BladeServerInfo
 {
@@ -59,7 +66,7 @@ public sealed class BladeServerInfo
         NetEntity? currentProjector = null)
     {
         Uid = uid;
-        HologramName = hologramName;
+        HologramName = string.IsNullOrWhiteSpace(hologramName) ? "Unknown" : hologramName;
         IsActive = isActive;
         HasBody = hasBody;
         IsEmagged = isEmagged;
@@ -68,6 +75,9 @@ public sealed class BladeServerInfo
     }
 }
 
+/// <summary>
+/// A projector row and map marker in the hologram console.
+/// </summary>
 [Serializable, NetSerializable]
 public sealed class ProjectorInfo
 {
@@ -78,8 +88,8 @@ public sealed class ProjectorInfo
     public ProjectorInfo(NetEntity uid, string name, string location)
     {
         Uid = uid;
-        Name = name;
-        Location = location;
+        Name = string.IsNullOrWhiteSpace(name) ? "Hologram projector" : name;
+        Location = string.IsNullOrWhiteSpace(location) ? "Unknown location" : location;
     }
 }
 

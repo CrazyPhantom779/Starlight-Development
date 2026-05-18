@@ -28,7 +28,7 @@ public sealed partial class HologramConsoleComponent : Component
     /// <summary>
     /// Whether to show the project button.
     /// </summary>
-    [DataField("showProjectButton")]
+    [DataField]
     public bool ShowProjectButton = true;
 
     /// <summary>
@@ -52,6 +52,6 @@ public sealed partial class HologramConsoleComponent : Component
     /// <summary>
     /// Portable mode only. Maps inserted blade server UIDs to their active holograms.
     /// </summary>
-    [DataField("activeHolograms")]
+    [ViewVariables]
     public Dictionary<EntityUid, EntityUid> ActiveHolograms = [];
 }

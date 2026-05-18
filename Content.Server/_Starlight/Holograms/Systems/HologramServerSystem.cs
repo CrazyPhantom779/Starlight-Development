@@ -1,3 +1,4 @@
+using System.Linq;
 using Content.Shared._Starlight.Holograms;
 using Content.Shared.Power;
 
@@ -5,7 +6,8 @@ namespace Content.Server._Starlight.Holograms.Systems;
 
 public sealed partial class HologramServerSystem : EntitySystem
 {
-    [Dependency] private readonly HologramSystem _hologram = default!;
+    [Dependency] private HologramSystem _hologram = default!;
+    [Dependency] private HologramConsoleSystem _console = default!;
 
     public override void Initialize()
     {
@@ -15,7 +17,7 @@ public sealed partial class HologramServerSystem : EntitySystem
         SubscribeLocalEvent<HologramServerComponent, ComponentShutdown>(OnServerShutdown);
     }
 
-    private void ServerOnPowerChanged(EntityUid uid, HologramServerComponent component, ref PowerChangedEvent args)
+    private void ServerOnPowerChanged(EntityUid _, HologramServerComponent component, ref PowerChangedEvent args)
     {
         if (args.Powered)
             return;
@@ -23,16 +25,23 @@ public sealed partial class HologramServerSystem : EntitySystem
         KillAllHolograms(component);
     }
 
-    private void OnServerShutdown(EntityUid uid, HologramServerComponent component, ComponentShutdown args)
+    private void OnServerShutdown(EntityUid _, HologramServerComponent component, ComponentShutdown __)
         => KillAllHolograms(component);
 
     private void KillAllHolograms(HologramServerComponent component)
     {
-        foreach (var hologram in component.ActiveHolograms.Values)
+        // Starlight Edit Start - blade-backed projections must return their minds before deletion.
+        foreach (var (blade, hologram) in component.ActiveHolograms.ToArray())
         {
-            if (Exists(hologram))
+            if (!Exists(hologram))
+                continue;
+
+            if (Exists(blade) && TryComp<HologramBladeServerComponent>(blade, out var bladeComp))
+                _console.KillBladeHologram(blade, bladeComp);
+            else
                 _hologram.DoKillHologram(hologram);
         }
+        // Starlight Edit End
 
         component.ActiveHolograms.Clear();
 

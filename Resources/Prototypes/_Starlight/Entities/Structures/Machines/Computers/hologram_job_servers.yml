@@ -76,6 +76,18 @@
   suffix: Hologram job spawn
   components:
   - type: HologramJobRack
+  - type: HologramConsole
+    maxActiveHolograms: 4
+    showMap: true
+    showProjectButton: true
+    showRecallButton: true
+    showBladeServerPanel: true
+  - type: ActivatableUI
+    key: enum.HologramConsoleUiKey.Key
+  - type: UserInterface
+    interfaces:
+      enum.HologramConsoleUiKey.Key:
+        type: HologramConsoleBoundUserInterface
   - type: BladeServerRack
     bladeServerVisualsOffset: 0, -4
     startingContents: []

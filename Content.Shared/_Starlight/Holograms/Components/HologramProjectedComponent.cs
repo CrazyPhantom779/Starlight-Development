@@ -6,67 +6,83 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototy
 namespace Content.Shared._Starlight.Holograms.Components;
 
 /// <summary>
-/// Marks that this Hologram is projected from cameras, or some other hologram projector source.
+/// Marks a hologram as an active projection that must stay connected to a projector.
 /// </summary>
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class HologramProjectedComponent : Component
 {
     /// <summary>
-    /// A whitelist to check for on projectors, to determine if they're valid.
+    /// Whitelist used to restrict which projectors this hologram can use.
     /// </summary>
     [DataField]
     [AutoNetworkedField]
     public EntityWhitelist ValidProjectorWhitelist = new();
 
     /// <summary>
-    /// A timer for a grace period before the Holo is returned, to allow for moving through doors.
+    /// Grace time after leaving projector range before the hologram is returned.
     /// </summary>
     [DataField, ViewVariables(VVAccess.ReadWrite)]
     [AutoNetworkedField]
-    public TimeSpan GracePeriod = TimeSpan.FromSeconds(0.1f);
+    public TimeSpan GracePeriod = TimeSpan.FromSeconds(2);
 
     /// <summary>
-    /// The prototype of the effect to spawn for the Hologram's projection.
+    /// How often the server revalidates projector connectivity. This avoids
+    /// scanning every projector every tick while still feeling responsive.
+    /// </summary>
+    [DataField]
+    public TimeSpan ValidationInterval = TimeSpan.FromSeconds(0.25);
+
+    /// <summary>
+    /// Next server-side time this projection should revalidate its projector.
+    /// </summary>
+    [ViewVariables(VVAccess.ReadWrite)]
+    public TimeSpan NextProjectorCheck = TimeSpan.Zero;
+
+    /// <summary>
+    /// Prototype of the client-side projection effect entity.
     /// </summary>
     [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
     [AutoNetworkedField]
     public string? EffectPrototype;
 
     /// <summary>
-    /// Whether or not the Hologram's vision should snap to the projector they're projected from.
+    /// Whether the hologram's eye should snap to the projector it is emitted from.
     /// </summary>
     [DataField]
     [AutoNetworkedField]
     public bool SetEyeTarget;
 
     /// <summary>
-    /// The current projector the hologram is connected to.
+    /// Current projector this hologram is connected to.
     /// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
     [AutoNetworkedField]
     public NetEntity? CurProjector;
 
     /// <summary>
-    /// If set, the Hologram will only be able to be projected from this projector.
+    /// If set, the hologram can only be projected from this projector.
+    /// Used by portable/briefcase-style projectors.
     /// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
     [AutoNetworkedField]
     public NetEntity? ProjectorOverride;
 
     /// <summary>
-    /// Whether or not the Hologram is currently in the range of a projector.
+    /// Whether the hologram is currently connected to a projector.
     /// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
     [AutoNetworkedField]
     public bool CurrentlyInProjector;
 
     /// <summary>
-    /// The point at which a Hologram will be sent back to their last projector or killed.
+    /// Server-side time when the hologram should be returned if it does not
+    /// reconnect to a projector.
     /// </summary>
+    [ViewVariables(VVAccess.ReadOnly)]
     public TimeSpan VanishTime = TimeSpan.Zero;
 
     /// <summary>
-    /// The UID of the entity for the Hologram's visual projection effect. Client side only.
+    /// Client-side visual projection effect entity.
     /// </summary>
     public EntityUid? EffectEntity;
 }

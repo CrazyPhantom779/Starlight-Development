@@ -806,8 +806,7 @@
   description: A computer for managing hologram projection. Scans for powered blade servers within range.
   components:
     - type: HologramConsole
-      searchRange: 5
-      bladeServerScanRange: 15
+      maxActiveHolograms: 4
     - type: ActivatableUI
       key: enum.HologramConsoleUiKey.Key
     - type: UserInterface

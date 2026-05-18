@@ -1,13 +1,11 @@
 - type: entity
   id: ActionOpenHologramConsole
-  parent: BaseAction
-  name: Open Hologram Console
-  description: Open your hologram projection menu.
-  categories: [ HideSpawnMenu ]
+  name: Open hologram console
+  description: Access your linked hologram blade server console.
   components:
   - type: InstantAction
-    itemIconStyle: NoItem
+    itemIconStyle: BigAction
     icon:
       sprite: Interface/Actions/actions_ai.rsi
-      state: crew_monitor
+      state: camera-light
     event: !type:HologramOpenConsoleActionEvent

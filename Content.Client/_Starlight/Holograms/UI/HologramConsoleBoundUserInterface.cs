@@ -3,14 +3,10 @@ using Robust.Client.UserInterface;
 
 namespace Content.Client._Starlight.Holograms.UI;
 
-public sealed class HologramConsoleBoundUserInterface : BoundUserInterface
+public sealed class HologramConsoleBoundUserInterface(EntityUid owner, Enum uiKey) : BoundUserInterface(owner, uiKey)
 {
     [ViewVariables]
     private HologramConsoleWindow? _window;
-
-    public HologramConsoleBoundUserInterface(EntityUid owner, Enum uiKey) : base(owner, uiKey)
-    {
-    }
 
     protected override void Open()
     {
@@ -27,10 +23,8 @@ public sealed class HologramConsoleBoundUserInterface : BoundUserInterface
     {
         base.UpdateState(state);
 
-        if (state is not HologramConsoleBoundUserInterfaceState castState)
-            return;
-
-        _window?.UpdateState(castState);
+        if (state is HologramConsoleBoundUserInterfaceState hologramState)
+            _window?.UpdateState(hologramState);
     }
 
     private void OnProjectHologram(NetEntity bladeServerUid, NetEntity projectorUid)

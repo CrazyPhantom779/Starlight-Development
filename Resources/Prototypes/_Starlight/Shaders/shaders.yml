@@ -94,11 +94,18 @@
   kind: source
   path: "/Textures/_Starlight/Shaders/holy_stars_trail.swsl"
 
-# Hologram
 - type: shader
-  id: StarlightHologram
+  id: HologramProjection
   kind: source
-  path: "/Textures/_Starlight/Shaders/hologram.swsl"
+  path: "/Textures/_Starlight/Shaders/hologram_projection.swsl"
   params:
-    textureHeight: 32
     hue: 0.64
+    saturation: 0.85
+    alpha: 0.9
+    intensity: 1.25
+    textureHeight: 32
+    colorBlend: 0.45
+    scanlineOpacity: 0.32
+    noiseOpacity: 0.26
+    flickerStrength: 0.16
+    lineScrollSpeed: 0.12

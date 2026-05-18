@@ -12,6 +12,7 @@ using Content.Shared.Power;
 using Content.Shared.Preferences;
 using Content.Shared.Roles.Jobs;
 using Robust.Shared.Containers;
+using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server._Starlight.Holograms.Systems;
@@ -20,20 +21,24 @@ namespace Content.Server._Starlight.Holograms.Systems;
 /// Installs hologram job minds into blade servers.
 /// Job racks start empty; a job blade is created only when a hologram player actually joins.
 /// </summary>
-public sealed class HologramJobSpawnSystem : EntitySystem
+public sealed partial class HologramJobSpawnSystem : EntitySystem
 {
     private const string HologramJobId = "Hologram";
     private const string JobBladePrototype = "HologramJobBladeServer";
+    private const string FailedSpawnPrototype = "MobObserver";
+    private const float StrayInstallInterval = 1f;
 
-    [Dependency] private readonly HologramBladeLawSystem _bladeLaws = default!;
-    [Dependency] private readonly HologramSystem _hologram = default!;
-    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
-    [Dependency] private readonly StationSystem _station = default!;
-    [Dependency] private readonly StationSpawningSystem _stationSpawning = default!;
-    [Dependency] private readonly IServerPreferencesManager _prefs = default!;
-    [Dependency] private readonly SharedJobSystem _job = default!;
-    [Dependency] private readonly MindSystem _mind = default!;
+    private float _strayInstallAccumulator;
+
+    [Dependency] private HologramBladeLawSystem _bladeLaws = default!;
+    [Dependency] private HologramSystem _hologram = default!;
+    [Dependency] private ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private SharedContainerSystem _container = default!;
+    [Dependency] private StationSystem _station = default!;
+    [Dependency] private StationSpawningSystem _stationSpawning = default!;
+    [Dependency] private IServerPreferencesManager _prefs = default!;
+    [Dependency] private SharedJobSystem _job = default!;
+    [Dependency] private MindSystem _mind = default!;
 
     public override void Initialize()
     {
@@ -50,7 +55,10 @@ public sealed class HologramJobSpawnSystem : EntitySystem
             return;
 
         if (!TryFindOrCreateBlade(args.Station, null, out var bladeServerUid, out var bladeServer, out var brainSlot))
+        {
+            FailHologramSpawn(args);
             return;
+        }
 
         args.SpawnResult = _stationSpawning.SpawnPlayerMob(
             Transform(bladeServerUid).Coordinates,
@@ -66,12 +74,17 @@ public sealed class HologramJobSpawnSystem : EntitySystem
             if (args.SpawnResult is { } spawnResult)
                 Del(spawnResult);
 
-            args.SpawnResult = null;
+            FailHologramSpawn(args);
             return;
         }
 
         SetupInstalledChip(bladeServerUid, bladeServer, args.SpawnResult.Value, brainChip, mindId, args.HumanoidCharacterProfile);
     }
+
+    private void FailHologramSpawn(PlayerSpawningEvent args)
+        // Claim the spawn so the normal latejoin path does not place the hologram brain chip at arrivals.
+        // Hologram jobs require mapped HologramJobRack infrastructure; if none exists, leave the player as an observer.
+         => args.SpawnResult = Spawn(FailedSpawnPrototype, MapCoordinates.Nullspace);
 
     private void OnContainerSpawn(EntityUid uid, HologramJobSpawnComponent component, ref ContainerSpawnEvent args)
     {
@@ -91,8 +104,15 @@ public sealed class HologramJobSpawnSystem : EntitySystem
     {
         base.Update(frameTime);
 
+        _strayInstallAccumulator += frameTime;
+        if (_strayInstallAccumulator < StrayInstallInterval)
+            return;
+
+        _strayInstallAccumulator = 0f;
+
         // Defensive fallback for admin/runtime testing: if something still spawns a hologram
         // job chip loose on the station, put it into a newly-created job blade instead.
+        // Only the Hologram job is eligible; scanned/ghost-role chips should not be stolen.
         var query = EntityQueryEnumerator<HologramBrainChipComponent, MindContainerComponent>();
         while (query.MoveNext(out var chip, out var brainChip, out var mindContainer))
         {
@@ -100,6 +120,9 @@ public sealed class HologramJobSpawnSystem : EntitySystem
                 continue;
 
             if (mindContainer.Mind is not { } mindId)
+                continue;
+
+            if (!_job.MindTryGetJob(mindId, out var jobPrototype) || jobPrototype.ID.ToString() != HologramJobId)
                 continue;
 
             TryInstallStrayJobChip(chip, brainChip, mindId);
@@ -313,6 +336,8 @@ public sealed class HologramJobSpawnSystem : EntitySystem
         if (!TryComp<HologramBodyChipComponent>(bodyChip, out var bodyComp))
             return;
 
+        bodyComp.HologramPrototype ??= HologramSystem.DefaultHologramPrototype;
+
         if (profile != null)
         {
             bodyComp.HologramProfile = profile;
@@ -353,12 +378,36 @@ public sealed class HologramJobSpawnSystem : EntitySystem
         return prefs.GetRandomEnabledProfile();
     }
 
+    private bool TryGetContainingRack(EntityUid uid, out EntityUid rackUid, out BladeServerRackComponent rack)
+    {
+        var current = uid;
+
+        while (Exists(current))
+        {
+            var xform = Transform(current);
+            if (xform.ParentUid == EntityUid.Invalid || xform.ParentUid == current)
+                break;
+
+            current = xform.ParentUid;
+
+            if (!TryComp<BladeServerRackComponent>(current, out var rackComp))
+                continue;
+
+            rackUid = current;
+            rack = rackComp;
+            return true;
+        }
+
+        rackUid = default;
+        rack = default!;
+        return false;
+    }
+
     private bool IsBladeServerPowered(EntityUid bladeServerUid)
     {
-        var parent = Transform(bladeServerUid).ParentUid;
-        if (parent != EntityUid.Invalid && TryComp<BladeServerRackComponent>(parent, out var rackComp))
+        if (TryGetContainingRack(bladeServerUid, out var rackUid, out var rackComp))
         {
-            if (!TryComp<ApcPowerReceiverComponent>(parent, out var rackPower) || !rackPower.Powered)
+            if (!TryComp<ApcPowerReceiverComponent>(rackUid, out var rackPower) || !rackPower.Powered)
                 return false;
 
             foreach (var slot in rackComp.BladeSlots)
@@ -370,13 +419,13 @@ public sealed class HologramJobSpawnSystem : EntitySystem
             return false;
         }
 
-        if (TryComp<ApcPowerReceiverComponent>(bladeServerUid, out var ownPower))
-            return ownPower.Powered;
-
-        return false;
+        return TryComp<ApcPowerReceiverComponent>(bladeServerUid, out var ownPower) && ownPower.Powered;
     }
 
     private void OnBladePowerChanged(EntityUid uid, HologramBladeServerComponent component, ref PowerChangedEvent args)
+        => RefreshBladePower(uid, component);
+
+    private void RefreshBladePower(EntityUid uid, HologramBladeServerComponent component)
     {
         component.IsPowered = IsBladeServerPowered(uid);
         _bladeLaws.SyncBladeLawsToOccupants(uid, component);

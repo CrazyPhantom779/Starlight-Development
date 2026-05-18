@@ -20,28 +20,34 @@ using Robust.Shared.Map;
 
 namespace Content.Server._Starlight.Holograms.Systems;
 
-public sealed class HologramConsoleSystem : EntitySystem
+public sealed partial class HologramConsoleSystem : EntitySystem
 {
     private const string PortableBladeSlot = "blade_server_slot";
 
-    [Dependency] private readonly UserInterfaceSystem _ui = default!;
-    [Dependency] private readonly HologramSystem _hologram = default!;
-    [Dependency] private readonly HologramBladeLawSystem _bladeLaws = default!;
-    [Dependency] private readonly ItemSlotsSystem _itemSlots = default!;
-    [Dependency] private readonly SharedTransformSystem _transform = default!;
-    [Dependency] private readonly PowerCellSystem _powerCell = default!;
-    [Dependency] private readonly BatterySystem _battery = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedPopupSystem _popup = default!;
+    [Dependency] private UserInterfaceSystem _ui = default!;
+    [Dependency] private HologramSystem _hologram = default!;
+    [Dependency] private HologramBladeLawSystem _bladeLaws = default!;
+    [Dependency] private ItemSlotsSystem _itemSlots = default!;
+    [Dependency] private SharedTransformSystem _transform = default!;
+    [Dependency] private PowerCellSystem _powerCell = default!;
+    [Dependency] private BatterySystem _battery = default!;
+    [Dependency] private SharedAppearanceSystem _appearance = default!;
+    [Dependency] private SharedPopupSystem _popup = default!;
+    [Dependency] private ILogManager _logManager = default!;
+
+    private ISawmill _sawmill = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
+        _sawmill = _logManager.GetSawmill("hologram.console");
+
         SubscribeLocalEvent<HologramConsoleComponent, BoundUIOpenedEvent>(OnUIOpened);
         SubscribeLocalEvent<HologramConsoleComponent, BoundUIClosedEvent>(OnUIClosed);
         SubscribeLocalEvent<HologramConsoleComponent, HologramConsoleProjectHologramMessage>(OnProjectHologram);
         SubscribeLocalEvent<HologramConsoleComponent, HologramConsoleRecallMessage>(OnRecallHologram);
+        SubscribeLocalEvent<HologramConsoleComponent, HologramConsoleEjectBladeServerMessage>(OnEjectBladeServer);
         SubscribeLocalEvent<HologramConsoleComponent, HologramConsoleToggleCarryMessage>(OnToggleCarry);
         SubscribeLocalEvent<HologramConsoleComponent, PowerCellSlotEmptyEvent>(OnBatteryEmpty);
         SubscribeLocalEvent<HologramConsoleComponent, EntInsertedIntoContainerMessage>(OnBladeInserted);
@@ -115,14 +121,32 @@ public sealed class HologramConsoleSystem : EntitySystem
         if (args.Container.ID != PortableBladeSlot)
             return;
 
-        if (component.ActiveHolograms.Remove(args.Entity, out var portableHologram) && Exists(portableHologram))
-            _hologram.DoKillHologram(portableHologram);
+        component.ActiveHolograms.Remove(args.Entity);
 
         if (TryComp<HologramBladeServerComponent>(args.Entity, out var blade))
             KillBladeHologram(args.Entity, blade);
-
         UpdateBriefcaseAppearance(uid, component);
         UpdateUserInterface(uid, component);
+    }
+
+    private void OnEjectBladeServer(EntityUid console, HologramConsoleComponent component, HologramConsoleEjectBladeServerMessage args)
+    {
+        if (!IsPortable(console))
+            return;
+
+        var bladeServer = GetEntity(args.BladeServerUid);
+
+        if (!CollectBladeServers(console).Contains(bladeServer))
+            return;
+
+        if (_itemSlots.GetItemOrNull(console, PortableBladeSlot) != bladeServer)
+            return;
+
+        if (_itemSlots.TryGetSlot(console, PortableBladeSlot, out var slot))
+            _itemSlots.TryEject(console, slot, user: null, out _);
+
+        UpdateUserInterface(console, component);
+        UpdateBriefcaseAppearance(console, component);
     }
 
     private EntityUid? GetEffectiveGridUid(EntityUid uid)
@@ -262,7 +286,7 @@ public sealed class HologramConsoleSystem : EntitySystem
                     currentProjector = projected.CurProjector;
             }
 
-            var hasBody = bodyComp?.HologramPrototype != null;
+            var hasBody = bodyComp != null;
             bladeServerList.Add(new BladeServerInfo(
                 GetNetEntity(bladeServerUid),
                 GetHologramName(brainChip, brainComp, bodyChip, bodyComp),
@@ -474,23 +498,41 @@ public sealed class HologramConsoleSystem : EntitySystem
     private void OnProjectHologram(EntityUid console, HologramConsoleComponent component, HologramConsoleProjectHologramMessage args)
     {
         var bladeServer = GetEntity(args.BladeServerUid);
-        if (!Exists(bladeServer) || !TryGetBladeServerData(bladeServer, out var bladeComp, out var brainChip, out var brainChipComp, out _, out var bodyChipComp))
+
+        if (!CollectBladeServers(console).Contains(bladeServer))
         {
-            Logger.Warning($"Hologram projection failed: invalid, unpowered, or incomplete blade server {bladeServer}.");
-            _popup.PopupEntity("Projection failed: invalid, unpowered, or incomplete blade server.", console);
+            _sawmill.Warning($"Hologram projection failed: blade server {bladeServer} is not linked to console {ToPrettyString(console)}.");
+            _popup.PopupEntity("Projection failed: that blade server is not linked to this console.", console);
+            UpdateUserInterface(console, component);
             return;
         }
 
-        if (bodyChipComp?.HologramPrototype == null)
+        if (!Exists(bladeServer) ||
+            !TryGetBladeServerData(bladeServer, out var bladeComp, out var brainChip, out var brainChipComp, out _, out var bodyChipComp))
         {
-            Logger.Warning($"Hologram projection failed: blade server {ToPrettyString(bladeServer)} has no body chip/prototype.");
+            _sawmill.Warning($"Hologram projection failed: invalid, unpowered, or incomplete blade server {bladeServer}.");
+            _popup.PopupEntity("Projection failed: invalid, unpowered, or incomplete blade server.", console);
+            UpdateUserInterface(console, component);
+            return;
+        }
+
+        if (bodyChipComp == null)
+        {
+            _sawmill.Warning($"Hologram projection failed: blade server {ToPrettyString(bladeServer)} has no body chip.");
             _popup.PopupEntity("Projection failed: no body chip is installed.", console);
             UpdateUserInterface(console, component);
             return;
         }
 
         var hasMind = TryGetStoredMind(brainChip, brainChipComp, out var mind);
-        var bodyOnly = !hasMind;
+        var autonomousProjection = !hasMind && brainChipComp?.AllowAutonomousProjection == true;
+
+        if (!hasMind && !autonomousProjection)
+        {
+            _popup.PopupEntity("Projection failed: no mind chip is installed.", console);
+            UpdateUserInterface(console, component);
+            return;
+        }
 
         EntityUid projector;
         EntityCoordinates coords;
@@ -504,30 +546,31 @@ public sealed class HologramConsoleSystem : EntitySystem
 
             CleanupPortableHolograms(component.ActiveHolograms);
 
-            if (component.ActiveHolograms.Count >= component.MaxActiveHolograms)
+            if (component.MaxActiveHolograms > 0 &&
+                component.ActiveHolograms.Count >= component.MaxActiveHolograms &&
+                bladeComp.ActiveHologram is not { })
+            {
+                _popup.PopupEntity("Projection failed: this console is already at its active hologram limit.", console);
                 return;
+            }
 
             if (IsBatteryPowered(console) &&
                 (!_powerCell.TryGetBatteryFromSlot(console, out var batteryNullable) ||
                  batteryNullable is not { } battery ||
                  _battery.GetCharge(battery.AsNullable()) <= 0))
+            {
+                _popup.PopupEntity("Projection failed: the portable projector has no charge.", console);
                 return;
+            }
         }
         else
         {
             projector = GetEntity(args.ProjectorUid);
-            if (!Exists(projector) || !HasComp<HologramProjectorComponent>(projector))
+            if (!TryValidateProjector(console, projector))
             {
-                Logger.Warning("Hologram projection failed: no valid projector selected.");
-                _popup.PopupEntity("Projection failed: select a projector first.", console);
-                return;
-            }
-
-            var consoleGrid = GetEffectiveGridUid(console);
-            if (consoleGrid == null || consoleGrid != Transform(projector).GridUid)
-            {
-                Logger.Warning("Hologram projection failed: selected projector is not on the console/blade grid.");
-                _popup.PopupEntity("Projection failed: selected projector is not on this grid.", console);
+                _sawmill.Warning("Hologram projection failed: no valid same-grid projector selected.");
+                _popup.PopupEntity("Projection failed: select a valid same-grid projector.", console);
+                UpdateUserInterface(console, component);
                 return;
             }
 
@@ -535,16 +578,19 @@ public sealed class HologramConsoleSystem : EntitySystem
             if (component.MaxActiveHolograms > 0 &&
                 bladeComp.ActiveHologram is not { } &&
                 activeCount >= component.MaxActiveHolograms)
+            {
+                _popup.PopupEntity("Projection failed: this console is already at its active hologram limit.", console);
                 return;
+            }
 
             coords = Transform(projector).Coordinates;
         }
 
         if (bladeComp.ActiveHologram is { } existing && Exists(existing))
         {
-            if (!ReprojectHologram(bladeServer, bladeComp, existing, brainChip, bodyChipComp, coords, projector, lockToProjector, out var refreshed))
+            if (!ReprojectHologram(bladeServer, bladeComp, existing, brainChip, brainChipComp, bodyChipComp, coords, projector, lockToProjector, out var refreshed))
             {
-                Logger.Warning($"Hologram reprojection failed: could not refresh prototype {bodyChipComp.HologramPrototype}.");
+                _sawmill.Warning($"Hologram reprojection failed: could not refresh prototype {bodyChipComp.HologramPrototype}.");
                 _popup.PopupEntity("Reprojection failed: could not refresh the configured hologram body.", console);
                 return;
             }
@@ -557,9 +603,15 @@ public sealed class HologramConsoleSystem : EntitySystem
             return;
         }
 
-        if (!TrySpawnHologram(hasMind ? mind : null, bodyChipComp, coords, out var hologram))
+        EntityUid hologram;
+
+        if (autonomousProjection)
         {
-            Logger.Warning($"Hologram projection failed: could not spawn prototype {bodyChipComp.HologramPrototype}.");
+            hologram = _hologram.SpawnAutonomousHologram(bodyChipComp, coords);
+        }
+        else if (!TrySpawnHologram(mind, bodyChipComp, coords, out hologram))
+        {
+            _sawmill.Warning($"Hologram projection failed: could not spawn prototype {bodyChipComp.HologramPrototype}.");
             _popup.PopupEntity("Projection failed: could not spawn the configured hologram body.", console);
             return;
         }
@@ -571,11 +623,26 @@ public sealed class HologramConsoleSystem : EntitySystem
         SetProjection(hologram, projector, lockToProjector);
         _bladeLaws.ApplyBladeLaws(bladeServer, bladeComp, hologram);
 
-        if (bodyOnly)
-            _popup.PopupEntity("No mind detected. Projecting an autonomous hardlight body.", projector);
-
         UpdateUserInterface(console, component);
         UpdateBriefcaseAppearance(console, component);
+    }
+
+    private bool TryValidateProjector(EntityUid console, EntityUid projector)
+    {
+        if (!Exists(projector) || !TryComp<HologramProjectorComponent>(projector, out var projectorComp))
+            return false;
+
+        if (!projectorComp.IsActive)
+            return false;
+
+        if (HasComp<ItemComponent>(projector) || HasComp<HologramComponent>(projector))
+            return false;
+
+        var consoleGrid = GetEffectiveGridUid(console);
+        if (consoleGrid == null)
+            return false;
+
+        return Transform(projector).GridUid == consoleGrid;
     }
 
     private bool ReprojectHologram(
@@ -583,6 +650,7 @@ public sealed class HologramConsoleSystem : EntitySystem
         HologramBladeServerComponent bladeComp,
         EntityUid oldHologram,
         EntityUid? brainChip,
+        HologramBrainChipComponent? brainChipComp,
         HologramBodyChipComponent bodyChipComp,
         EntityCoordinates coords,
         EntityUid projector,
@@ -595,14 +663,33 @@ public sealed class HologramConsoleSystem : EntitySystem
         if (TryComp<MindContainerComponent>(oldHologram, out var oldMind) && oldMind.Mind is { } oldMindUid)
             mind = oldMindUid;
 
-        if (mind != null && brainChip is { } chip && Exists(chip))
+        var autonomousProjection = mind == null && brainChipComp?.AllowAutonomousProjection == true;
+
+        if (mind is { } mindUid && brainChip is { } chip && Exists(chip))
             _hologram.TryReturnMindToBrainChip(oldHologram, chip);
+        else if (mind == null && !autonomousProjection)
+        {
+            _hologram.DoKillHologram(oldHologram);
+            bladeComp.ActiveHologram = null;
+            return false;
+        }
 
         _hologram.DoKillHologram(oldHologram);
         bladeComp.ActiveHologram = null;
 
-        if (!TrySpawnHologram(mind, bodyChipComp, coords, out hologram))
+        if (autonomousProjection)
+        {
+            hologram = _hologram.SpawnAutonomousHologram(bodyChipComp, coords);
+        }
+        else if (mind is { } mindUidToProject)
+        {
+            if (!TrySpawnHologram(mindUidToProject, bodyChipComp, coords, out hologram))
+                return false;
+        }
+        else
+        {
             return false;
+        }
 
         bladeComp.ActiveHologram = hologram;
         SetProjection(hologram, projector, lockToProjector);
@@ -611,24 +698,18 @@ public sealed class HologramConsoleSystem : EntitySystem
     }
 
     private bool TrySpawnHologram(
-        EntityUid? mind,
+        EntityUid mind,
         HologramBodyChipComponent bodyChipComp,
         EntityCoordinates coords,
         out EntityUid hologram)
     {
         hologram = default;
 
-        if (mind is { } mindUid)
-        {
-            if (!_hologram.TryGenerateHologram(mindUid, bodyChipComp, coords, out var generatedHologram) ||
-                generatedHologram is not { } generated)
-                return false;
+        if (!_hologram.TryGenerateHologram(mind, bodyChipComp, coords, out var generatedHologram) ||
+            generatedHologram is not { } generated)
+            return false;
 
-            hologram = generated;
-            return true;
-        }
-
-        hologram = _hologram.SpawnAutonomousHologram(bodyChipComp, coords);
+        hologram = generated;
         return true;
     }
 
@@ -650,6 +731,9 @@ public sealed class HologramConsoleSystem : EntitySystem
         if (args.BladeServerUid is { } bladeServerNetEntity)
         {
             var bladeServer = GetEntity(bladeServerNetEntity);
+            if (!CollectBladeServers(console).Contains(bladeServer))
+                return;
+
             if (TryComp<HologramBladeServerComponent>(bladeServer, out var bladeComp))
                 KillBladeHologram(bladeServer, bladeComp);
         }
@@ -738,12 +822,13 @@ public sealed class HologramConsoleSystem : EntitySystem
         bladeComp.ActiveHologram = null;
     }
 
-    private void KillBladeHologram(EntityUid bladeServerUid, HologramBladeServerComponent bladeComp)
+    public void KillBladeHologram(EntityUid bladeServerUid, HologramBladeServerComponent bladeComp)
     {
         if (bladeComp.ActiveHologram is { } hologram && Exists(hologram))
             ReturnMindAndKill(bladeServerUid, bladeComp, hologram);
 
         bladeComp.ActiveHologram = null;
+        RemovePortableHologramEntry(bladeServerUid);
     }
 
     private void ReturnMindAndKill(EntityUid bladeServerUid, HologramBladeServerComponent bladeComp, EntityUid hologram)
@@ -772,6 +857,19 @@ public sealed class HologramConsoleSystem : EntitySystem
 
         brainChip = chip;
         return true;
+    }
+
+    private void RemovePortableHologramEntry(EntityUid bladeServerUid)
+    {
+        var query = EntityQueryEnumerator<HologramConsoleComponent>();
+        while (query.MoveNext(out var consoleUid, out var console))
+        {
+            if (!console.ActiveHolograms.Remove(bladeServerUid))
+                continue;
+
+            UpdateBriefcaseAppearance(consoleUid, console);
+            UpdateUserInterface(consoleUid, console);
+        }
     }
 
     private void CleanupPortableHolograms(Dictionary<EntityUid, EntityUid> activeHolograms)

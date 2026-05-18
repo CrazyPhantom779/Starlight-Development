@@ -51,11 +51,11 @@
         name: Brain Chip
         whitelist:
           tags:
-            - HologramBrainChip
-        startingItem: HologramBrainChip  # Empty brain chip
+          - HologramBrainChip
+        startingItem: HologramStuntedBrainChip
       hologram_body_chip:
         name: Body Chip
         whitelist:
           tags:
-            - HologramBodyChip
-        startingItem: HologramBodyChipCorgi  # Pre-programmed corgi chip
+          - HologramBodyChip
+        startingItem: HologramBodyChipCorgi

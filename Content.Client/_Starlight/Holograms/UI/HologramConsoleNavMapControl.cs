@@ -3,14 +3,12 @@ using Content.Client.Pinpointer.UI;
 namespace Content.Client._Starlight.Holograms.UI;
 
 /// <summary>
-/// NavMap control for hologram console showing projector locations.
+/// Station nav map themed for hologram projector selection.
 /// </summary>
 public sealed class HologramConsoleNavMapControl : NavMapControl
 {
-    public NetEntity? SelectedProjector;
-
     private readonly Color _selectedColor = Color.FromHex("#10b981");
-    private readonly Color _unselectedColor = Color.FromHex("#ef4444");
+    private readonly Color _unselectedColor = Color.FromHex("#38bdf8");
 
     public HologramConsoleNavMapControl()
     {
@@ -19,5 +17,5 @@ public sealed class HologramConsoleNavMapControl : NavMapControl
         BackgroundColor = Color.FromHex("#0a1612");
     }
 
-    public Color GetProjectorColor(bool isSelected) => isSelected ? _selectedColor : _unselectedColor;
+    public Color GetProjectorColor(bool selected) => selected ? _selectedColor : _unselectedColor;
 }

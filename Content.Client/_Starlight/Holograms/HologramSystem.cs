@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using Content.Shared._Starlight.Holograms;
 using Content.Shared._Starlight.Holograms.Components;
 using Robust.Client.GameObjects;
@@ -7,134 +7,167 @@ using Robust.Shared.Map;
 
 namespace Content.Client._Starlight.Holograms;
 
-public sealed class HologramSystem : SharedHologramSystem
+public sealed partial class HologramSystem : SharedHologramSystem
 {
-    [Dependency] private readonly IPlayerManager _player = default!;
-    [Dependency] private readonly TransformSystem _transform = default!;
-    [Dependency] private readonly EyeSystem _eyeSystem = default!;
-    [Dependency] private readonly SpriteSystem _spriteSystem = default!;
+    [Dependency] private IPlayerManager _player = default!;
+    [Dependency] private TransformSystem _transform = default!;
+    [Dependency] private EyeSystem _eye = default!;
+    [Dependency] private SpriteSystem _sprite = default!;
 
     public override void Initialize()
     {
         base.Initialize();
-        SubscribeLocalEvent<HologramProjectedComponent, ComponentShutdown>(OnProjectedShutdown);
-    }
 
-    private void OnProjectedShutdown(EntityUid uid, HologramProjectedComponent component, ComponentShutdown args)
-    {
-        // Delete client-side effect
-        DeleteEffect(component);
-        
-        // Clear eye target on client
-        if (component.SetEyeTarget && TryComp<EyeComponent>(uid, out var eyeComp))
-            _eyeSystem.SetTarget(uid, null, eyeComp);
+        SubscribeLocalEvent<HologramProjectedComponent, ComponentShutdown>(OnProjectedShutdown);
     }
 
     public override void Update(float frameTime)
     {
-        base.Update(frameTime);
-        
-        var player = _player.LocalSession?.AttachedEntity;
-        if (TryComp<HologramProjectedComponent>(player, out var holoProjComp))
-        {
-            ProjectedUpdate(player.Value, holoProjComp); // This makes it so only the currently controlled entity is predicted, assuming they're a hologram.
-
-            // Check if we should be setting the eye target of the hologram.
-            if (holoProjComp.SetEyeTarget && TryComp<EyeComponent>(player.Value, out var eyeComp) && 
-                holoProjComp.CurProjector != null && TryGetEntity(holoProjComp.CurProjector.Value, out var projectorEntity))
-                _eyeSystem.SetTarget(player.Value, projectorEntity, eyeComp);
-        }
-        
-        // Handle projected effects for all holograms
-        HandleProjectedEffects();
+        PredictLocalHologram();
+        UpdateProjectedEffects();
     }
-    
-    private void HandleProjectedEffects()
+
+    private void OnProjectedShutdown(EntityUid uid, HologramProjectedComponent component, ComponentShutdown args)
     {
-        var query = EntityManager.EntityQueryEnumerator<HologramProjectedComponent>();
-        while (query.MoveNext(out var hologram, out var component))
+        DeleteEffect(component);
+        ClearEyeTarget(uid, component);
+    }
+
+    private void PredictLocalHologram()
+    {
+        if (_player.LocalSession?.AttachedEntity is not { } player ||
+            !TryComp<HologramProjectedComponent>(player, out var projected))
+            return;
+
+        ProjectedUpdate(player, projected);
+        UpdateEyeTarget(player, projected);
+    }
+
+    private void UpdateEyeTarget(EntityUid uid, HologramProjectedComponent projected)
+    {
+        if (!TryComp<EyeComponent>(uid, out var eye))
+            return;
+
+        if (!projected.SetEyeTarget ||
+            projected.CurProjector is not { } projectorNet ||
+            !TryGetEntity(projectorNet, out var projector) ||
+            projector is not { } projectorUid ||
+            !Exists(projectorUid))
         {
-            if (component.CurProjector == null || !TryGetEntity(component.CurProjector.Value, out var projectorEntity))
+            _eye.SetTarget(uid, null, eye);
+            return;
+        }
+
+        _eye.SetTarget(uid, projectorUid, eye);
+    }
+
+    private void ClearEyeTarget(EntityUid uid, HologramProjectedComponent projected)
+    {
+        if (!projected.SetEyeTarget || !TryComp<EyeComponent>(uid, out var eye))
+            return;
+
+        _eye.SetTarget(uid, null, eye);
+    }
+
+    private void UpdateProjectedEffects()
+    {
+        var query = EntityQueryEnumerator<HologramProjectedComponent>();
+        while (query.MoveNext(out var hologram, out var projected))
+        {
+            if (!TryGetEffectData(hologram, projected, out var coords, out var rotation, out var distance))
             {
-                DeleteEffect(component);
+                DeleteEffect(projected);
                 continue;
             }
 
-            if (component.EffectPrototype == null)
-            {
-                DeleteEffect(component);
-                continue;
-            }
-
-            var holoXform = Transform(hologram);
-            var holoCoords = _transform.GetMoverCoordinates(hologram, holoXform);
-
-            var projXform = Transform(projectorEntity.Value);
-            var projCoords = _transform.GetMoverCoordinates(projectorEntity.Value, projXform);
-
-            if (holoCoords.EntityId != projCoords.EntityId)
-            {
-                DeleteEffect(component);
-                continue;
-            }
-
-            var originPos = projCoords.Position;
-
-            // Add the effect's offset, if applicable
-            if (TryComp<HologramProjectorComponent>(projectorEntity.Value, out var projComp))
-            {
-                var direction = projXform.LocalRotation.GetCardinalDir();
-
-                var offset = direction switch
-                {
-                    Direction.North => projComp.EffectOffsets[Direction.South],
-                    Direction.South => projComp.EffectOffsets[Direction.North],
-                    Direction.East => projComp.EffectOffsets[Direction.West],
-                    Direction.West => projComp.EffectOffsets[Direction.East],
-                    _ => Vector2.Zero
-                };
-
-                originPos += offset;
-            }
-
-            // Determine middle point between hologram and projector
-            var effectPos = (holoCoords.Position + originPos) / 2;
-
-            // Determine rotation that points from projector to hologram
-            var effectRot = (holoCoords.Position - originPos).ToAngle() - MathHelper.PiOver2;
-            
-            // Calculate distance for scaling
-            var distance = (holoCoords.Position - originPos).Length();
-
-            var effectCoords = new EntityCoordinates(holoCoords.EntityId, effectPos);
-            if (!effectCoords.IsValid(EntityManager))
-            {
-                DeleteEffect(component);
-                continue;
-            }
-
-            // Spawn or update the effect entity
-            if (component.EffectEntity == null || !Exists(component.EffectEntity.Value))
-            {
-                component.EffectEntity = Spawn(component.EffectPrototype, effectCoords);
-            }
-            else
-            {
-                _transform.SetCoordinates(component.EffectEntity.Value, effectCoords);
-            }
-
-            _transform.SetLocalRotation(component.EffectEntity.Value, effectRot);
-            
-            // Scale the sprite to match the distance
-            _spriteSystem.SetScale(component.EffectEntity.Value, new Vector2(1f, distance));
+            EnsureEffect(projected, coords, rotation, distance);
         }
     }
-    
-    private void DeleteEffect(HologramProjectedComponent component)
-    {
-        if (component.EffectEntity != null && Exists(component.EffectEntity.Value))
-            QueueDel(component.EffectEntity.Value);
 
-        component.EffectEntity = null;
+    private bool TryGetEffectData(
+        EntityUid hologram,
+        HologramProjectedComponent projected,
+        out EntityCoordinates effectCoords,
+        out Angle rotation,
+        out float distance)
+    {
+        effectCoords = default;
+        rotation = default;
+        distance = default;
+
+        if (projected.EffectPrototype == null)
+            return false;
+
+        if (projected.CurProjector is not { } projectorNet ||
+            !TryGetEntity(projectorNet, out var projector) ||
+            projector is not { } projectorUid ||
+            !Exists(projectorUid))
+            return false;
+
+        var hologramXform = Transform(hologram);
+        var hologramCoords = _transform.GetMoverCoordinates(hologram, hologramXform);
+
+        var projectorXform = Transform(projectorUid);
+        var projectorCoords = _transform.GetMoverCoordinates(projectorUid, projectorXform);
+
+        if (hologramCoords.EntityId != projectorCoords.EntityId)
+            return false;
+
+        var origin = projectorCoords.Position + GetProjectorEffectOffset(projectorUid, projectorXform);
+        var delta = hologramCoords.Position - origin;
+        distance = MathF.Max(delta.Length(), 0.05f);
+
+        effectCoords = new EntityCoordinates(hologramCoords.EntityId, (hologramCoords.Position + origin) / 2f);
+        if (!effectCoords.IsValid(EntityManager))
+            return false;
+
+        rotation = delta.ToAngle() - MathHelper.PiOver2;
+        return true;
+    }
+
+    private Vector2 GetProjectorEffectOffset(EntityUid projectorUid, TransformComponent projectorXform)
+    {
+        if (!TryComp(projectorUid, out HologramProjectorComponent? projector))
+            return Vector2.Zero;
+
+        Direction? opposite = projectorXform.LocalRotation.GetCardinalDir() switch
+        {
+            Direction.North => Direction.South,
+            Direction.South => Direction.North,
+            Direction.East => Direction.West,
+            Direction.West => Direction.East,
+            _ => null,
+        };
+
+        return opposite is { } direction && projector.EffectOffsets.TryGetValue(direction, out var offset)
+            ? offset
+            : Vector2.Zero;
+    }
+
+    private void EnsureEffect(HologramProjectedComponent projected, EntityCoordinates coords, Angle rotation, float distance)
+    {
+        if (projected.EffectPrototype == null)
+            return;
+
+        if (projected.EffectEntity is not { } effect || !Exists(effect))
+        {
+            effect = Spawn(projected.EffectPrototype, coords);
+            projected.EffectEntity = effect;
+        }
+        else
+        {
+            _transform.SetCoordinates(effect, coords);
+        }
+
+        _transform.SetLocalRotation(effect, rotation);
+        _sprite.SetScale(effect, new Vector2(1f, distance));
+    }
+
+    private void DeleteEffect(HologramProjectedComponent projected)
+    {
+        if (projected.EffectEntity is { } effect && Exists(effect))
+            QueueDel(effect);
+
+        projected.EffectEntity = null;
     }
 }

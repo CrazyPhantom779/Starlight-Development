@@ -14,14 +14,21 @@ namespace Content.Client._Starlight.Holograms.UI;
 [GenerateTypedNameReferences]
 public sealed partial class HologramConsoleWindow : DefaultWindow
 {
+    private const string ReadyColor = "#7dd3fc";
+    private const string ActiveColor = "#10b981";
+    private const string WarningColor = "#fbbf24";
+    private const string ErrorColor = "#ef4444";
+    private const string MutedColor = "#94a3b8";
+
     private readonly IEntityManager _entManager;
-    private readonly SpriteSystem _spriteSystem;
+    private readonly SpriteSystem _sprite;
     private readonly Texture? _blipTexture;
 
+    private HologramConsoleBoundUserInterfaceState? _currentState;
     private NetEntity? _selectedBladeServer;
     private NetEntity? _selectedProjector;
     private bool _isPortableMode;
-    private HologramConsoleBoundUserInterfaceState? _currentState;
+    private bool _updatingCarryCheckbox;
 
     public event Action<NetEntity, NetEntity>? OnProjectHologram;
     public event Action<NetEntity?>? OnRecallHologram;
@@ -33,29 +40,51 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
         RobustXamlLoader.Load(this);
 
         _entManager = IoCManager.Resolve<IEntityManager>();
-        _spriteSystem = _entManager.System<SpriteSystem>();
-        _blipTexture = _spriteSystem.Frame0(new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/NavMap/beveled_circle.png")));
+        _sprite = _entManager.System<SpriteSystem>();
+        _blipTexture = _sprite.Frame0(new SpriteSpecifier.Texture(new ResPath("/Textures/Interface/NavMap/beveled_circle.png")));
 
         NavMap.Visible = false;
         NoServerOverlay.Visible = true;
 
-        ProjectButton.OnPressed += _ =>
+        ProjectButton.OnPressed += _ => TryProjectSelected();
+        RecallButton.OnPressed += _ => TryRecallSelected();
+        AllowCarryCheckbox.OnToggled += args =>
         {
-            if (_selectedBladeServer is not { } selectedBladeServer)
-                return;
-
-            var projector = _isPortableMode ? NetEntity.Invalid : (_selectedProjector ?? NetEntity.Invalid);
-            OnProjectHologram?.Invoke(selectedBladeServer, projector);
+            if (!_updatingCarryCheckbox)
+                OnToggleCarry?.Invoke(args.Pressed);
         };
-
-        RecallButton.OnPressed += _ =>
-        {
-            var selected = GetSelectedBladeInfo();
-            OnRecallHologram?.Invoke(selected is { IsActive: true } ? selected.Uid : null);
-        };
-
-        AllowCarryCheckbox.OnToggled += args => OnToggleCarry?.Invoke(args.Pressed);
         NavMap.TrackedEntitySelectedAction += OnProjectorSelectedFromMap;
+    }
+
+    public void UpdateState(HologramConsoleBoundUserInterfaceState state)
+    {
+        _currentState = state;
+        _isPortableMode = state.IsPortable;
+
+        ValidateSelections(state);
+        UpdatePanels(state);
+
+        if (!state.IsPortable && !state.HasServer)
+            return;
+
+        UpdateBladeServerList(state);
+        UpdateStatus(state);
+        UpdateSelectionState(state);
+    }
+
+    private void TryProjectSelected()
+    {
+        if (_selectedBladeServer is not { } selectedBlade)
+            return;
+
+        var projector = _isPortableMode ? NetEntity.Invalid : (_selectedProjector ?? NetEntity.Invalid);
+        OnProjectHologram?.Invoke(selectedBlade, projector);
+    }
+
+    private void TryRecallSelected()
+    {
+        var selected = GetSelectedBladeInfo();
+        OnRecallHologram?.Invoke(selected is { IsActive: true } ? selected.Uid : null);
     }
 
     private void OnProjectorSelectedFromMap(NetEntity? netEntity)
@@ -64,11 +93,62 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
             return;
 
         _selectedProjector = selectedProjector;
-        UpdateSelectionStateAfterChange();
+        RefreshSelectionOnly();
+    }
+
+    private void UpdatePanels(HologramConsoleBoundUserInterfaceState state)
+    {
+        BatteryPanel.Visible = state.IsPortable;
+        SettingsPanel.Visible = state.IsPortable;
+        ModeLabel.Visible = true;
+        ModeLabel.Text = state.IsPortable ? "PORTABLE MODE" : "STATION MODE";
+
+        LeftPanel.Visible = state.ShowBladeServerPanel;
+        MapPanel.Visible = state.ShowMap && !state.IsPortable;
+        ProjectButton.Visible = state.ShowProjectButton;
+        RecallButton.Visible = state.ShowRecallButton;
+        ControlsPanel.Visible = state.ShowProjectButton || state.ShowRecallButton;
+        SelectedPanel.Visible = state.ShowBladeServerPanel;
+
+        if (state.IsPortable)
+        {
+            NavMap.Visible = false;
+            NoServerOverlay.Visible = false;
+            UpdateBattery(state);
+            UpdateCarryCheckbox(state.AllowCarry);
+            PortableInfoLabel.Visible = true;
+            PortableInfoLabel.Text = state.MaxActive > 0
+                ? $"Active: {state.ActiveCount} / {state.MaxActive}"
+                : $"Active: {state.ActiveCount}";
+            return;
+        }
+
+        PortableInfoLabel.Visible = false;
+        UpdateCarryCheckbox(state.AllowCarry);
+
+        if (!state.HasServer)
+        {
+            HandleNoServerState();
+            return;
+        }
+
+        NoBladeServersLabel.Visible = false;
+        SetupNavMap(state);
+    }
+
+    private void UpdateCarryCheckbox(bool allowCarry)
+    {
+        _updatingCarryCheckbox = true;
+        AllowCarryCheckbox.Pressed = allowCarry;
+        _updatingCarryCheckbox = false;
     }
 
     private void SetupNavMap(HologramConsoleBoundUserInterfaceState state)
     {
+        ProjectorCountLabel.Text = state.Projectors.Count > 0
+            ? $" {state.Projectors.Count} Same-Grid Projectors "
+            : " No Same-Grid Projectors ";
+
         if (_blipTexture == null || state.ProjectorCoordinates.Count == 0)
         {
             NavMap.Visible = false;
@@ -90,20 +170,20 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
 
     private void UpdateNavMapBlips(HologramConsoleBoundUserInterfaceState state)
     {
+        NavMap.TrackedEntities.Clear();
+
         if (_blipTexture == null)
             return;
 
-        NavMap.TrackedEntities.Clear();
         foreach (var (netEntity, netCoords) in state.ProjectorCoordinates)
         {
             var coords = _entManager.GetCoordinates(netCoords);
             var selected = netEntity == _selectedProjector;
-            var color = NavMap.GetProjectorColor(selected);
-            NavMap.TrackedEntities[netEntity] = new NavMapBlip(coords, _blipTexture, color, true, true);
+            NavMap.TrackedEntities[netEntity] = new NavMapBlip(coords, _blipTexture, NavMap.GetProjectorColor(selected), true, true);
         }
     }
 
-    private void UpdateSelectionStateAfterChange()
+    private void RefreshSelectionOnly()
     {
         if (_currentState == null)
             return;
@@ -112,76 +192,56 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
         UpdateNavMapBlips(_currentState);
     }
 
-    public void UpdateState(HologramConsoleBoundUserInterfaceState state)
-    {
-        _currentState = state;
-        _isPortableMode = state.IsPortable;
-        ValidateSelections(state);
-
-        BatteryPanel.Visible = state.IsPortable;
-        SettingsPanel.Visible = state.IsPortable;
-        ModeLabel.Visible = state.IsPortable;
-        MapPanel.Visible = state.ShowMap && !state.IsPortable;
-        LeftPanel.Visible = state.ShowBladeServerPanel;
-        ProjectButton.Visible = state.ShowProjectButton;
-        RecallButton.Visible = state.ShowRecallButton;
-        ControlsPanel.Visible = state.ShowProjectButton || state.ShowRecallButton;
-
-        if (state.IsPortable)
-        {
-            ModeLabel.Text = "PORTABLE MODE";
-            NavMap.Visible = false;
-            NoServerOverlay.Visible = false;
-            UpdateBattery(state);
-            AllowCarryCheckbox.Pressed = state.AllowCarry;
-            PortableInfoLabel.Visible = true;
-            PortableInfoLabel.Text = $"Active: {state.ActiveCount} / {state.MaxActive}";
-        }
-        else
-        {
-            PortableInfoLabel.Visible = false;
-            if (!state.HasServer)
-            {
-                HandleNoServerState();
-                return;
-            }
-
-            NoBladeServersLabel.Visible = false;
-            SetupNavMap(state);
-        }
-
-        UpdateBladeServerList(state);
-        UpdateStatus(state);
-        ProjectorCountLabel.Text = state.Projectors.Count > 0
-            ? $" {state.Projectors.Count} Same-Grid Projectors "
-            : " No Same-Grid Projectors ";
-        UpdateSelectionState(state);
-    }
-
     private void ValidateSelections(HologramConsoleBoundUserInterfaceState state)
     {
-        if (_selectedBladeServer is { } selectedBladeServer && state.BladeServers.All(x => x.Uid != selectedBladeServer))
+        if (_selectedBladeServer is { } selectedBlade && state.BladeServers.All(x => x.Uid != selectedBlade))
             _selectedBladeServer = null;
 
         if (_selectedBladeServer == null && state.BladeServers.Count > 0)
-        {
-            var ready = state.BladeServers.FirstOrDefault(x => !x.IsActive && x.HasBody);
-            _selectedBladeServer = (ready ?? state.BladeServers.First()).Uid;
-        }
+            _selectedBladeServer = ChooseInitialBlade(state).Uid;
 
         if (_selectedProjector is { } selectedProjector && state.Projectors.All(x => x.Uid != selectedProjector))
             _selectedProjector = null;
 
-        if (!state.IsPortable && _selectedProjector == null && state.Projectors.Count > 0)
+        if (state.IsPortable)
+        {
+            _selectedProjector = null;
+            return;
+        }
+
+        var selected = GetSelectedBladeInfo(state);
+        if (selected?.CurrentProjector is { } currentProjector && state.Projectors.Any(x => x.Uid == currentProjector))
+        {
+            _selectedProjector ??= currentProjector;
+            return;
+        }
+
+        if (_selectedProjector == null && state.Projectors.Count > 0)
             _selectedProjector = state.Projectors.First().Uid;
     }
 
-    private BladeServerInfo? GetSelectedBladeInfo()
+    private static BladeServerInfo ChooseInitialBlade(HologramConsoleBoundUserInterfaceState state)
     {
-        if (_currentState == null || _selectedBladeServer is not { } selectedBladeServer)
+        var active = state.BladeServers.FirstOrDefault(x => x.IsActive);
+        if (active != null)
+            return active;
+
+        var ready = state.BladeServers.FirstOrDefault(x => x.HasBody);
+        return ready ?? state.BladeServers.First();
+    }
+
+    private BladeServerInfo? GetSelectedBladeInfo()
+    => _currentState == null ? null : GetSelectedBladeInfo(_currentState);
+
+    private BladeServerInfo? GetSelectedBladeInfo(HologramConsoleBoundUserInterfaceState state)
+    => _selectedBladeServer is not { } selectedBlade ? null : state.BladeServers.FirstOrDefault(x => x.Uid == selectedBlade);
+
+    private ProjectorInfo? GetSelectedProjectorInfo(HologramConsoleBoundUserInterfaceState state)
+    {
+        if (_selectedProjector is not { } selectedProjector)
             return null;
 
-        return _currentState.BladeServers.FirstOrDefault(x => x.Uid == selectedBladeServer);
+        return state.Projectors.FirstOrDefault(x => x.Uid == selectedProjector);
     }
 
     private void HandleNoServerState()
@@ -190,28 +250,37 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
         NoServerOverlay.Visible = true;
         NavMap.Visible = false;
         BladeServersList.RemoveAllChildren();
-        StatusLabel.Text = "No same-grid hologram hardware";
-        StatusLabel.FontColorOverride = Color.FromHex("#ef4444");
-        ActiveIndicator.Text = "● OFFLINE";
-        ActiveIndicator.FontColorOverride = Color.FromHex("#ef4444");
+        ProjectorCountLabel.Text = " No Same-Grid Projectors ";
+
+        SetText(StatusLabel, "No same-grid hologram hardware", ErrorColor);
+        SetText(ActiveIndicator, "● OFFLINE", ErrorColor);
+        SetText(SelectedBladeLabel, "Blade: none", MutedColor);
+        SetText(SelectedProjectorLabel, "Projector: none", MutedColor);
+        SetText(HintLabel, "Install or power a hologram rack/console on this grid.", ErrorColor);
+
         ProjectButton.Disabled = true;
         RecallButton.Disabled = true;
-        ProjectorCountLabel.Text = " No Same-Grid Projectors ";
     }
 
     private void UpdateBattery(HologramConsoleBoundUserInterfaceState state)
     {
         if (state.BatteryPercent is not { } percent)
+        {
+            BatteryBar.Value = 0f;
+            BatteryLabel.Text = "--%";
+            BatteryLabel.FontColorOverride = Color.FromHex(MutedColor);
+            BatteryBar.ForegroundStyleBoxOverride = new StyleBoxFlat { BackgroundColor = Color.FromHex(MutedColor) };
             return;
+        }
 
         BatteryBar.Value = Math.Clamp(percent / 100f, 0f, 1f);
         BatteryLabel.Text = $"{percent:F0}%";
 
         var color = percent switch
         {
-            > 50 => "#10b981",
-            > 20 => "#fbbf24",
-            _ => "#ef4444",
+            > 50 => ActiveColor,
+            > 20 => WarningColor,
+            _ => ErrorColor,
         };
 
         BatteryLabel.FontColorOverride = Color.FromHex(color);
@@ -237,34 +306,33 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
             entry.OnSelected += () =>
             {
                 _selectedBladeServer = blade.Uid;
-                UpdateSelectionState(state);
+                if (blade.CurrentProjector is { } currentProjector && state.Projectors.Any(x => x.Uid == currentProjector))
+                    _selectedProjector = currentProjector;
+                RefreshSelectionOnly();
             };
             entry.OnEject += () => OnEjectBladeServer?.Invoke(blade.Uid);
             BladeServersList.AddChild(entry);
         }
-
-        RecallButton.Disabled = state.ActiveCount <= 0;
     }
 
     private void UpdateStatus(HologramConsoleBoundUserInterfaceState state)
     {
         if (state.BladeServers.Count == 0)
         {
-            StatusLabel.Text = "No blade servers available";
-            StatusLabel.FontColorOverride = Color.FromHex("#ef4444");
-            ActiveIndicator.Text = " ● NO DATA ";
-            ActiveIndicator.FontColorOverride = Color.FromHex("#6b7280");
+            SetText(StatusLabel, "No blade servers available", ErrorColor);
+            SetText(ActiveIndicator, "● NO DATA", MutedColor);
             return;
         }
 
         var missingBodies = state.BladeServers.Count(x => !x.HasBody);
         var activeText = state.ActiveCount == 1 ? "1 active" : $"{state.ActiveCount} active";
-        StatusLabel.Text = missingBodies > 0
+
+        var status = missingBodies > 0
             ? $"{state.BladeServers.Count} hologram(s), {activeText}, {missingBodies} missing body"
             : $"{state.BladeServers.Count} hologram(s) available, {activeText}";
-        StatusLabel.FontColorOverride = Color.FromHex("#7dd3fc");
-        ActiveIndicator.Text = state.ActiveCount > 0 ? "● ACTIVE" : "● READY";
-        ActiveIndicator.FontColorOverride = state.ActiveCount > 0 ? Color.FromHex("#10b981") : Color.FromHex("#fbbf24");
+
+        SetText(StatusLabel, status, ReadyColor);
+        SetText(ActiveIndicator, state.ActiveCount > 0 ? "● ACTIVE" : "● READY", state.ActiveCount > 0 ? ActiveColor : WarningColor);
     }
 
     private void UpdateSelectionState(HologramConsoleBoundUserInterfaceState state)
@@ -276,11 +344,47 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
         }
 
         UpdateNavMapBlips(state);
+        UpdateSelectionLabels(state);
+        UpdateButtons(state);
+    }
 
-        var selected = GetSelectedBladeInfo();
+    private void UpdateSelectionLabels(HologramConsoleBoundUserInterfaceState state)
+    {
+        var selected = GetSelectedBladeInfo(state);
+        var projector = GetSelectedProjectorInfo(state);
+
+        SetText(SelectedBladeLabel, selected == null ? "Blade: none" : $"Blade: {selected.HologramName}", selected == null ? MutedColor : ReadyColor);
+
+        if (state.IsPortable)
+        {
+            SetText(SelectedProjectorLabel, "Projector: portable emitter", ReadyColor);
+        }
+        else
+        {
+            SetText(SelectedProjectorLabel,
+                projector == null ? "Projector: none" : $"Projector: {projector.Name} — {projector.Location}",
+                projector == null ? MutedColor : ReadyColor);
+        }
+
+        if (selected == null)
+            SetText(HintLabel, "Select a blade server.", MutedColor);
+        else if (!selected.HasBody)
+            SetText(HintLabel, "Install or scan a body chip before projecting.", ErrorColor);
+        else if (selected.IsActive && !state.IsPortable)
+            SetText(HintLabel, "Select a projector to move this active hologram.", ActiveColor);
+        else if (!state.IsPortable && projector == null)
+            SetText(HintLabel, "Select a same-grid projector on the map.", WarningColor);
+        else
+            SetText(HintLabel, "Ready to project.", ActiveColor);
+    }
+
+    private void UpdateButtons(HologramConsoleBoundUserInterfaceState state)
+    {
+        var selected = GetSelectedBladeInfo(state);
         var selectedActive = selected?.IsActive == true;
         var selectedMissingBody = selected != null && !selected.HasBody;
         var maxed = state.MaxActive > 0 && state.ActiveCount >= state.MaxActive;
+        var canProject = selected != null && !selectedMissingBody && (state.IsPortable || _selectedProjector != null);
 
         if (selectedMissingBody)
         {
@@ -289,34 +393,33 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
         }
         else if (state.IsPortable)
         {
-            ProjectButton.Disabled = selected == null || selectedActive || (!selectedActive && maxed);
-            ProjectButton.Text = selectedActive
-                ? "▶ ALREADY PROJECTED"
-                : state.ActiveCount > 0
-                    ? "▶ PROJECT ANOTHER"
-                    : "▶ PROJECT";
+            ProjectButton.Disabled = !canProject || selectedActive || (!selectedActive && maxed);
+            ProjectButton.Text = selectedActive ? "▶ ALREADY PROJECTED" : state.ActiveCount > 0 ? "▶ PROJECT ANOTHER" : "▶ PROJECT";
         }
         else
         {
-            ProjectButton.Disabled = selected == null || _selectedProjector == null || (!selectedActive && maxed);
-            ProjectButton.Text = selectedActive
-                ? "▶ MOVE TO PROJECTOR"
-                : state.ActiveCount > 0
-                    ? "▶ PROJECT ANOTHER"
-                    : "▶ PROJECT";
+            ProjectButton.Disabled = !canProject || (!selectedActive && maxed);
+            ProjectButton.Text = selectedActive ? "▶ MOVE TO PROJECTOR" : state.ActiveCount > 0 ? "▶ PROJECT ANOTHER" : "▶ PROJECT";
         }
 
-        RecallButton.Text = selectedActive
-            ? "◾ RECALL SELECTED"
-            : state.ActiveCount > 1
-                ? "◾ RECALL ALL"
-                : "◾ RECALL";
+        RecallButton.Text = selectedActive ? "◾ RECALL SELECTED" : state.ActiveCount > 1 ? "◾ RECALL ALL" : "◾ RECALL";
         RecallButton.Disabled = state.ActiveCount <= 0;
+    }
+
+    private static void SetText(Label label, string text, string color)
+    {
+        label.Text = text;
+        label.FontColorOverride = Color.FromHex(color);
     }
 }
 
 public sealed class BladeServerListEntry : PanelContainer
 {
+    private const string ReadyColor = "#7dd3fc";
+    private const string ActiveColor = "#10b981";
+    private const string ErrorColor = "#ef4444";
+    private const string MutedColor = "#94a3b8";
+
     public NetEntity BladeServerUid { get; }
 
     public event Action? OnSelected;
@@ -325,12 +428,14 @@ public sealed class BladeServerListEntry : PanelContainer
     private readonly PanelContainer _panel;
     private readonly bool _isActive;
     private readonly bool _hasBody;
+    private readonly bool _isEmagged;
 
-    public BladeServerListEntry(BladeServerInfo info, bool _)
+    public BladeServerListEntry(BladeServerInfo info, bool isPortable)
     {
         BladeServerUid = info.Uid;
         _isActive = info.IsActive;
         _hasBody = info.HasBody;
+        _isEmagged = info.IsEmagged;
 
         _panel = new PanelContainer
         {
@@ -352,37 +457,24 @@ public sealed class BladeServerListEntry : PanelContainer
             SeparationOverride = 2,
         };
 
-        var nameLabel = new Label
+        infoContainer.AddChild(new Label
         {
             Text = info.HologramName,
             FontColorOverride = Color.FromHex("#e5e7eb"),
-        };
-        infoContainer.AddChild(nameLabel);
+        });
 
-        var statusLabel = new RichTextLabel
-        {
-            SetHeight = 16,
-        };
-
-        var status = !info.HasBody
-            ? "[color=#ef4444]MISSING BODY[/color]"
-            : info.IsEmagged
-                ? "[color=#ef4444]SUBVERTED[/color]"
-                : info.IsActive
-                    ? "[color=#10b981]ACTIVE PROJECTION[/color]"
-                    : "[color=#7dd3fc]READY[/color]";
-
-        statusLabel.SetMessage(FormattedMessage.FromMarkupOrThrow(status));
+        var statusLabel = new RichTextLabel { SetHeight = 16 };
+        statusLabel.SetMessage(FormattedMessage.FromMarkupOrThrow(GetStatusMarkup(info)));
         infoContainer.AddChild(statusLabel);
-
         container.AddChild(infoContainer);
 
         var ejectButton = new Button
         {
-            Text = "⏏ EJECT",
-            MinWidth = 70,
+            Text = "⏏",
+            ToolTip = isPortable ? "Eject blade server" : "Only portable consoles can eject blade servers",
+            MinWidth = 34,
             MinHeight = 30,
-            Disabled = true,
+            Disabled = !isPortable || _isActive,
         };
         ejectButton.OnPressed += _ => OnEject?.Invoke();
         container.AddChild(ejectButton);
@@ -403,22 +495,44 @@ public sealed class BladeServerListEntry : PanelContainer
     public void SetSelected(bool selected)
         => _panel.PanelOverride = GetPanelStyle(selected);
 
+    private static string GetStatusMarkup(BladeServerInfo info)
+    {
+        if (!info.HasBody)
+            return $"[color={ErrorColor}]MISSING BODY[/color]";
+
+        if (info.IsEmagged)
+            return $"[color={ErrorColor}]SUBVERTED[/color]";
+
+        if (info.IsActive)
+            return $"[color={ActiveColor}]ACTIVE PROJECTION[/color]";
+
+        return $"[color={ReadyColor}]READY[/color]";
+    }
+
     private StyleBoxFlat GetPanelStyle(bool selected)
     {
         if (selected)
         {
             return new StyleBoxFlat
             {
-                BackgroundColor = Color.FromHex("#1e3a8a"),
-                BorderColor = Color.FromHex("#3b82f6"),
+                BackgroundColor = Color.FromHex("#102a43"),
+                BorderColor = Color.FromHex("#38bdf8"),
                 BorderThickness = new Thickness(2),
             };
         }
 
+        var border = !_hasBody
+            ? ErrorColor
+            : _isEmagged
+                ? ErrorColor
+                : _isActive
+                    ? ActiveColor
+                    : "#374151";
+
         return new StyleBoxFlat
         {
             BackgroundColor = _isActive ? Color.FromHex("#0f172a") : Color.FromHex("#1f2937"),
-            BorderColor = !_hasBody ? Color.FromHex("#ef4444") : _isActive ? Color.FromHex("#10b981") : Color.FromHex("#374151"),
+            BorderColor = Color.FromHex(border),
             BorderThickness = new Thickness(2),
         };
     }
