@@ -229,8 +229,8 @@
     damageContainer: Biological
     damageModifierSet: HologramHardlight
   - type: HologramProjected
-    gracePeriod: 2
-    validationInterval: 0.25
+    gracePeriod: 0.2
+    validationInterval: 0.05
     setEyeTarget: false
     validProjectorWhitelist:
       tags:
