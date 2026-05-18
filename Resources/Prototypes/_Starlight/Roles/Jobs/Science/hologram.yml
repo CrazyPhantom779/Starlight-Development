@@ -10,7 +10,7 @@
   canBeAntag: false
   icon: JobIconHologram
   supervisors: job-supervisors-rd
-  jobEntity: HologramJobBrainChip
+  jobEntity: HologramBrainChip
   jobPreviewEntity: MobHologramHardlight
   applyTraits: false
   special:

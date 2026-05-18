@@ -1,12 +1,4 @@
 - type: entity
-  id: HologramJobBrainChip
-  parent: HologramBrainChip
-  suffix: Job
-  categories: [ HideSpawnMenu, DoNotMap ]
-  components:
-  - type: HologramBrainChip
-
-- type: entity
   id: HologramJobBodyChip
   parent: HologramBodyChip
   suffix: Job
