@@ -9,7 +9,7 @@ using Content.Shared.Whitelist;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
 
-namespace Content.Shared._Starlight.Holograms;
+namespace Content.Shared._Starlight.Holograms.Systems;
 
 public partial class SharedHologramSystem
 {

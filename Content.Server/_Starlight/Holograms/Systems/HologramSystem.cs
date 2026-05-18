@@ -10,6 +10,7 @@ using Content.Server.Station.Components;
 using Content.Server.Station.Systems;
 using Content.Shared._Starlight.Holograms;
 using Content.Shared._Starlight.Holograms.Components;
+using Content.Shared._Starlight.Holograms.Systems;
 using Content.Shared.Access.Components;
 using Content.Shared.Administration.Logs;
 using Content.Shared.Body.Components;

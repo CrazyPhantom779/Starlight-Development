@@ -10,7 +10,7 @@ using Robust.Shared.Audio.Systems;
 using Robust.Shared.Timing;
 using Content.Shared._Starlight.Holograms.Components;
 
-namespace Content.Shared._Starlight.Holograms;
+namespace Content.Shared._Starlight.Holograms.Systems;
 
 public abstract partial class SharedHologramSystem : EntitySystem
 {

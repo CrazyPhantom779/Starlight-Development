@@ -1,6 +1,7 @@
 using System.Numerics;
 using Content.Shared._Starlight.Holograms;
 using Content.Shared._Starlight.Holograms.Components;
+using Content.Shared._Starlight.Holograms.Systems;
 using Robust.Client.GameObjects;
 using Robust.Client.Player;
 using Robust.Shared.Map;
@@ -23,8 +24,6 @@ public sealed partial class HologramSystem : SharedHologramSystem
 
     public override void Update(float frameTime)
     {
-        // Server owns projector validation and forced returns.
-        // The client only updates purely visual/eye effects so prediction does not fight authoritative movement.
         UpdateLocalEyeTarget();
         UpdateProjectedEffects();
     }
