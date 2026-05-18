@@ -264,17 +264,24 @@ public partial class SharedHologramSystem
 
         projected.NextProjectorCheck = _timing.CurTime + projected.ValidationInterval;
 
-        if (TryGetHoloProjector(hologram, out var nearestProjector, projected) &&
+        if (TryGetHoloProjector(hologram, out var nearestProjector, projected, occlude: true) &&
             nearestProjector is { } projector)
         {
             SetCurrentProjector(hologram, projected, projector);
             return true;
         }
 
+        // If the stored projector is still in range but line-of-sight is blocked, use a much
+        // shorter grace period.  Walking around the edge of camera range gets normal grace;
+        // hiding behind a wall/closed door should snap the projection back almost immediately.
+        var storedProjector = GetStoredProjector(projected);
+        var storedProjectorInRange = IsHoloProjectorValid(hologram, storedProjector, occlude: false, raiseEvent: false, projected);
+        var grace = storedProjectorInRange ? projected.OcclusionGracePeriod : projected.GracePeriod;
+
         if (projected.CurrentlyInProjector)
         {
             projected.CurrentlyInProjector = false;
-            projected.VanishTime = _timing.CurTime + projected.GracePeriod;
+            projected.VanishTime = _timing.CurTime + grace;
             Dirty(hologram, projected);
             return true;
         }

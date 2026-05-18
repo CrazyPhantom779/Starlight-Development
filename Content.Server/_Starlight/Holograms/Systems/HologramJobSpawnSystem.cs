@@ -2,7 +2,6 @@ using Content.Server._Starlight.Holograms.Components;
 using Content.Server.Mind;
 using Content.Server.Power.Components;
 using Content.Server.Preferences.Managers;
-using Content.Server.Spawners.EntitySystems;
 using Content.Server.Station.Systems;
 using Content.Shared._Moffstation.BladeServer;
 using Content.Shared.Containers.ItemSlots;
@@ -24,10 +23,6 @@ public sealed partial class HologramJobSpawnSystem : EntitySystem
 {
     private const string HologramJobId = "Hologram";
     private const string JobBladePrototype = "HologramJobBladeServer";
-    private const float StrayInstallInterval = 1f;
-
-    private float _strayInstallAccumulator;
-
     [Dependency] private HologramBladeLawSystem _bladeLaws = default!;
     [Dependency] private HologramSystem _hologram = default!;
     [Dependency] private ItemSlotsSystem _itemSlots = default!;
@@ -47,8 +42,7 @@ public sealed partial class HologramJobSpawnSystem : EntitySystem
 
         _sawmill = _logManager.GetSawmill("hologram.job");
 
-        SubscribeLocalEvent<PlayerSpawningEvent>(OnPlayerSpawning, before: new[] { typeof(ContainerSpawnPointSystem) });
-        SubscribeLocalEvent<HologramJobSpawnComponent, ContainerSpawnEvent>(OnContainerSpawn);
+        SubscribeLocalEvent<PlayerSpawningEvent>(OnPlayerSpawning);
         SubscribeLocalEvent<HologramBladeServerComponent, PowerChangedEvent>(OnBladePowerChanged);
     }
 
@@ -60,7 +54,7 @@ public sealed partial class HologramJobSpawnSystem : EntitySystem
         if (!TryFindOrCreateBlade(args.Station, null, out var bladeServerUid, out var bladeServer, out var brainSlot) &&
             !TryFindOrCreateBlade(null, null, out bladeServerUid, out bladeServer, out brainSlot))
         {
-            _sawmill.Warning("Unable to place Hologram job: no mapped HologramJobRack with a free blade slot was found.");
+            _sawmill.Warning("Unable to place Hologram job: no mapped HologramJobRack with a free blade slot was found. The Hologram job should be disabled or unmapped on maps without a job rack.");
             return;
         }
 
@@ -84,67 +78,6 @@ public sealed partial class HologramJobSpawnSystem : EntitySystem
         }
 
         SetupInstalledChip(bladeServerUid, bladeServer, args.SpawnResult.Value, brainChip, mindId, args.HumanoidCharacterProfile);
-    }
-
-    private void OnContainerSpawn(EntityUid uid, HologramJobSpawnComponent component, ref ContainerSpawnEvent args)
-    {
-        if (!TryComp<HologramBladeServerComponent>(uid, out var bladeServer))
-            return;
-
-        if (!TryComp<HologramBrainChipComponent>(args.Player, out var brainChip))
-            return;
-
-        if (!TryComp<MindContainerComponent>(args.Player, out var mindContainer) || mindContainer.Mind is not { } mindId)
-            return;
-
-        SetupInstalledChip(uid, bladeServer, args.Player, brainChip, mindId, null);
-    }
-
-    public override void Update(float frameTime)
-    {
-        base.Update(frameTime);
-
-        _strayInstallAccumulator += frameTime;
-        if (_strayInstallAccumulator < StrayInstallInterval)
-            return;
-
-        _strayInstallAccumulator = 0f;
-
-        // Defensive fallback for admin/runtime testing: if something still spawns a hologram
-        // job chip loose on the station, put it into a newly-created job blade inside a mapped rack.
-        // Only the Hologram job is eligible; scanned/ghost-role chips should not be stolen.
-        var query = EntityQueryEnumerator<HologramBrainChipComponent, MindContainerComponent>();
-        while (query.MoveNext(out var chip, out var brainChip, out var mindContainer))
-        {
-            if (_container.IsEntityInContainer(chip))
-                continue;
-
-            if (mindContainer.Mind is not { } mindId)
-                continue;
-
-            if (!_job.MindTryGetJob(mindId, out var jobPrototype) || jobPrototype.ID.ToString() != HologramJobId)
-                continue;
-
-            TryInstallStrayJobChip(chip, brainChip, mindId);
-        }
-    }
-
-    private bool TryInstallStrayJobChip(EntityUid chip, HologramBrainChipComponent brainChip, EntityUid mindId)
-        => TryInstallStrayJobChip(chip, brainChip, mindId, sameGridOnly: true) ||
-           TryInstallStrayJobChip(chip, brainChip, mindId, sameGridOnly: false);
-
-    private bool TryInstallStrayJobChip(EntityUid chip, HologramBrainChipComponent brainChip, EntityUid mindId, bool sameGridOnly)
-    {
-        var chipGrid = GetEffectiveGridUid(chip);
-
-        if (!TryFindOrCreateBlade(null, sameGridOnly ? chipGrid : null, out var bladeServerUid, out var bladeServer, out var brainSlot))
-            return false;
-
-        if (!_itemSlots.TryInsert(bladeServerUid, brainSlot, chip, user: null))
-            return false;
-
-        SetupInstalledChip(bladeServerUid, bladeServer, chip, brainChip, mindId, null);
-        return true;
     }
 
     private bool TryFindOrCreateBlade(

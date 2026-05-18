@@ -28,10 +28,18 @@ public sealed partial class HologramProjectedComponent : Component
     public TimeSpan GracePeriod = TimeSpan.FromSeconds(0.75);
 
     /// <summary>
+    /// Short grace used when the current projector is still in range but line-of-sight is blocked.
+    /// This makes walls and closed doors cut projections quickly without making range-edge movement harsh.
+    /// </summary>
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [AutoNetworkedField]
+    public TimeSpan OcclusionGracePeriod = TimeSpan.FromSeconds(0.15);
+
+    /// <summary>
     /// How often the server revalidates projector connectivity.
     /// </summary>
     [DataField]
-    public TimeSpan ValidationInterval = TimeSpan.FromSeconds(0.10);
+    public TimeSpan ValidationInterval = TimeSpan.FromSeconds(0.05);
 
     /// <summary>
     /// Next server-side time this projection should revalidate its projector.

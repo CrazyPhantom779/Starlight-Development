@@ -1,18 +1,14 @@
 - type: entity
   id: HologramJobBrainChip
   parent: HologramBrainChip
-  name: hologram brain chip
-  description: A stored crew consciousness waiting to be projected into hardlight.
   suffix: Job
   categories: [ HideSpawnMenu, DoNotMap ]
   components:
-  - type: HologramBrainChipGhostRole
+  - type: HologramBrainChip
 
 - type: entity
   id: HologramJobBodyChip
   parent: HologramBodyChip
-  name: hologram body profile
-  description: Stored body projection data for a hologram.
   suffix: Job
   categories: [ HideSpawnMenu, DoNotMap ]
   components:
@@ -23,7 +19,6 @@
 - type: entity
   id: HologramJobBladeServer
   parent: HologramBladeServer
-  name: hologram blade server
   suffix: Hologram job spawn
   categories: [ HideSpawnMenu, DoNotMap ]
   components:
@@ -34,22 +29,6 @@
   - type: HologramBladeServer
     normalLawset: Drone
     emaggedLawset: SyndicateStatic
-  - type: HologramConsole
-    maxActiveHolograms: 1
-    showMap: true
-    showProjectButton: true
-    showRecallButton: true
-    showBladeServerPanel: true
-  - type: ActivatableUI
-    key: enum.HologramConsoleUiKey.Key
-  - type: UserInterface
-    interfaces:
-      enum.HologramConsoleUiKey.Key:
-        type: HologramConsoleBoundUserInterface
-  - type: ContainerSpawnPoint
-    containerId: hologram_brain_chip
-    job: Hologram
-    spawnType: Unset
   - type: ItemSlots
     slots:
       hologram_brain_chip:
@@ -71,37 +50,9 @@
 - type: entity
   id: BladeServerRackHologramJob
   parent: BladeServerRack
-  name: hologram blade server rack
-  description: A rack that creates hologram job blade servers only when hologram players actually join.
-  suffix: Hologram job spawn
+  suffix: [ Job ]
   components:
   - type: HologramJobRack
-  - type: HologramConsole
-    maxActiveHolograms: 4
-    showMap: true
-    showProjectButton: true
-    showRecallButton: true
-    showBladeServerPanel: true
-  - type: ActivatableUI
-    key: enum.HologramConsoleUiKey.Key
-  - type: UserInterface
-    interfaces:
-      enum.HologramConsoleUiKey.Key:
-        type: HologramConsoleBoundUserInterface
   - type: BladeServerRack
     bladeServerVisualsOffset: 0, -4
     startingContents: []
-
-- type: entity
-  id: BladeServerRackHologramJobSpawner
-  parent: MarkerBase
-  name: hologram blade server rack spawner
-  suffix: Hologram job spawn
-  components:
-  - type: Sprite
-    layers:
-    - state: blue
-  - type: EntityTableSpawner
-    table: !type:GroupSelector
-      children:
-      - id: BladeServerRackHologramJob
