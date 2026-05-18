@@ -50,7 +50,7 @@
 - type: entity
   id: BladeServerRackHologramJob
   parent: BladeServerRack
-  suffix: [ Job ]
+  suffix: Job
   components:
   - type: HologramJobRack
   - type: BladeServerRack
