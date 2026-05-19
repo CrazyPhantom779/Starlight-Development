@@ -106,6 +106,16 @@
     baseWalkSpeed: 3.5
     baseSprintSpeed: 5
   - type: Hands
+    showInHands: true
+    activeHandId: right
+    sortedHands:
+    - left
+    - right
+    hands:
+      left:
+        location: Left
+      right:
+        location: Right
   - type: Inventory
   - type: InventorySlots
   - type: Body

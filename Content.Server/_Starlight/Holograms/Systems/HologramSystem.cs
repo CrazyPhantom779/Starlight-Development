@@ -8,7 +8,6 @@ using Content.Server.Mind;
 using Content.Server.Preferences.Managers;
 using Content.Server.Station.Components;
 using Content.Server.Station.Systems;
-using Content.Shared._Starlight.Holograms;
 using Content.Shared._Starlight.Holograms.Components;
 using Content.Shared._Starlight.Holograms.Systems;
 using Content.Shared.Access.Components;
@@ -23,6 +22,7 @@ using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
 using Content.Shared.Preferences;
 using Content.Shared.Roles.Jobs;
+using Content.Shared.Whitelist;
 using Robust.Server.GameObjects;
 using Robust.Server.Player;
 using Robust.Shared.Audio.Systems;
@@ -157,6 +157,9 @@ public sealed partial class HologramSystem : SharedHologramSystem
         if (TryComp<HologramBrainChipComponent>(brainChip, out var brainChipComp))
             brainChipComp.HoloMind = mindId;
 
+        if (TryComp<MindComponent>(mindId, out var mind) && !string.IsNullOrWhiteSpace(mind.CharacterName))
+            _meta.SetEntityName(brainChip, mind.CharacterName);
+
         return true;
     }
 
@@ -181,11 +184,12 @@ public sealed partial class HologramSystem : SharedHologramSystem
     public void PrepareHardlightBody(EntityUid mob)
     {
         EnsureComp<HologramComponent>(mob);
-        EnsureComp<HologramProjectedComponent>(mob);
+
+        var projected = EnsureComp<HologramProjectedComponent>(mob);
+        ApplyDefaultProjectionSettings(mob, projected);
+
         EnsureComp<MindContainerComponent>(mob);
 
-        // Biological parent prototypes are useful for hands, inventory, interaction, and appearance,
-        // but hardlight bodies should not breathe or bleed.
         RemCompDeferred<RespiratorComponent>(mob);
         RemCompDeferred<BloodstreamComponent>(mob);
 
@@ -343,8 +347,12 @@ public sealed partial class HologramSystem : SharedHologramSystem
         if (string.IsNullOrWhiteSpace(name))
             name = profile?.Name;
 
-        if (!string.IsNullOrWhiteSpace(name))
-            _meta.SetEntityName(mob, name);
+        if (string.IsNullOrWhiteSpace(name))
+            return;
+
+        _meta.SetEntityName(mob, name);
+
+        bodyChip?.HologramName = name;
     }
 
     private void ApplyHumanoidJobData(EntityUid mindId, EntityUid mob)
@@ -399,5 +407,24 @@ public sealed partial class HologramSystem : SharedHologramSystem
 
         if (mindToRemove is { } removedMind)
             HologramsWaitingForMind.Remove(removedMind);
+    }
+
+    private void ApplyDefaultProjectionSettings(EntityUid mob, HologramProjectedComponent projected)
+    {
+        projected.GracePeriod = TimeSpan.FromSeconds(2);
+        projected.ValidationInterval = TimeSpan.FromSeconds(0.05);
+        projected.SetEyeTarget = false;
+        projected.EffectPrototype ??= "EffectHologramProjectionBeam";
+
+        projected.ValidProjectorWhitelist = new EntityWhitelist
+        {
+            Tags =
+            [
+                "HoloProjectorServer",
+                "HoloProjectorCamera",
+            ],
+        };
+
+        Dirty(mob, projected);
     }
 }

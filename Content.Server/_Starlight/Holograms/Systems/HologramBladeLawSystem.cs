@@ -1,4 +1,3 @@
-using Content.Server._Starlight.Holograms.Components;
 using Content.Server.Silicons.Laws;
 using Content.Shared._Moffstation.BladeServer;
 using Content.Shared._Starlight.Holograms;
@@ -7,6 +6,7 @@ using Content.Shared._Starlight.Holograms.Events;
 using Content.Shared.Actions.Components;
 using Content.Shared.Containers.ItemSlots;
 using Content.Shared.Emag.Systems;
+using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
 using Content.Shared.Popups;
 using Content.Shared.Silicons.Laws.Components;
@@ -28,6 +28,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
     [Dependency] private SiliconLawSystem _laws = default!;
     [Dependency] private ILogManager _logManager = default!;
     [Dependency] private HologramConsoleSystem _console = default!;
+    [Dependency] private MetaDataSystem _meta = default!;
 
     private ISawmill _sawmill = default!;
 
@@ -73,6 +74,9 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         action.BladeServer = bladeUid;
     }
 
+    private static EntityUid? GetSlotItem(ItemSlot slot)
+        => slot.Item ?? slot.ContainerSlot?.ContainedEntity;
+
     public bool TryGetBrainChip(EntityUid bladeUid, HologramBladeServerComponent blade, out EntityUid brainChip)
     {
         brainChip = default;
@@ -81,7 +85,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
             return false;
 
         if (!_itemSlots.TryGetSlot(bladeUid, blade.BrainChipSlot, out var brainSlot, slots) ||
-            brainSlot.Item is not { } chip)
+            GetSlotItem(brainSlot) is not { } chip)
         {
             return false;
         }
@@ -98,7 +102,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
             return false;
 
         if (!_itemSlots.TryGetSlot(bladeUid, blade.BodyChipSlot, out var bodySlot, slots) ||
-            bodySlot.Item is not { } chip)
+            GetSlotItem(bodySlot) is not { } chip)
         {
             return false;
         }
@@ -138,12 +142,37 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
             RemCompDeferred<HologramBladeLawProviderComponent>(target);
     }
 
+    private void SyncBrainChipName(EntityUid brainChip, EntityUid mindId)
+    {
+        if (!TryComp<MindComponent>(mindId, out var mind) || string.IsNullOrWhiteSpace(mind.CharacterName))
+            return;
+
+        _meta.SetEntityName(brainChip, mind.CharacterName);
+    }
+
+    private void SyncBodyChipName(EntityUid bodyChip, EntityUid mindId)
+    {
+        if (!TryComp<MindComponent>(mindId, out var mind) ||
+            string.IsNullOrWhiteSpace(mind.CharacterName) ||
+            !TryComp<HologramBodyChipComponent>(bodyChip, out var bodyComp))
+        {
+            return;
+        }
+
+        bodyComp.HologramName = mind.CharacterName;
+        _meta.SetEntityName(bodyChip, mind.CharacterName);
+    }
+
     private void OnBrainMindAdded(EntityUid uid, HologramBrainChipComponent component, MindAddedMessage args)
     {
         component.HoloMind = args.Mind;
+        SyncBrainChipName(uid, args.Mind);
 
         if (!TryFindBladeForChip(uid, out var bladeUid, out var blade))
             return;
+
+        if (TryGetBodyChip(bladeUid, blade, out var bodyChip))
+            SyncBodyChipName(bodyChip, args.Mind);
 
         SyncBladeLawsToOccupants(bladeUid, blade);
     }
@@ -294,7 +323,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         while (query.MoveNext(out var uid, out var bladeComp, out var slots))
         {
             if (!_itemSlots.TryGetSlot(uid, bladeComp.BrainChipSlot, out var brainSlot, slots) ||
-                brainSlot.Item != chip)
+                GetSlotItem(brainSlot) != chip)
             {
                 continue;
             }

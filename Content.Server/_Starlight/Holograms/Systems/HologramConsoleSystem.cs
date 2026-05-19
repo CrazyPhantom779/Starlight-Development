@@ -197,6 +197,29 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         return false;
     }
 
+    private static EntityUid? GetSlotItem(ItemSlot slot)
+        => slot.Item ?? slot.ContainerSlot?.ContainedEntity;
+
+    private static EntityUid? GetRackBladeSlotItem(BladeSlot slot)
+        => slot.Item ?? slot.Slot.Item ?? slot.Slot.ContainerSlot?.ContainedEntity;
+
+    private bool TryGetSlotItem(EntityUid owner, string slotId, out EntityUid item, ItemSlotsComponent? slots = null)
+    {
+        item = default;
+
+        if (slots == null && !TryComp(owner, out slots))
+            return false;
+
+        if (!_itemSlots.TryGetSlot(owner, slotId, out var slot, slots))
+            return false;
+
+        if (GetSlotItem(slot) is not { } contained || !Exists(contained))
+            return false;
+
+        item = contained;
+        return true;
+    }
+
     private bool TryGetStoredMind(EntityUid? brainChip, HologramBrainChipComponent? brainComp, out EntityUid mind)
     {
         if (brainChip == null || brainComp == null)
@@ -377,7 +400,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         {
             foreach (var slot in containingRack.BladeSlots)
             {
-                if (slot.Item is { } bladeServer && HasComp<HologramBladeServerComponent>(bladeServer))
+                if (GetRackBladeSlotItem(slot) is { } bladeServer && HasComp<HologramBladeServerComponent>(bladeServer))
                     bladeServers.Add(bladeServer);
             }
 
@@ -407,7 +430,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
 
             foreach (var slot in rackComp.BladeSlots)
             {
-                if (slot.Item is { } bladeServer && HasComp<HologramBladeServerComponent>(bladeServer))
+                if (GetRackBladeSlotItem(slot) is { } bladeServer && HasComp<HologramBladeServerComponent>(bladeServer))
                     bladeServers.Add(bladeServer);
             }
         }
@@ -454,16 +477,14 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         if (!TryComp<ItemSlotsComponent>(bladeServer, out var itemSlots))
             return false;
 
-        if (_itemSlots.TryGetSlot(bladeServer, bladeServerComp.BrainChipSlot, out var brainSlot, itemSlots) &&
-            brainSlot.Item is { } brainChipUid &&
+        if (TryGetSlotItem(bladeServer, bladeServerComp.BrainChipSlot, out var brainChipUid, itemSlots) &&
             TryComp<HologramBrainChipComponent>(brainChipUid, out var brainChipComp))
         {
             brainChip = brainChipUid;
             brainComp = brainChipComp;
         }
 
-        if (_itemSlots.TryGetSlot(bladeServer, bladeServerComp.BodyChipSlot, out var bodySlot, itemSlots) &&
-            bodySlot.Item is { } bodyChipUid &&
+        if (TryGetSlotItem(bladeServer, bladeServerComp.BodyChipSlot, out var bodyChipUid, itemSlots) &&
             TryComp<HologramBodyChipComponent>(bodyChipUid, out var bodyChipComp))
         {
             bodyChip = bodyChipUid;
@@ -497,7 +518,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
 
             foreach (var slot in rackComp.BladeSlots)
             {
-                if (slot.Item == bladeServerUid)
+                if (GetRackBladeSlotItem(slot) == bladeServerUid)
                     return slot.IsPowerEnabled;
             }
 
@@ -616,15 +637,15 @@ public sealed partial class HologramConsoleSystem : EntitySystem
 
         if (bladeComp.ActiveHologram is { } existing && Exists(existing))
         {
-            if (!ReprojectHologram(bladeServer, bladeComp, existing, brainChip, brainChipComp, bodyChipComp, coords, projector, lockToProjector, out var refreshed))
+            if (!MoveExistingHologram(bladeServer, bladeComp, existing, coords, projector, lockToProjector))
             {
-                _sawmill.Warning($"Hologram reprojection failed: could not refresh prototype {bodyChipComp.HologramPrototype}.");
-                _popup.PopupEntity("Reprojection failed: could not refresh the configured hologram body.", console);
+                _sawmill.Warning($"Hologram move failed: could not move active hologram {ToPrettyString(existing)} to projector {ToPrettyString(projector)}.");
+                _popup.PopupEntity("Move failed: could not move the active hologram to that projector.", console);
                 return;
             }
 
             if (IsPortable(console))
-                component.ActiveHolograms[bladeServer] = refreshed;
+                component.ActiveHolograms[bladeServer] = existing;
 
             UpdateConsoleIfAlive(console, component);
             return;
@@ -853,38 +874,45 @@ public sealed partial class HologramConsoleSystem : EntitySystem
     public void KillBladeHologram(EntityUid bladeServerUid, HologramBladeServerComponent bladeComp)
     {
         if (bladeComp.ActiveHologram is { } hologram && Exists(hologram))
-            ReturnMindAndKill(bladeServerUid, bladeComp, hologram);
+        {
+            if (!ReturnMindAndKill(bladeServerUid, bladeComp, hologram))
+                return;
+        }
 
         bladeComp.ActiveHologram = null;
         RemovePortableHologramEntry(bladeServerUid);
     }
 
-    private void ReturnMindAndKill(EntityUid bladeServerUid, HologramBladeServerComponent bladeComp, EntityUid hologram)
+    private bool ReturnMindAndKill(EntityUid bladeServerUid, HologramBladeServerComponent bladeComp, EntityUid hologram)
     {
+        var hasMind = TryComp<MindContainerComponent>(hologram, out var hologramMind) &&
+                      hologramMind.Mind != null;
+
         if (TryGetBrainChip(bladeServerUid, bladeComp, out var brainChip))
         {
-            _hologram.TryReturnMindToBrainChip(hologram, brainChip);
+            if (hasMind && !_hologram.TryReturnMindToBrainChip(hologram, brainChip))
+            {
+                _sawmill.Warning($"Recall failed: could not return mind from {ToPrettyString(hologram)} to brain chip {ToPrettyString(brainChip)}.");
+                return false;
+            }
+
             _bladeLaws.ApplyBladeLaws(bladeServerUid, bladeComp, brainChip);
+        }
+        else if (hasMind)
+        {
+            _sawmill.Warning($"Recall failed: blade server {ToPrettyString(bladeServerUid)} has no readable brain chip slot for {ToPrettyString(hologram)}.");
+            return false;
         }
 
         _hologram.DoKillHologram(hologram);
+        return true;
     }
 
     private bool TryGetBrainChip(EntityUid bladeServerUid, HologramBladeServerComponent bladeComp, out EntityUid brainChip)
     {
         brainChip = default;
 
-        if (!TryComp<ItemSlotsComponent>(bladeServerUid, out var slots))
-            return false;
-
-        if (!_itemSlots.TryGetSlot(bladeServerUid, bladeComp.BrainChipSlot, out var brainSlot, slots) ||
-            brainSlot.Item is not { } chip)
-        {
-            return false;
-        }
-
-        brainChip = chip;
-        return true;
+        return TryGetSlotItem(bladeServerUid, bladeComp.BrainChipSlot, out brainChip);
     }
 
     private void RemovePortableHologramEntry(EntityUid bladeServerUid)
@@ -922,9 +950,14 @@ public sealed partial class HologramConsoleSystem : EntitySystem
                 continue;
 
             if (Exists(blade) && TryComp<HologramBladeServerComponent>(blade, out var bladeComp))
-                ReturnMindAndKill(blade, bladeComp, hologram);
+            {
+                if (!ReturnMindAndKill(blade, bladeComp, hologram))
+                    continue;
+            }
             else
+            {
                 _hologram.DoKillHologram(hologram);
+            }
         }
 
         activeHolograms.Clear();
@@ -937,5 +970,23 @@ public sealed partial class HologramConsoleSystem : EntitySystem
 
         UpdateUserInterface(console, component);
         UpdateBriefcaseAppearance(console, component);
+    }
+
+    private bool MoveExistingHologram(
+        EntityUid bladeServerUid,
+        HologramBladeServerComponent bladeComp,
+        EntityUid hologram,
+        EntityCoordinates coords,
+        EntityUid projector,
+        bool lockToProjector)
+    {
+        if (!Exists(hologram) || !HasComp<HologramComponent>(hologram))
+            return false;
+
+        _hologram.MoveHologram(hologram, coords);
+        SetProjection(hologram, projector, lockToProjector);
+        bladeComp.ActiveHologram = hologram;
+        _bladeLaws.ApplyBladeLaws(bladeServerUid, bladeComp, hologram);
+        return true;
     }
 }

@@ -1,7 +1,6 @@
 using System.Linq;
 using System.Numerics;
 using Content.Shared._Starlight.Holograms.Components;
-using Content.Shared.Tag;
 using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Shared.Prototypes;
@@ -11,13 +10,11 @@ namespace Content.Client._Starlight.Holograms;
 
 public sealed partial class HologramVisualizerSystem : EntitySystem
 {
-    private const string HideContextMenuTag = "HideContextMenu";
     private const string HologramProjectionShader = "HologramProjection";
     private const string StarlightHologramShader = "StarlightHologram";
 
     [Dependency] private IPrototypeManager _prototype = default!;
     [Dependency] private SpriteSystem _sprite = default!;
-    [Dependency] private TagSystem _tag = default!;
     [Dependency] private IGameTiming _timing = default!;
 
     public override void Initialize()
@@ -31,8 +28,6 @@ public sealed partial class HologramVisualizerSystem : EntitySystem
 
     private void OnHologramInit(Entity<HologramComponent> ent, ref ComponentInit args)
     {
-        _tag.AddTag(ent.Owner, HideContextMenuTag);
-
         if (!TryComp(ent.Owner, out SpriteComponent? sprite))
             return;
 
@@ -46,9 +41,8 @@ public sealed partial class HologramVisualizerSystem : EntitySystem
 
         sprite.PostShader = null;
         sprite.RaiseShaderEvent = false;
-
-        if (ent.Comp.ForceHolopadFacing)
-            sprite.NoRotation = false;
+        sprite.NoRotation = false;
+        sprite.EnableDirectionOverride = false;
     }
 
     private void OnShaderRender(Entity<HologramComponent> ent, ref BeforePostShaderRenderEvent args)
@@ -80,7 +74,11 @@ public sealed partial class HologramVisualizerSystem : EntitySystem
         _sprite.SetOffset((uid, sprite), component.Offset);
 
         if (component.ForceHolopadFacing)
+        {
             sprite.NoRotation = true;
+            sprite.DirectionOverride = Direction.South;
+            sprite.EnableDirectionOverride = true;
+        }
 
         if (!TryEnsureShader(component, sprite))
             return;
