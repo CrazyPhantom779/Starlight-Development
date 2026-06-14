@@ -14,6 +14,9 @@
   categories: [ HideSpawnMenu ]
   components:
   - type: ShowHealthBars
+    damageContainers: # Starlight start
+    - Biological
+    - Hybrid # Starlight end, Protogens
   - type: ShowHealthIcons
 
 - type: entity
@@ -30,6 +33,8 @@
     damageContainers:
     - Inorganic
     - Silicon
+    - IPC # SL
+    - Hybrid # Starlight
   - type: ShowAccessReaderSettings
 
 - type: entity
@@ -91,13 +96,16 @@
   - type: Clothing
     sprite: Clothing/Eyes/Hud/beergoggles.rsi
   - type: ShowThirstIcons
+  - type: FlashImmunity # Starlight
+  - type: EyeProtection # Starlight. They're a steal target, why don't they actually...
   - type: StealTarget
-    stealGroup: ClothingEyesHudBeer
+    stealGroup: MiscGlassesCollection # Starlight
   - type: SolutionScanner
   - type: Tag
     tags:
     - PetWearable
     - WhitelistChameleon
+    - Sunglasses # Starlight
 
 - type: entity
   parent: ClothingEyesBase
@@ -189,6 +197,8 @@
     damageContainers:
     - Biological
     - Inorganic
+    - IPC # SL
+    - Hybrid # Starlight
   - type: ShowSyndicateIcons
 
 - type: entity
@@ -205,6 +215,8 @@
     damageContainers:
     - Biological
     - Inorganic
+    - IPC # SL
+    - Hybrid # Starlight
   - type: ShowHungerIcons
   - type: ShowThirstIcons
   - type: ShowSyndicateIcons
@@ -237,7 +249,10 @@
     sprite: Clothing/Eyes/Hud/syndagent.rsi
   - type: ShowSyndicateIcons
   - type: ShowHealthBars
-  - type: SolutionScanner #starlight
+    damageContainers: # Starlight start
+    - Biological
+    - Hybrid # Protogens
+  - type: SolutionScanner # Starlight end
   - type: Tag
     tags:
     - PetWearable
@@ -291,7 +306,7 @@
   name: security hud eyepatch
 
 - type: entity
-  parent: [ClothingEyesHudBeer, ClothingHeadEyeBaseFlippable]
+  parent: ClothingHeadEyeBaseFlippable
   id: ClothingEyesEyepatchHudBeer
   name: beer hud eyepatch
   description: A pair of sunHud outfitted with apparatus to scan reagents, as well as providing an innate understanding of liquid viscosity while in motion. For true patriots.
@@ -300,6 +315,13 @@
     sprite: Clothing/Eyes/Hud/beerpatch.rsi
   - type: Clothing
     sprite: Clothing/Eyes/Hud/beerpatch.rsi
+  - type: ShowThirstIcons # Starlight. This, and the next 8 lines were moved from ClothingEyesHudBeer. Why would an eyepatch have flash protection? Unparented it from the mentioned ID
+  - type: StealTarget
+    stealGroup: MiscGlassesCollection # Starlight
+  - type: SolutionScanner
+  - type: Tag
+    tags:
+    - WhitelistChameleon
 
 - type: entity
   parent: [ClothingEyesEyepatchHudBeer, ClothingHeadEyeBaseFlipped]

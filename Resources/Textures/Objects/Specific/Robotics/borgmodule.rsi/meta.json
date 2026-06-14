@@ -134,6 +134,9 @@
             "name": "icon-xenoborg-cloak"
         },
         {
+            "name": "icon-xenoborg-jump"
+        },
+        {
             "name": "icon-xenoborg-cloak2"
         },
         {
@@ -162,6 +165,9 @@
         },
         {
             "name": "icon-xenoborg-sword2"
+        },
+        {
+            "name": "icon-xenoborg-tile"
         },
         {
             "name": "icon-xenoborg-tools"
@@ -236,6 +242,9 @@
             "name": "icon-loading"
         },
         {
+            "name": "icon-plumbing"
+        },
+        {
             "name": "base-icon-inhand-left",
             "directions": 4
         },
@@ -266,6 +275,15 @@
         {
             "name": "base-stripes-inhand-right",
             "directions": 4
+        },
+        {
+            "name": "makeshift"
+        },
+        {
+            "name": "icon-knife"
+        },
+        {
+            "name": "icon-salvage-defense"
         }
     ]
 

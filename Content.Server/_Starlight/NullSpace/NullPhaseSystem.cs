@@ -12,6 +12,9 @@ using Content.Server.Ghost;
 using Robust.Server.Containers;
 using Robust.Shared.Prototypes;
 using Content.Shared.Light.Components;
+using Robust.Shared.Containers;
+using Content.Shared.Mobs.Components;
+using Content.Shared.Inventory;
 
 namespace Content.Server._Starlight.NullSpace;
 
@@ -24,10 +27,11 @@ public sealed class NullSpacePhaseSystem : EntitySystem
     [Dependency] private readonly GhostSystem _ghost = default!;
     [Dependency] private readonly ContainerSystem _container = default!;
     [Dependency] private readonly TurfSystem _turf = default!;
+    [Dependency] private readonly InventorySystem _inventorySystem = default!;
 
     private readonly EntProtoId _shadekinShadow = "ShadekinShadow";
-    private readonly EntProtoId ShadekinPhaseInEffect = "ShadekinPhaseInEffect";
-    private readonly EntProtoId ShadekinPhaseOutEffect = "ShadekinPhaseOutEffect";
+    private readonly EntProtoId _shadekinPhaseInEffect = "ShadekinPhaseInEffect";
+    private readonly EntProtoId _shadekinPhaseOutEffect = "ShadekinPhaseOutEffect";
 
     public override void Initialize()
     {
@@ -40,14 +44,10 @@ public sealed class NullSpacePhaseSystem : EntitySystem
     }
 
     private void OnInit(EntityUid uid, NullPhaseComponent component, MapInitEvent args)
-    {
-        Toggle(uid, component, true);
-    }
+        => Toggle(uid, component, true);
 
     public void OnShutdown(EntityUid uid, NullPhaseComponent component, ComponentShutdown args)
-    {
-        Toggle(uid, component, false);
-    }
+        => Toggle(uid, component, false);
 
     private void OnEquipped(EntityUid uid, NullPhaseComponent component, GotEquippedEvent args)
     {
@@ -56,8 +56,8 @@ public sealed class NullSpacePhaseSystem : EntitySystem
             return;
 
         EnsureComp<NullPhaseComponent>(args.Equipee);
-        if (!component.PreventLightFlicker 
-            || !TryComp<ShadekinComponent>(args.Equipee, out var shadekin)) 
+        if (!component.PreventLightFlicker
+            || !TryComp<ShadekinComponent>(args.Equipee, out var shadekin))
             return;
         component.OriginalFlickerFlagState = shadekin.DoLightFlicker;
         shadekin.DoLightFlicker = false;
@@ -66,8 +66,8 @@ public sealed class NullSpacePhaseSystem : EntitySystem
     private void OnUnequipped(EntityUid uid, NullPhaseComponent component, GotUnequippedEvent args)
     {
         RemComp<NullPhaseComponent>(args.Equipee);
-        if (!component.PreventLightFlicker 
-            || !TryComp<ShadekinComponent>(args.Equipee, out var shadekin)) 
+        if (!component.PreventLightFlicker
+            || !TryComp<ShadekinComponent>(args.Equipee, out var shadekin))
             return;
         shadekin.DoLightFlicker = component.OriginalFlickerFlagState;
     }
@@ -102,12 +102,14 @@ public sealed class NullSpacePhaseSystem : EntitySystem
         }
         else
         {
+            // No phaising if were in a container.
             if (_container.IsEntityInContainer(uid))
             {
                 _popup.PopupEntity(Loc.GetString("phase-fail-generic"), uid, uid);
                 return false;
             }
 
+            // No phaising if were blocked by a NullSpaceBlockerComponent entity.
             foreach (var entity in _lookup.GetEntitiesIntersecting(Transform(uid).Coordinates))
             {
                 if (HasComp<NullSpaceBlockerComponent>(entity))
@@ -116,6 +118,27 @@ public sealed class NullSpacePhaseSystem : EntitySystem
                     return false;
                 }
             }
+
+            // No phaising if were holding or have an entity with the MobStateComponent (including backpack)
+            if (TryComp<InventoryComponent>(uid, out var inventoryComponent) && _inventorySystem.TryGetSlots(uid, out var slots))
+                foreach (var slot in slots)
+                    if (_inventorySystem.TryGetSlotEntity(uid, slot.Name, out var slotEnt, inventoryComponent))
+                    {
+                        if (HasComp<MobStateComponent>(slotEnt))
+                        {
+                            _popup.PopupEntity(Loc.GetString("phase-fail-generic"), uid, uid);
+                            return false;
+                        }
+
+                        if (TryComp<ContainerManagerComponent>(slotEnt, out var containercomp))
+                            foreach (var container in containercomp.Containers.Values)
+                                foreach (var contEnt in container.ContainedEntities)
+                                    if (HasComp<MobStateComponent>(contEnt))
+                                    {
+                                        _popup.PopupEntity(Loc.GetString("phase-fail-generic"), uid, uid);
+                                        return false;
+                                    }
+                    }
         }
 
         return true;
@@ -135,7 +158,7 @@ public sealed class NullSpacePhaseSystem : EntitySystem
                         _ghost.DoGhostBooEvent(light);
                 }
 
-                var effect = SpawnAtPosition(ShadekinPhaseInEffect, Transform(uid).Coordinates);
+                var effect = SpawnAtPosition(_shadekinPhaseInEffect, Transform(uid).Coordinates);
                 Transform(effect).LocalRotation = Transform(uid).LocalRotation;
             }
             else
@@ -157,7 +180,7 @@ public sealed class NullSpacePhaseSystem : EntitySystem
                         _ghost.DoGhostBooEvent(light);
                 }
 
-                var effect = SpawnAtPosition(ShadekinPhaseOutEffect, Transform(uid).Coordinates);
+                var effect = SpawnAtPosition(_shadekinPhaseOutEffect, Transform(uid).Coordinates);
                 Transform(effect).LocalRotation = Transform(uid).LocalRotation;
             }
             else

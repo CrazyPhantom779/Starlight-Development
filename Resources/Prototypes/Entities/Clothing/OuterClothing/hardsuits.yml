@@ -142,8 +142,8 @@
     modifiers:
       coefficients:
       # region starlight: lowered values
-        Blunt: 0.7 
-        Slash: 0.7 
+        Blunt: 0.7
+        Slash: 0.7
         Piercing: 0.8
         # end region starlight
         Heat: 0.7
@@ -197,7 +197,7 @@
     node: hardsuitGoliath
   - type: Tag
     tags:
-    - CorgiWearable
+    - CorgiWearable #Starlight
     - Hardsuit
     - WhitelistChameleon
 
@@ -221,17 +221,17 @@
     modifiers:
       coefficients:
       # region starlight: maxim lowered values
-        Blunt: 0.65 
-        Slash: 0.65 
-        Piercing: 0.65 
-        Heat: 0.6 
-        Radiation: 0.3 
-        Caustic: 0.8 
+        Blunt: 0.65
+        Slash: 0.65
+        Piercing: 0.65
+        Heat: 0.6
+        Radiation: 0.3
+        Caustic: 0.8
   - type: ClothingSpeedModifier
     walkModifier: 0.85
-    sprintModifier: 0.85 
+    sprintModifier: 0.85
   - type: ExplosionResistance
-    damageCoefficient: 0.4 
+    damageCoefficient: 0.4
     # end region starlight
   - type: HeldSpeedModifier #Starlight addition
   - type: TemperatureProtection
@@ -342,6 +342,15 @@
   - type: HeldSpeedModifier
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetHardsuitBrigmedic
+  - type: StealTarget # Starlight
+    stealGroup: BrigmedicHardsuit # Starlight
+#Starlight start
+  - type: Tag
+    tags:
+    - Hardsuit
+    - CorgiWearable
+    - WhitelistChameleon
+#Starlight end
 
 #Warden's Hardsuit
 - type: entity
@@ -376,10 +385,17 @@
   - type: HeldSpeedModifier
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetHardsuitWarden
+  - type: StealTarget # Starlight
+    stealGroup: WardenHardsuit # Starlight
+  - type: Tag
+    tags:
+    - Hardsuit
+    - CorgiWearable #Starlight
+    - WhitelistChameleon
 
 #Captain's Hardsuit
 - type: entity
-  parent: [ClothingOuterHardsuitBase, BaseCommandContraband]
+  parent: [ClothingOuterHardsuitBase, BaseGrandTheftContraband] # Starlight, grand theft
   id: ClothingOuterHardsuitCap
   name: captain's armored spacesuit
   description: A formal armored spacesuit, made for the station's captain.
@@ -416,10 +432,12 @@
     - CorgiWearable
     - Hardsuit
     - WhitelistChameleon
+  - type: StealTarget # Starlight
+    stealGroup: CaptainHardsuit # Starlight
 
 #Chief Engineer's Hardsuit
 - type: entity
-  parent: [ClothingOuterHardsuitBase, BaseCommandContraband]
+  parent: [ClothingOuterHardsuitBase, BaseGrandTheftContraband] # Starlight, Grand theft
   id: ClothingOuterHardsuitEngineeringWhite
   name: chief engineer's hardsuit
   description: A special hardsuit that protects against hazardous, low pressure environments, made for the chief engineer of the station.
@@ -457,10 +475,12 @@
     - CorgiWearable
     - Hardsuit
     - WhitelistChameleon
+  - type: StealTarget # Starlight
+    stealGroup: CEHardsuit # Starlight
 
 #Chief Medical Officer's Hardsuit
 - type: entity
-  parent: [ClothingOuterHardsuitBase, BaseCommandContraband]
+  parent: [ClothingOuterHardsuitBase, BaseGrandTheftContraband] # Starlight, grand theft
   id: ClothingOuterHardsuitMedical
   name: chief medical officer's hardsuit
   description: A special suit that protects against hazardous, low pressure environments. Built with lightweight materials for easier movement.
@@ -491,6 +511,8 @@
     - CorgiWearable
     - Hardsuit
     - WhitelistChameleon
+  - type: StealTarget # Starlight
+    stealGroup: CMOHardsuit # Starlight
 
 #Research Director's Hardsuit
 - type: entity
@@ -539,10 +561,11 @@
     price: 750
   - type: StealTarget
     stealGroup: ClothingOuterHardsuitRd
+  - type: TheDarkImmune # Starlight
 
 #Head of Security's Hardsuit
 - type: entity
-  parent: [ClothingOuterHardsuitBase, BaseCommandContraband]
+  parent: [ClothingOuterHardsuitBase, BaseGrandTheftContraband] # Starlight, grand theft
   id: ClothingOuterHardsuitSecurityRed
   name: head of security's hardsuit
   description: A special suit that protects against hazardous, low pressure environments. Has an additional layer of armor.
@@ -598,6 +621,14 @@
     useCharge: 0
   - type: UseDelay
     delay: 10.0
+  - type: StealTarget # Starlight
+    stealGroup: HOSHardsuit # Starlight
+  - type: Tag
+    tags:
+    - WhitelistChameleon
+    - HighRiskItem
+    - CorgiWearable
+    - Hardsuit
 
 #Luxury Mining Hardsuit
 - type: entity
@@ -633,6 +664,12 @@
   - type: HeldSpeedModifier
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetHardsuitLuxury
+# Starlight
+  - type: Tag
+    tags:
+    - CorgiWearable
+    - Hardsuit
+    - WhitelistChameleon
 
 #ANTAG HARDSUITS
 #Blood-red Hardsuit
@@ -703,6 +740,7 @@
   - type: Tag
     tags:
     - Hardsuit
+    - CorgiWearable # Starlight
     - WhitelistChameleon
 
 #Syndicate Elite Hardsuit
@@ -895,6 +933,7 @@
     - CorgiWearable
     - Hardsuit
     - WhitelistChameleon
+  - type: TheDarkImmune # SL
 
 #Ling Space Suit
 - type: entity
@@ -981,17 +1020,20 @@
     highPressureMultiplier: 0.02
     lowPressureMultiplier: 1000
   - type: ExplosionResistance
-    damageCoefficient: 0.6
+    damageCoefficient: 0.5 # Starlight-edit
   - type: Pierceable
     level: Metal
   - type: Armor
     modifiers:
       coefficients:
-        Blunt: 0.7
-        Slash: 0.8
-        Piercing: 0.85
-        Heat: 0.4
-        Caustic: 0.75
+      # Starlight-start
+        Blunt: 0.55
+        Slash: 0.55
+        Piercing: 0.55
+        Heat: 0.55
+        Caustic: 0.6
+    staminaModifier: 0.5
+    # Starlight-end
   - type: ClothingSpeedModifier
     walkModifier: 0.8
     sprintModifier: 0.8
@@ -1028,6 +1070,12 @@
     # Starlight-end
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetHardsuitERTLeader
+#Starlight
+  - type: Tag
+    tags:
+    - Hardsuit
+    - WhitelistChameleon
+    - CorgiWearable
 
 #ERT Chaplain Hardsuit
 - type: entity
@@ -1042,6 +1090,12 @@
     sprite: Clothing/OuterClothing/Hardsuits/ERTSuits/ertchaplain.rsi
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetHardsuitERTChaplain
+#Starlight
+  - type: Tag
+    tags:
+    - Hardsuit
+    - WhitelistChameleon
+    - CorgiWearable
 
 #ERT Engineer Hardsuit
 - type: entity
@@ -1058,6 +1112,12 @@
     clothingPrototype: ClothingHeadHelmetHardsuitERTEngineer
   - type: FireProtection
     reduction: 0.8
+#Starlight
+  - type: Tag
+    tags:
+    - Hardsuit
+    - WhitelistChameleon
+    - CorgiWearable
 
 #ERT Medic Hardsuit
 - type: entity
@@ -1072,6 +1132,36 @@
     sprite: Clothing/OuterClothing/Hardsuits/ERTSuits/ertmedical.rsi
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetHardsuitERTMedical
+  - type: ItemToggle
+    onUse: false
+    soundActivate:
+      path: /Audio/Items/flashlight_on.ogg
+    soundDeactivate:
+      path: /Audio/Items/flashlight_off.ogg
+  - type: ItemToggleActiveSound
+    activeSound:
+      path: /Audio/Effects/Vehicle/ambulancesiren.ogg #not the best sound, but after looking through all of current freesound regarding sirens and ambulance, this was the best compromise
+      params:
+        volume: -4
+  - type: UseDelay
+    delay: 1.0
+  - type: ToggleClothing
+    action: ActionToggleParamedicSiren
+  - type: ItemTogglePointLight
+  - type: PointLight
+    enabled: false
+    radius: 2
+    energy: 2
+    color: blue
+    mask: /Textures/Effects/LightMasks/double_cone.png
+  - type: RotatingLight
+    speed: 360
+#Starlight
+  - type: Tag
+    tags:
+    - Hardsuit
+    - WhitelistChameleon
+    - CorgiWearable
 
 #ERT Security Hardsuit
 - type: entity
@@ -1089,7 +1179,7 @@
     lowPressureMultiplier: 1000
   - type: ExplosionResistance
     damageCoefficient: 0.5 #Starlight edit
-  - type: StaminaResistance 
+  - type: StaminaResistance
     damageCoefficient: 0.75
   - type: Armor #Starlight edit - all resists are new, ert sec was formerly a copy of elite suit, it should not be.
     modifiers:
@@ -1107,6 +1197,7 @@
     tags:
     - Hardsuit
     - WhitelistChameleon
+    - CorgiWearable
 
 #ERT Janitor Hardsuit
 - type: entity
@@ -1121,6 +1212,12 @@
     sprite: Clothing/OuterClothing/Hardsuits/ERTSuits/ertjanitor.rsi
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetHardsuitERTJanitor
+#Starlight
+  - type: Tag
+    tags:
+    - Hardsuit
+    - WhitelistChameleon
+    - CorgiWearable
 
 #Deathsquad
 - type: entity
@@ -1165,6 +1262,12 @@
   - type: HeldSpeedModifier
   - type: ToggleableClothing
     clothingPrototype: ClothingHeadHelmetHardsuitDeathsquad
+#Starlight
+  - type: Tag
+    tags:
+    - Hardsuit
+    - WhitelistChameleon
+    - CorgiWearable
 
 #CBURN Hardsuit
 - type: entity
@@ -1319,12 +1422,12 @@
   - type: Armor
     modifiers:
       coefficients:
-        Blunt: 0.95
-        Slash: 0.95
-        Piercing: 1
+        Blunt: 0.75 # Starlight start
+        Slash: 0.75
+        Piercing: 0.85 # Starlight end
         Heat: 0.5
   - type: ClothingSpeedModifier
-    walkModifier: 0.9
-    sprintModifier: 0.9
+    walkModifier: 0.95 # Starlight, giving it something over the armor
+    sprintModifier: 0.95 # Starlight
   - type: HeldSpeedModifier
   - type: Unremoveable

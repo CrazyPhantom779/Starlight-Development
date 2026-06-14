@@ -77,11 +77,15 @@ public sealed partial class StoreListingControl : Control
         var stationTime = _timing.CurTime.Subtract(_ticker.RoundStartTimeSpan);
         if (_data.RestockTime > stationTime)
             return false;
+        #region Starlight
+        // Remove item if Destock time window has passed.
+        if (_data.DestockTime < stationTime  && _data.DestockTime != TimeSpan.Zero)
+            return false;
 
         // Starlight: Check if the listing is marked as unavailable (e.g., when a rift is active or out of stock)
         if (_data.Unavailable)
             return false;
-        // Starlight End
+        #endregion
 
         return true;
     }
@@ -94,6 +98,12 @@ public sealed partial class StoreListingControl : Control
             var timeLeftToBuy = stationTime - _data.RestockTime;
             StoreItemBuyButton.Text =  timeLeftToBuy.Duration().ToString(@"mm\:ss");
         }
+        #region Starlight
+        else if (_data.DestockTime < stationTime && _data.DestockTime != TimeSpan.Zero)
+        {
+            StoreItemBuyButton.Text =  Loc.GetString("store-listing-late");
+        }
+        #endregion
         else
         {
             DiscountSubText.Text = _discount;
@@ -103,7 +113,7 @@ public sealed partial class StoreListingControl : Control
                 var m = _priceNumberRegex.Match(_price);
                 if (m.Success)
                 {
-                    StoreItemBuyButton.Text = $"{m.Groups[1].Value}¢";
+                    StoreItemBuyButton.Text = $"{m.Groups[1].Value}Â¢";
                 }
                 else
                 {

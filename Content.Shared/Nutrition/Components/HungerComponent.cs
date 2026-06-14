@@ -10,7 +10,7 @@ using Robust.Shared.Serialization.TypeSerializers.Implementations.Generic;
 
 namespace Content.Shared.Nutrition.Components;
 
-[RegisterComponent, NetworkedComponent, Access(typeof(HungerSystem), typeof(SharedStaminaSurgeSystem))] // Starlight edit
+[RegisterComponent, NetworkedComponent, Access(typeof(HungerSystem))]
 [AutoGenerateComponentState(fieldDeltas: true), AutoGenerateComponentPause]
 public sealed partial class HungerComponent : Component
 {
@@ -132,12 +132,12 @@ public sealed partial class HungerComponent : Component
     [ViewVariables(VVAccess.ReadWrite)]
     [AutoNetworkedField]
     public TimeSpan ThresholdUpdateRate = TimeSpan.FromSeconds(1);
-    
+
     //Starlight begin
     /// <summary>
     /// A list of values to drain hunger by every update tick. Gets multiplied by decay rate.
     /// </summary>
-    [ViewVariables] public readonly List<(EntityUid, float, TimeSpan)> HungerDrains = [];
+    [ViewVariables] public readonly List<(EntityUid, float, TimeSpan?)> HungerDrains = [];
     //Starlight end
 }
 

@@ -157,6 +157,9 @@
       hasMindState: borg_e
       noMindState: borg
     - type: ShowHealthBars
+      damageContainers: # Starlight start
+      - Biological
+      - Hybrid # Starlight end, Protogens
     - type: InteractionPopup
       interactSuccessString: petting-success-syndicate-cyborg
       interactFailureString: petting-failure-syndicate-cyborg
@@ -173,7 +176,7 @@
   id: BorgChassisSyndicateSaboteur
   parent: BaseBorgChassisSyndicate
   name: syndicate saboteur cyborg
-  description: A streamlined engineering cyborg, equipped with covert modules. Its chameleon projector lets it disguise itself as a Nanotrasen cyborg.
+  description: A streamlined engineering cyborg, equipped with covert modules. Its chameleon projector lets it disguise itself as a NanoTrasen cyborg. # SL
   components:
     - type: TextToSpeech
     - type: Sprite
@@ -201,6 +204,7 @@
       damageContainers:
       - Inorganic
       - Silicon
+      - Hybrid # Starlight
     - type: InteractionPopup
       interactSuccessString: petting-success-syndicate-cyborg
       interactFailureString: petting-failure-syndicate-cyborg
@@ -239,6 +243,19 @@
     interactFailureString: petting-failure-derelict-cyborg
     interactSuccessSound:
       path: /Audio/Ambience/Objects/periodic_beep.ogg
+# Starlight Start
+  - type: IntrinsicRadioReceiver
+  - type: IntrinsicRadioTransmitter
+    channels:
+    - Binary
+    - Common
+    - Science
+  - type: ActiveRadio
+    channels:
+    - Binary
+    - Common
+    - Science
+#Starlight End
 
 - type: entity
   parent: BaseBorgChassisDerelict
@@ -273,6 +290,21 @@
       - BorgModuleEngineering
     hasMindState: borg_e #Starlight ;-;
     noMindState: borg_e_r #Starlight ;-;
+# Starlight Start
+  - type: IntrinsicRadioReceiver
+  - type: IntrinsicRadioTransmitter
+    channels:
+    - Binary
+    - Common
+    - Engineering
+    - Science
+  - type: ActiveRadio
+    channels:
+    - Binary
+    - Common
+    - Engineering
+    - Science
+#Starlight End
 
 - type: entity
   parent: BaseBorgChassisDerelict
@@ -309,6 +341,21 @@
       - BorgModuleJanitor
     hasMindState: borg_e #Starlight ;-;
     noMindState: borg_e_r #Starlight ;-;
+# Starlight Start
+  - type: IntrinsicRadioReceiver
+  - type: IntrinsicRadioTransmitter
+    channels:
+    - Binary
+    - Common
+    - Science
+    - Service
+  - type: ActiveRadio
+    channels:
+    - Binary
+    - Common
+    - Science
+    - Service
+#Starlight End
 
 - type: entity
   parent: BaseBorgChassisDerelict
@@ -349,9 +396,32 @@
   - type: ShowHealthBars
     damageContainers:
     - Biological
+    - Hybrid # Starlight
   - type: ShowHealthIcons
     damageContainers:
     - Biological
+    - Hybrid # Starlight
+# Starlight Start
+  - type: IntrinsicRadioReceiver
+  - type: IntrinsicRadioTransmitter
+    channels:
+    - Binary
+    - Common
+    - Command
+    - Engineering
+    - Medical
+    - Science
+    - Security
+    - Service
+    - Supply
+    - Law
+  - type: ActiveRadio
+    channels:
+    - Binary
+    - Common
+    - Medical
+    - Science
+#Starlight End
 
 - type: entity
   parent: BaseBorgChassisDerelict
@@ -388,6 +458,23 @@
       - BorgModuleCargo
     hasMindState: borg_e #Starlight ;-;
     noMindState: borg_e_r #Starlight ;-;
+# Starlight Start
+  - type: IntrinsicRadioReceiver
+  - type: IntrinsicRadioTransmitter
+    channels:
+    - Binary
+    - Common
+    - Science
+    - Supply
+    - Expedition
+  - type: ActiveRadio
+    channels:
+    - Binary
+    - Common
+    - Science
+    - Supply
+    - Expedition
+#Starlight End
 
 - type: entity
   parent: BaseBorgChassisSyndicateDerelict
@@ -421,3 +508,16 @@
     noMindState: synd_sec_derelict
   - type: Construction
     node: derelictcyborg
+# Starlight Start
+  - type: IntrinsicRadioReceiver
+  - type: IntrinsicRadioTransmitter
+    channels:
+    - Binary
+    - Common
+    - Syndicate
+  - type: ActiveRadio
+    channels:
+    - Binary
+    - Common
+    - Syndicate
+#Starlight End

@@ -13,6 +13,7 @@ store-category-job = Job
 store-category-wearables = Wearables
 store-category-pointless = Pointless
 store-discounted-items = Discounts
+store-second-hand-items = Second Hand
 
 # Revenant
 store-category-abilities = Abilities
@@ -26,3 +27,5 @@ store-caregory-spellbook-events = Event Spells
 
 # Nukie Delivery
 store-category-nukie-delivery = Offers
+
+store-category-languages = Languages

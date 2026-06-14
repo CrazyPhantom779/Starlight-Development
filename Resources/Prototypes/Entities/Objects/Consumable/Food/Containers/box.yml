@@ -508,7 +508,9 @@
   - type: Item
     sprite: Objects/Storage/Happyhonk/clown.rsi
     heldPrefix: box
-    size: Normal # Starlight-edit
+    size: Normal # Starlight start
+    shape:
+    - 0,0,3,3 # Starlight end
   - type: Storage
     maxItemSize: Normal
     grid:
@@ -697,7 +699,7 @@
     - id: FoamBlade
     - id: ClothingHeadHatBunny
     - id: PersonalAI
-    - id: CrayonMagic # Starlight-edit
+    #- id: CrayonMagic # Starlight-edit commented out due to lag for now - 31-05-2026
     - id: ToySword
     - id: RevolverCapGun
     - id: ToyRubberDuck

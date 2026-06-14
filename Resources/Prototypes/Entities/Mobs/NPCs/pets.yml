@@ -58,6 +58,7 @@
     tags:
     - CannotSuicide
     - VimPilot
+    - DogEmotes # Starlight
   - type: StealTarget
     stealGroup: AnimalIan
 
@@ -417,6 +418,11 @@
     - Dog
     - GalacticCommon
     - Canilunzt
+  - type: Vocal
+    sounds:
+      Male: Dog
+      Female: Dog
+      Unsexed: Dog
   # Starlight-end
   - type: Sprite
     drawdepth: Mobs
@@ -478,10 +484,12 @@
   - type: Speech
     speechVerb: Canine
     speechSounds: Dog
+    allowedEmotes: [ 'Bark', 'Snarl', 'Whine', 'Howl', 'Growl', 'Yip' ] # Starlight
   - type: Tag
     tags:
     - CannotSuicide
     - VimPilot
+    - DogEmotes # Starlight
   - type: StealTarget
     stealGroup: AnimalMcGriff
   - type: MessyDrinker
@@ -535,6 +543,12 @@
     - Dog
     - GalacticCommon
     - Canilunzt
+  - type: Vocal
+    sounds:
+      Male: Dog
+      Female: Dog
+      Unsexed: Dog
+  - type: Emoting
   # Starlight-end
   - type: Sprite
     drawdepth: Mobs
@@ -584,11 +598,13 @@
     tags:
     - CannotSuicide
     - VimPilot
+    - DogEmotes # Starlight
   - type: StealTarget
     stealGroup: AnimalWalter
   - type: Speech
     speechVerb: Canine
     speechSounds: Dog
+    allowedEmotes: [ 'Bark', 'Snarl', 'Whine', 'Howl', 'Growl', 'Yip' ] # Starlight
   - type: MessyDrinker
 
 - type: entity
@@ -764,6 +780,7 @@
     understands:
     - Mouse
     - GalacticCommon
+    - Squeakish # Rodentia
   # Starlight-end
   - type: Sprite
     drawdepth: SmallMobs
@@ -859,7 +876,7 @@
       base:
         - options: Default
           data:
-            drawdepth: Mobs   
+            drawdepth: Mobs
             sprite: Mobs/Pets/shiva.rsi
             map: ["enum.DamageStateVisualLayers.Base", "movement"]
             state: shiva
@@ -1046,8 +1063,9 @@
 
 - type: entity
   name: Pun Pun
-  parent: MobMonkey
+  parent: MobMonkeyAdvanced # Starlight, he's smarter than the average monkey.
   id: MobMonkeyPunpun
+  suffix: AI
   description: A prominent representative of monkeys with unlimited access to alcohol.
   components:
   # Starlight-start: Languages

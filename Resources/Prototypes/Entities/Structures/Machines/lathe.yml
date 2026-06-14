@@ -49,6 +49,17 @@
     price: 800
   - type: ResearchClient
   - type: TechnologyDatabase
+  - type: StationAiWhitelist #Starlight
+# SL Start: Lighting Update
+  - type: LitOnPowered
+  - type: PointLight
+    autoRot: true
+    color: "#2f6b2b"
+    radius: 2
+    energy: 1.5
+    castShadows: false
+# SL End
+
 
 # a lathe that can be sped up with space lube / slowed down with glue
 - type: entity
@@ -133,14 +144,18 @@
     - ServiceStatic
     - PowerCellsStatic
     - ElectronicsStatic
-    dynamicPacks: # Starlight start
+    # Starlight Start
+    - CassetteTape
+    - TapeRecorder
+    dynamicPacks:
     - StarlightAutolatheLootable
   - type: EmagLatheRecipes
     emagStaticPacks:
     - StarlightSyndicateAmmoStatic
     - StarlightSecurityEmagWeaponsStatic
     - StarlightSecurityAmmoStatic
-    - StarlightSecurityAmmoEmagStatic # Starlight end
+    - StarlightSecurityAmmoEmagStatic
+    # Starlight end
     #- SecurityAmmoStatic # SL disable in favor of prior three lines
     - SyndicateAmmoStatic
   - type: BlueprintReceiver
@@ -202,6 +217,7 @@
     - ChemistryStatic
     dynamicPacks:
     - ScienceBlueSpace # Starlight
+    - ScienceDarkBreacher # Starlight
     - AdvancedTools
     - ScienceEquipment
     - ScienceExplosives
@@ -289,6 +305,8 @@
     - StarlightMechBoards
     - StarlightLawboards
     - StarlightCircuitImprinterLootable
+    - ReactorCircuitboards # FH edit
+    - OublietteCircuitBoard # Starlight
   - type: EmagLatheRecipes
     emagDynamicPacks:
     - StarlightSecurityBoards
@@ -310,17 +328,6 @@
     sprite: Structures/Machines/circuit_imprinter_hypercon.rsi
   - type: Machine
     board: CircuitImprinterHyperConvectionMachineCircuitboard
-  - type: MaterialStorage
-    whitelist:
-      tags:
-        - Sheet
-        - RawMaterial
-        - Ingot
-  - type: EmagLatheRecipes
-    emagDynamicPacks:
-    - StarlightSecurityBoards
-    emagStaticPacks: # Starlight
-    - StarlightDangerousLawboards # Starlight
 
 - type: entity
   id: ExosuitFabricator
@@ -351,13 +358,16 @@
     - BorgModules
     - MechParts
     - MechEquipment
+    - StarlightMechReactors
     - StarlightMechEquipment
     - StarlightSecurityMechs
     - StarlightMechParts
   - type: EmagLatheRecipes
     emagStaticPacks:
-    - StarlightMechWeapon
     - StarlightSyndicateModules
+    emagDynamicPacks:
+    - StarlightMechWeapon
+
   - type: MaterialStorage
     whitelist: *StandardMaterialWhitelist
   - type: OreSiloClient
@@ -435,13 +445,14 @@
     - NullSpaceDrainer
     - SecurityPracticeStatic
     - StarlightSecurityAmmoStatic
-    - StarlightSecurityAmmoEmagStatic
     - SecurityWeaponsStatic # Starlight end
     dynamicPacks:
     - SecurityScienceBlueSpace # Stalright
     - SalvageSecurityBoards
     - SalvageSecurityWeapons
-    - StarlightDefenseStatic
+    - SecurityDisablers
+    - StarlightDefenseStatic # starlight start
+    - SecurityCyberLimbs
     - StarlightSecurityEquipment
     - StarlightSecurityBoards
     - StarlightSecurityExplosives
@@ -457,6 +468,8 @@
     emagStaticPacks:
     - StarlightSyndicateModulesSecfab
     - StarlightSyndicateAmmoStatic
+    - StarlightSecurityAmmoEmagStatic
+    - StarlightSecurityGrenadesEmag
   #endregion Starlight secfab emagging
     - SyndicateAmmoStatic
   - type: MaterialStorage
@@ -528,6 +541,7 @@
     - MedicalClothingStatic
     - EmptyMedkitsStatic
     - StarlightMedicalStatic # Starlight
+    - AACTabletStatic # Moffstation - AAC tablet
     dynamicPacks:
     - StarlightSurgeryDynamic
     - StarlightAutomendersDynamic # Starlight-edit
@@ -688,7 +702,7 @@
           variation: 0.250
     - type: AltUseToggle
     - type: ComponentToggler
-      components: 
+      components:
       - type: MagnetPickup
         range: 3
         requiresEquipping: false

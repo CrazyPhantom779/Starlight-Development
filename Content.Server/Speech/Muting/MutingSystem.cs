@@ -6,7 +6,9 @@ using Content.Shared.Chat.Prototypes;
 using Content.Shared.Puppet;
 using Content.Shared.Speech;
 using Content.Shared.Speech.Muting;
-using Content.Server._Starlight.Language; // Starlight
+using Content.Server._Starlight.Language;
+using Content.Server._Starlight.Speech.EntitySystems; // Starlight
+using Content.Shared.StatusEffectNew; // Starlight
 
 namespace Content.Server.Speech.Muting
 {
@@ -20,6 +22,12 @@ namespace Content.Server.Speech.Muting
             SubscribeLocalEvent<MutedComponent, SpeakAttemptEvent>(OnSpeakAttempt);
             SubscribeLocalEvent<MutedComponent, EmoteEvent>(OnEmote, before: new[] { typeof(VocalSystem), typeof(MumbleAccentSystem) });
             SubscribeLocalEvent<MutedComponent, ScreamActionEvent>(OnScreamAction, before: new[] { typeof(VocalSystem) });
+
+            // Starlight START
+            // Remove when WizDen finally migrates mute status effect to StatusEffectNew
+            SubscribeLocalEvent<MutedComponent, StatusEffectAppliedEvent>((_, _, ref args) => EnsureComp<MutedComponent>(args.Target));
+            SubscribeLocalEvent<MutedComponent, StatusEffectRemovedEvent>((_, _, ref args) => RemComp<MutedComponent>(args.Target));
+            // Starlight END
         }
 
         private void OnEmote(EntityUid uid, MutedComponent component, ref EmoteEvent args)
@@ -45,25 +53,29 @@ namespace Content.Server.Speech.Muting
             args.Handled = true;
         }
 
-
         private void OnSpeakAttempt(EntityUid uid, MutedComponent component, SpeakAttemptEvent args)
         {
-            // TODO something better than this.
-
-            // Starlight-start: Cannot mute if there's no speech involved
-            var language = _languages.GetLanguage(uid);
-            if (!language.SpeechOverride.RequireSpeech)
-                return;
-            // Starlight-end
-
-            if (HasComp<MimePowersComponent>(uid))
+            #region Starlight
+            // Sign language is not pantomiming! Mimes have to break their vow of silence to speak in any form
+            if(TryComp<MimePowersComponent>(uid, out var mime) && !mime.VowBroken)
+            {
                 _popupSystem.PopupEntity(Loc.GetString("mime-cant-speak"), uid, uid);
-            else if (HasComp<VentriloquistPuppetComponent>(uid))
-                _popupSystem.PopupEntity(Loc.GetString("ventriloquist-puppet-cant-speak"), uid, uid);
-            else
-                _popupSystem.PopupEntity(Loc.GetString("speech-muted"), uid, uid);
+                args.Cancel();
+                return;
+            }
 
-            args.Cancel();
+            // If language requires speech, block it when muted
+            var language = _languages.GetLanguage(uid);
+            if (language.Speech.RequireSpeech)
+            {
+                if (HasComp<VentriloquistPuppetComponent>(uid))
+                    _popupSystem.PopupEntity(Loc.GetString("ventriloquist-puppet-cant-speak"), uid, uid);
+                else
+                    _popupSystem.PopupEntity(Loc.GetString("speech-muted"), uid, uid);
+
+                args.Cancel();
+            }
+            #endregion Starlight
         }
     }
 }

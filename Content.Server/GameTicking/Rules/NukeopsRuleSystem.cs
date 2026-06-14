@@ -32,13 +32,28 @@ using Content.Shared.Cuffs.Components;
 using Content.Shared.Cuffs;
 using Prometheus;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Containers;
+using Content.Server.AlertLevel;
+using Content.Server._NullLink.Helpers;
+using Content.Server._Starlight.Station;
+using Content.Shared.Starlight.CCVar;
+using Robust.Shared.Configuration;
+using Robust.Server.Player;
+using Content.Server._Starlight.Achievement;
 // Starlight End
 
 namespace Content.Server.GameTicking.Rules;
 
 public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
 {
+    // Starlight start: Achievements
+    private static readonly (int Threshold, string AchievementId)[] LoneOperativeAchievements =
+    [
+        (50, "lone_operative"),
+        (100, "one_against_all"),
+        (150, "one_man_syndicate"),
+        (200, "john_syndicate")
+    ];
+    // Starlight end: Achievements
     #region Starlight data collection
     private static readonly Counter _nukeopsCount = Metrics.CreateCounter(
         "nukie_count",
@@ -53,7 +68,14 @@ public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
     [Dependency] private readonly RoundEndSystem _roundEndSystem = default!;
     [Dependency] private readonly StoreSystem _store = default!;
     [Dependency] private readonly TagSystem _tag = default!;
-    [Dependency] private readonly SharedCuffableSystem _cuffable = default!; // Starlight
+    // Starlight Start
+    [Dependency] private readonly SharedCuffableSystem _cuffable = default!;
+    [Dependency] private readonly AlertLevelSystem _alertLevel = default!;
+    [Dependency] private readonly StationCrewCountSystem _stationCrewCount = default!;
+    [Dependency] private readonly IConfigurationManager _cfg = default!;
+    [Dependency] private readonly AchievementSystem _achievements = default!; // Starlight: Achievements
+    [Dependency] private readonly IPlayerManager _playerManager = default!; // StarlightL Achievements
+    // Starlight End
 
     private static readonly ProtoId<CurrencyPrototype> TelecrystalCurrencyPrototype = "Telecrystal";
     private static readonly ProtoId<TagPrototype> NukeOpsUplinkTagPrototype = "NukeOpsUplink";
@@ -175,7 +197,7 @@ public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
 
             if (GameTicker.IsGameRuleActive("Nukeops")) // If it's Nukeops then end the round on any detonation
             {
-                _roundEndSystem.EndRound();
+                _roundEndSystem.EndRound(TimeSpan.FromSeconds(_cfg.GetCVar(StarlightCCVars.NukeRoundRestartTime))); // Starlight Edit: Round end timer set by Cvar
             }
             else
             { // It's a LoneOp. Only end the round if the station was destroyed
@@ -184,7 +206,7 @@ public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
                 {
                     if (cond.ToString().ToLower() == "NukeExplodedOnCorrectStation") // If this is true, then the nuke destroyed the station! It's likely everyone is very dead so keeping the round going is pointless.
                     {
-                        _roundEndSystem.EndRound(); // end the round!
+                        _roundEndSystem.EndRound(TimeSpan.FromSeconds(_cfg.GetCVar(StarlightCCVars.NukeRoundRestartTime))); // end the round! // Starlight Edit: Round end timer set by Cvar
                         handled = true;
                         break;
                     }
@@ -416,6 +438,19 @@ public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
 
     private void DistributeExtraTc(Entity<NukeopsRuleComponent> nukieRule)
     {
+        // Starlight-start
+        var crewCount = _stationCrewCount.GetTotalCrewCount();
+
+        // TC scaling begins at threshold crew count of 80 and maxes out at 200
+        const int TcScaleStart = 80;
+        const int TcScaleCap = 200;
+
+        var clampedCrewCount =  Math.Clamp(crewCount, TcScaleStart, TcScaleCap);
+
+        // +1 bonus TC per 5 crew members
+        var scaledTc = (clampedCrewCount - TcScaleStart) / 5;
+        // Starlight-end
+
         var enumerator = EntityQueryEnumerator<StoreComponent>();
         while (enumerator.MoveNext(out var uid, out var component))
         {
@@ -428,7 +463,7 @@ public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
             if (Transform(uid).MapID != Transform(outpost).MapID) // Will receive bonus TC only on their start outpost
                 continue;
 
-            _store.TryAddCurrency(new() { { TelecrystalCurrencyPrototype, nukieRule.Comp.WarTcAmountPerNukie } }, uid, component);
+            _store.TryAddCurrency(new() { { TelecrystalCurrencyPrototype, nukieRule.Comp.WarTcAmountPerNukie + scaledTc } }, uid, component); // Starlight-edit
 
             var msg = Loc.GetString("store-currency-war-boost-given", ("target", uid));
             _popupSystem.PopupEntity(msg, uid);
@@ -440,11 +475,42 @@ public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
         ent.Comp.WinType = type;
 
         _nukeopsCount.WithLabels(type.ToString()).Inc(1); // Starlight
-
+        // Starlight start: Achievements
+        if (type is WinType.OpsMajor or WinType.OpsMinor)
+            TryAwardLoneOperativeAchievements(ent);
+        // Starlight end: Achievements
         if (endRound && (type == WinType.CrewMajor || type == WinType.OpsMajor))
-            _roundEndSystem.EndRound();
+            _roundEndSystem.EndRound(TimeSpan.FromSeconds(_cfg.GetCVar(StarlightCCVars.NukeRoundRestartTime))); // Starlight Edit: Round end timer set by Cvar
+    }
+    // Starlight start: Achievements
+    private void TryAwardLoneOperativeAchievements(Entity<NukeopsRuleComponent> ent)
+    {
+        if (!IsLoneOperativeRound(ent))
+            return;
+
+        var crewCount = _stationCrewCount.GetTotalCrewCount();
+
+        foreach (var (_, data, _) in _antag.GetAntagIdentifiers(ent.Owner))
+        {
+            if (!_playerManager.TryGetSessionById(data.UserId, out var session))
+                continue;
+
+            foreach (var (threshold, achievementId) in LoneOperativeAchievements)
+            {
+                if (crewCount < threshold)
+                    continue;
+
+                _achievements.TryUnlockAchievementAsync(session, achievementId)
+                    .AsTask()
+                    .FireAndForget();
+            }
+        }
     }
 
+    private bool IsLoneOperativeRound(Entity<NukeopsRuleComponent> ent)
+        => ent.Comp.RoundEndBehavior == RoundEndBehavior.Nothing
+           && MetaData(ent).EntityPrototype?.ID == "LoneOpsSpawn";
+    // Starlight end: Achievements
     private void CheckRoundShouldEnd()
     {
         var query = QueryActiveRules();
@@ -522,6 +588,10 @@ public sealed class NukeopsRuleSystem : GameRuleSystem<NukeopsRuleComponent>
 
         if (nukeops.RoundEndBehavior == RoundEndBehavior.Nothing) // It's still worth checking if operatives have all died, even if the round-end behaviour is nothing.
             return; // Shouldn't actually try to end the round in the case of nothing though.
+
+        // Starlight - Set the station to green alert so its not locked anymore to Gamma.
+        if (nukeops.TargetStation is not null)
+            _alertLevel.SetLevel(nukeops.TargetStation.Value, "green", true, true, true, false);
 
         _roundEndSystem.DoRoundEndBehavior(nukeops.RoundEndBehavior,
         nukeops.EvacShuttleTime,

@@ -200,6 +200,10 @@ namespace Content.Server.Lathe
             var recipe = _proto.Index(batch.Recipe);
 
             var time = _reagentSpeed.ApplySpeed(uid, recipe.CompleteTime) * component.TimeMultiplier;
+            // Starlight Begin
+            // Ensure the production time is at least one tick to avoid issue with multiple recipes completing at once causing lag.
+           time = MathHelper.Max(time, _timing.TickPeriod);
+            // Starlight End
 
             var lathe = EnsureComp<LatheProducingComponent>(uid);
             lathe.StartTime = _timing.CurTime;
@@ -213,10 +217,12 @@ namespace Content.Server.Lathe
             UpdateRunningAppearance(uid, true);
             UpdateUserInterfaceState(uid, component);
 
-            if (time == TimeSpan.Zero)
-            {
-                FinishProducing(uid, component, lathe);
-            }
+            // Starlight Begin
+            // if (time == TimeSpan.Zero)
+            // {
+            //     FinishProducing(uid, component, lathe);
+            // }
+            // Starlight End
             return true;
         }
 
@@ -230,13 +236,19 @@ namespace Content.Server.Lathe
                 var currentRecipe = _proto.Index(comp.CurrentRecipe.Value);
                 if (currentRecipe.Result is { } resultProto)
                 {
-                    var result = Spawn(resultProto, Transform(uid).Coordinates);
+
+                    //Starlight Start
+                    var transform = Transform(uid).Coordinates;
+                    if (_container.IsEntityInContainer(uid))
+                        transform = Transform(_container.GetContainingContainers(uid).Last().Owner).Coordinates;
+                    var result = Spawn(resultProto, transform);
                     _stack.TryMergeToContacts(result);
                     if (currentRecipe.PrintTicket)
                     {
-                        var tickets = Spawn(currentRecipe.TicketProtoId, Transform(uid).Coordinates);
+                        var tickets = Spawn(currentRecipe.TicketProtoId, transform);
                         _stack.TryMergeToContacts(tickets);
                     }
+                    //Starlight End
                 }
 
                 if (currentRecipe.ResultReagents is { } resultReagents &&

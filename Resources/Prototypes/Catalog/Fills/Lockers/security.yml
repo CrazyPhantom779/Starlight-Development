@@ -35,12 +35,12 @@
     - id: ClothingBeltSecurityFilled
     - id: Flash
     - id: ClothingEyesGlassesSecurity
-    - id: ClothingHandsGlovesCombat
+#    - id: ClothingHandsGlovesCombat # Starlight, they spawn with these now.
     - id: ClothingShoesBootsJack
     - id: ClothingOuterCoatWarden
     - id: ClothingOuterWinterWarden
-    - id: RubberStampWarden
     - id: DoorRemoteArmory
+    - id: BoxWardenStamps #Starlight
     - id: HoloprojectorSecurity
     - id: BookSpaceLaw
     - id: ClothingBackpackElectropack
@@ -49,6 +49,7 @@
       amount: 2
     - id: NetworkConfigurator
     - id: Binoculars
+    - id: NeuralLinkDisruptor # Starlight
 
 - type: entityTable
   id: FillLockerWardenHarduit
@@ -57,6 +58,7 @@
     - id: ClothingOuterHardsuitWarden
     - id: OxygenTankFilled
     - id: NitrogenTankFilled # Starlight - vox gang
+    - id: CoolingUnit # Starlight - Beep, Boop!
     - id: ClothingMaskBreath
 
 - type: entity
@@ -111,18 +113,24 @@
   id: FillLockerBrigmedic
   table: !type:AllSelector
     children:
+    - id: ClothingEyesGlassesBrigmedic # Starlight
+    - id: ClothingEyesGlassesCorpsman # Starlight
     - id: ClothingOuterCoatCorpsman #Starlight
     - id: ClothingUniformJumpsuitCorpsman #Starlight
     - id: ClothingUniformJumpskirtCorpsman #Starlight
     - id: ClothingHeadHatBeretCorpsman #Starlight
     - id: ClothingBeltCorpsmanFilled #Starlight
     - id: ClothingHandsGlovesBlackNitrile #Starlight
-    - id: ClothingEyesGlassesSecurity #Starlight
+    - id: BottleCaseSecurityFilled # Starlight
+    - id: PenPackSecurityFilled # Starlight
+#    - id: ClothingEyesGlassesSecurity #Starlight, replacing with brigmed glasses.
     - id: WeaponTaser
     - id: WeaponDisabler
     - id: TrackingImplanter
       amount: 2
     - id: ClothingOuterHardsuitBrigmedic
+    - id: ClothingShoesBootsMagSec # Starlight. They seem to have vanished.
+    - id: RubberStampBrigmedic # Starlight. Also seems to have vanished.
     - id: BoxSterileMask
     - id: ClothingHeadHatBeretBrigmedic
     - id: ClothingOuterCoatAMG
@@ -130,7 +138,11 @@
     - id: ClothingUniformJumpskirtBrigmedic
     - id: ClothingUniformJumpskirtOfLife
       prob: 0.1
+    - id: ClothingUniformJumpsuitOfLife # Starlight
+      prob: 0.1 # Starlight
     - id: MedkitFilled
+    - id: BedsheetBrigmedicStrange # Starlight
+    - id: BedsheetBrigmedic # Starlight
     - !type:GroupSelector
       prob: 0.7
       children:
@@ -149,6 +161,7 @@
       prob: 0.15
     - id: PlushieMorgana #starlight
     - id: PlushieKiller #starlight
+    - id: JawsOfLifeMed #Starlight
 
 
 - type: entity
@@ -183,6 +196,7 @@
     - id: HoloprojectorSecurity
     - id: BoxEvidenceMarkers
     - id: HandLabeler
+    - id: BoxTapeRecorder # Starlight
 
 - type: entity
   id: ClosetBombFilled
@@ -241,16 +255,12 @@
       amount: 2
     - id: WeaponPistolEnforcer
       amount: 1
-    #- id: WeaponMachinePistolMk64
-      #amount: 1
     - id: MagazinePistolSP
       amount: 4
     - id: MagazinePistolHP
       amount: 2
     - id: MagazinePistolFMJ
       amount: 2
-    #- id: MagazinePistolHighCapacitySP
-      #amount: 2
 
 - type: entity
   parent: [GunSafeBaseSecure, BaseSecurityContraband]
