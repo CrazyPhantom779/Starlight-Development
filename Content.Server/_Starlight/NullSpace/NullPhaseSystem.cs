@@ -32,6 +32,7 @@ public sealed partial class NullSpacePhaseSystem : EntitySystem
     private readonly EntProtoId _shadekinShadow = "ShadekinShadow";
     private readonly EntProtoId _shadekinPhaseInEffect = "ShadekinPhaseInEffect";
     private readonly EntProtoId _shadekinPhaseOutEffect = "ShadekinPhaseOutEffect";
+    private static readonly EntProtoId _nullPhaseActionId = "NullPhaseAction";
 
     public override void Initialize()
     {
@@ -83,7 +84,7 @@ public sealed partial class NullSpacePhaseSystem : EntitySystem
     private void Toggle(EntityUid uid, NullPhaseComponent component, bool toggle)
     {
         if (toggle)
-            _actionsSystem.AddAction(uid, ref component.PhaseAction, "NullPhaseAction", uid);
+            _actionsSystem.AddAction(uid, ref component.PhaseAction, _nullPhaseActionId, uid);
         else
             _actionsSystem.RemoveAction(uid, component.PhaseAction);
     }

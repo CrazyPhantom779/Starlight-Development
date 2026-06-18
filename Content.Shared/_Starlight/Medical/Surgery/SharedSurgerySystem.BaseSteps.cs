@@ -1,4 +1,5 @@
-﻿using Content.Shared._Starlight.Medical.Body.Part;
+using Content.Shared.Tag;
+using Content.Shared._Starlight.Medical.Body.Part;
 using Content.Shared.Body.Part;
 using Content.Shared.Body.Systems;
 using Content.Shared.Buckle.Components;
@@ -26,9 +27,10 @@ public abstract partial class SharedSurgerySystem
 
     // limb attachment blacklist, array because,,, future proofing.
     private static readonly string[] _nonImplantableTags =
-    {
+    [
         "CyberHandItem",
-    };
+    ];
+    private static readonly ProtoId<TagPrototype> _tagSurgeryCompatibleArmor = "SurgeryCompatibleArmor";
 
     private void InitializeSteps()
     {
@@ -202,7 +204,7 @@ public abstract partial class SharedSurgerySystem
             while (enumerator.MoveNext(out var con))
             {
                 total++;
-                if (con.ContainedEntity != null && !_tag.HasTag(con.ContainedEntity.Value, "SurgeryCompatibleArmor"))
+                if (con.ContainedEntity != null && !_tag.HasTag(con.ContainedEntity.Value, _tagSurgeryCompatibleArmor))
                     items++;
             }
 

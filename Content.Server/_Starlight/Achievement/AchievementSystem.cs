@@ -73,6 +73,8 @@ namespace Content.Server._Starlight.Achievement;
 
 public sealed partial class AchievementSystem : EntitySystem
 {
+    private static readonly ProtoId<TagPrototype> _tagArrow = "Arrow";
+
     [Dependency] private INullLinkPlayerManager _nullLinkPlayers = default!;
     [Dependency] private IAchievementRewardManager _achievementRewards = default!;
     [Dependency] private SharedJobSystem _jobs = default!;
@@ -529,7 +531,7 @@ public sealed partial class AchievementSystem : EntitySystem
 
     private void OnProjectileHit(EntityUid uid, ProjectileComponent _, ref ProjectileHitEvent args)
     {
-        if (_tag.HasTag(uid, "Arrow")
+        if (_tag.HasTag(uid, _tagArrow)
             && ResolvePlayerSessionFromParentChain(args.Target) is { } arrowSession)
         {
             QueueUnlockAchievement(arrowSession, "took_an_arrow_to_the_knee");

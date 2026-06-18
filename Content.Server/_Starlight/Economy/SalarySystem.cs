@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using Content.Server._NullLink.PlayerData;
 using Content.Server.Administration.Managers;
 using Content.Server.Chat.Managers;
@@ -37,13 +37,14 @@ public sealed partial class SalarySystem : SharedSalarySystem
     private readonly Dictionary<ICommonSession, TimeSpan> _lastSalary = [];
     private SalariesPrototype _salaries = new();
     private float _defaultBonusMultiplier = 1.0f;
+    private static readonly ProtoId<SalariesPrototype> _standardSalariesPrototype = "standart";
 
     public override void Initialize()
     {
         SubscribeLocalEvent<RoundStartingEvent>(ev => _lastSalary.Clear());
         _configurationManager.OnValueChanged(StarlightCCVars.SalaryMultiplier, UpdateBonusMultiplier, true);
 
-        _salaries = _prototypes.Index<SalariesPrototype>("standart");
+        _salaries = _prototypes.Index(_standardSalariesPrototype);
 
         base.Initialize();
     }
