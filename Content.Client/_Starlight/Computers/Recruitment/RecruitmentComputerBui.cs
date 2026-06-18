@@ -1,4 +1,4 @@
-﻿using System.Linq;
+using System.Linq;
 using System.Numerics;
 using Content.Client._Starlight.UI;
 using Content.Client.GameTicking.Managers;
@@ -29,7 +29,11 @@ public sealed partial class RecruitmentComputerBui(EntityUid owner, Enum uiKey) 
     [ViewVariables]
     private SLWindow? _window;
 
-    protected override void Open() => UpdateState(State);
+    protected override void Open()
+    {
+        base.Open();
+        UpdateState(State);
+    }
     protected override void UpdateState(BoundUserInterfaceState? state)
     {
         TryInitWindow();

@@ -1,3 +1,4 @@
+using Robust.Shared.Audio;
 using Content.Client._Starlight.MHelp;
 using Content.Client.Administration.Managers;
 using Content.Shared.Starlight.MHelp;
@@ -75,7 +76,7 @@ public sealed partial class MHelpUIController : UIController, IOnSystemChanged<M
         if (message.PlaySound && localPlayer.UserId != message.Sender && _config.GetCVar(StarlightCCVars.MHelpPing))
         {
             if (_mHelpSound != null)
-                _audio.PlayGlobal(_mHelpSound, Filter.Local(), false);
+                _audio.PlayGlobal(new SoundPathSpecifier(_mHelpSound), Filter.Local(), false);
             _clyde.RequestWindowAttention();
         }
 
