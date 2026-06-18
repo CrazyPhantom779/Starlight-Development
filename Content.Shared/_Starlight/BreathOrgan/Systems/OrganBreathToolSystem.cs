@@ -80,7 +80,6 @@ public sealed partial class OrganBreathToolSystem : EntitySystem
             _internals.ConnectBreathTool((args.Body, internals), ent.Owner);
         }
 
-
         if (TryComp<GasTankComponent>(ent.Owner, out var gasTank))
         {
             var actionsComp = EnsureComp<ActionsComponent>(args.Body);

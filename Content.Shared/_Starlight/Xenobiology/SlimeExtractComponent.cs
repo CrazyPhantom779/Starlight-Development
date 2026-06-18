@@ -27,7 +27,6 @@ public sealed partial class SlimeExtractComponent : Component
     public int RemainingUses = 1;
 }
 
-
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class SlimeExtractActiveReactionComponent : Component
 {

@@ -6,7 +6,6 @@ using Robust.Shared.GameStates;
 
 namespace Content.Shared._Starlight.Character.Info.Components;
 
-
 /// <summary>
 /// Stores exploitable roleplaying information that is only visible to the possessing player (or paradox clones)
 /// </summary>

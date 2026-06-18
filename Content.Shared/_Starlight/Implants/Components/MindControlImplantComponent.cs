@@ -23,7 +23,6 @@ public sealed partial class MindControlImplantComponent : Component
     /// </summary>
     [DataField] public LocId DebriefingText = "mind-control-user-freed";
 
-
     /// <summary>
     /// Briefing sound when a user is implanted
     /// </summary>

@@ -12,7 +12,6 @@ public abstract partial class SharedDissolvableSystem : EntitySystem
     [Dependency] private SharedAppearanceSystem _appearance = default!;
     [Dependency] private ISharedAdminLogManager _adminLogger = default!;
 
-
     public void UpdateAppearance(EntityUid uid, DissolvableComponent? dissolvable = null, AppearanceComponent? appearance = null)
     {
         if (!Resolve(uid, ref dissolvable, ref appearance))
@@ -45,7 +44,6 @@ public abstract partial class SharedDissolvableSystem : EntitySystem
             UpdateAppearance(uid, dissolvable);
         }
     }
-
 
     public void Extinguish(EntityUid uid, DissolvableComponent? dissolvable = null)
     {

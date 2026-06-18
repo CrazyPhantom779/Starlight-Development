@@ -1,7 +1,6 @@
 using Content.Shared.Silicons.Laws;
 using Robust.Shared.GameStates;
 
-
 namespace Content.Shared._Starlight.Silicons.Borgs;
 
 /// <summary>

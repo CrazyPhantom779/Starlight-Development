@@ -67,7 +67,6 @@ public sealed partial class DarkHubSystem : EntitySystem
         SpawnAtPosition(component.ShadekinShadow, coords);
         _transform.SetCoordinates(args.Subject, coords);
 
-
         args.Cancel(); // Duh, we need to handle the teleport ourself!
     }
 }

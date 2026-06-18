@@ -23,7 +23,6 @@ public sealed partial class MovementHinderedByShoesSystem : EntitySystem
         if (!_inventory.TryGetSlotEntity(uid, "shoes", out var entityUid))
             return;
 
-
         var hinderModifier = 0f;
 
         foreach (var legEntity in body.LegEntities)

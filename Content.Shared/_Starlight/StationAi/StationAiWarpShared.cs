@@ -9,7 +9,6 @@ public sealed partial class StationAiOpenWarpActionEvent : InstantActionEvent
 {
 }
 
-
 [Serializable, NetSerializable]
 public sealed partial class StationAiWarpRequestEvent : EntityEventArgs
 {

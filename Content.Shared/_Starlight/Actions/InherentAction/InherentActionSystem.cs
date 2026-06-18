@@ -7,7 +7,6 @@ public abstract partial class SharedInherentActionSystem : EntitySystem
     [Dependency] private SharedActionsSystem _action = default!;
     [Dependency] private ActionContainerSystem _actionContainer = default!;
 
-
     public override void Initialize()
     {
         base.Initialize();

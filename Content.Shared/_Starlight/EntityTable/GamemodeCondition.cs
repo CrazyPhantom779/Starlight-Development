@@ -27,4 +27,3 @@ public sealed partial class GamemodeCondition : EntityTableCondition
     }
 }
 
-

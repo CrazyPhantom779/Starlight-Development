@@ -46,9 +46,9 @@ public abstract partial class SharedKnockbackSystem : EntitySystem
     private void OnGunShot(Entity<KnockbackByUserTagComponent> ent, ref OnNonEmptyGunShotEvent args)
     {
         //make sure the ammo is shootable
-        foreach (var ammo in args.Ammo)
+        foreach (var (Uid, _) in args.Ammo)
         {
-            if (TryComp<CartridgeAmmoComponent>(ammo.Uid, out var cartridge))
+            if (TryComp<CartridgeAmmoComponent>(Uid, out var cartridge))
             {
                 //check if its spent
                 if (cartridge.Spent)
@@ -137,10 +137,9 @@ public abstract partial class SharedKnockbackSystem : EntitySystem
 
     private static float CalculateStaminaDamage(KnockbackData data, float knockback) => MathF.Abs(knockback) * data.StaminaMultiplier;
 
-
     private bool CheckForNoSlips(EntityUid uid)
     {
-        if (TryComp(uid, out NoSlipComponent? flashImmunityComponent))
+        if (TryComp(uid, out NoSlipComponent? _))
         {
             return true;
         }
@@ -151,7 +150,7 @@ public abstract partial class SharedKnockbackSystem : EntitySystem
             var slots = _inventory.GetSlotEnumerator((uid, inventoryComp), SlotFlags.WITHOUT_POCKET);
             while (slots.MoveNext(out var slot))
             {
-                if (slot.ContainedEntity != null && TryComp(slot.ContainedEntity, out NoSlipComponent? wornNoSlipComponent))
+                if (slot.ContainedEntity != null && TryComp(slot.ContainedEntity, out NoSlipComponent? _))
                 {
                     return true;
                 }

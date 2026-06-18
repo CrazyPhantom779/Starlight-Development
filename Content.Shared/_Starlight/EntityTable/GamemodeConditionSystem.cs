@@ -28,7 +28,6 @@ public sealed partial class GamemodeConditionSystem : EntitySystem
     }
 }
 
-
 [Serializable, NetSerializable]
 public sealed class PresetConditionCheckEvent(HashSet<string> presets) : EntityEventArgs
 {

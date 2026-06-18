@@ -94,10 +94,10 @@ public sealed class BodyPrototypeSerializer : ITypeReader<BodyPrototype, Mapping
                     continue;
                 }
 
-                var result = ValidateSlot(slot, dependencies);
-                nodes.Add(result.Node);
+                var (Node, Connections) = ValidateSlot(slot, dependencies);
+                nodes.Add(Node);
 
-                foreach (var connection in result.Connections)
+                foreach (var connection in Connections)
                 {
                     if (!slots.TryGet(connection, out MappingDataNode? _))
                         nodes.Add(new ErrorNode(slots, $"No slot found with id {connection}"));
