@@ -180,9 +180,7 @@ public abstract partial class SharedLanguageSystem : EntitySystem
     ///     Will return null if the player does not have an entity, or if the client has not yet received the component state.
     /// </summary>
     public LanguageSpeakerComponent? GetLocalSpeaker()
-    {
-        return CompOrNull<LanguageSpeakerComponent>(_player.LocalEntity);
-    }
+        => CompOrNull<LanguageSpeakerComponent>(_player.LocalEntity);
 
     public void RequestSetLanguage(ProtoId<LanguagePrototype> language)
     {
@@ -258,7 +256,7 @@ public abstract partial class SharedLanguageSystem : EntitySystem
             {
                 if (!_prototype.TryIndex(langId, out var lang)) continue;
                 if (lang.ChatPrefix is null) continue;
-                if (!(lang.ChatPrefix.Length == 1 || lang.ChatPrefix.Length == 3))
+                if (lang.ChatPrefix.Length is not (1 or 3))
                     throw new Exception(
                         $"Chat prefixes must be 1 or 3 characters long. {lang.Name}'s prefix is {lang.ChatPrefix}");
                 if (lang.ChatPrefix.Length == length && lang.ChatPrefix.Equals(prefix, StringComparison.CurrentCultureIgnoreCase))

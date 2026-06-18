@@ -46,7 +46,7 @@ public sealed class BodyPrototypeSerializer : ITypeReader<BodyPrototype, Mapping
                     continue;
                 }
 
-                if (organ.Value == "null" || organ.Value == null)
+                if (organ.Value is "null" or null)
                     continue;
 
                 if (!prototypes.TryIndex(organ.Value, out EntityPrototype? organPrototype))

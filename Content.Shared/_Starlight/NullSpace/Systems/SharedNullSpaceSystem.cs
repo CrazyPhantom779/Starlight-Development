@@ -45,7 +45,7 @@ public abstract partial class SharedNullSpaceSystem : EntitySystem
 
     private void OnMobStateChanged(EntityUid uid, NullSpaceComponent component, MobStateChangedEvent args)
     {
-        if (args.NewMobState == MobState.Critical || args.NewMobState == MobState.Dead)
+        if (args.NewMobState is MobState.Critical or MobState.Dead)
         {
             SpawnAtPosition(_shadekinShadow, Transform(uid).Coordinates);
             RemComp(uid, component);
@@ -56,19 +56,13 @@ public abstract partial class SharedNullSpaceSystem : EntitySystem
     }
 
     private void OnKnockdownAttempt(EntityUid uid, NullSpaceComponent component, ref KnockDownAttemptEvent args)
-    {
-        args.Cancelled = true;
-    }
+        => args.Cancelled = true;
 
     private void OnShootAttempt(Entity<NullSpaceComponent> ent, ref ShotAttemptedEvent args)
-    {
-        args.Cancel();
-    }
+        => args.Cancel();
 
     private void OnAttempt(EntityUid uid, NullSpaceComponent component, CancellableEntityEventArgs args)
-    {
-        args.Cancel();
-    }
+        => args.Cancel();
 
     private void OnAttackAttempt(EntityUid uid, NullSpaceComponent component, AttackAttemptEvent args)
     {
@@ -79,9 +73,7 @@ public abstract partial class SharedNullSpaceSystem : EntitySystem
     }
 
     private void OnBeforeThrow(Entity<NullSpaceComponent> ent, ref BeforeThrowEvent args)
-    {
-        args.Cancelled = true;
-    }
+        => args.Cancelled = true;
 
     private void OnInteractionAttempt(EntityUid uid, NullSpaceComponent component, ref InteractionAttemptEvent args)
     {
@@ -103,7 +95,5 @@ public abstract partial class SharedNullSpaceSystem : EntitySystem
     }
 
     private void OnGetExplosionResistance(EntityUid uid, NullSpaceComponent component, ref GetExplosionResistanceEvent args)
-        {
-            args.DamageCoefficient = 0;
-        }
+        => args.DamageCoefficient = 0;
 }
