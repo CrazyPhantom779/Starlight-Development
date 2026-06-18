@@ -1,10 +1,8 @@
 using Content.Shared._Starlight.MassDriver.Components;
 using Content.Shared.Throwing;
 using Content.Shared.Power;
-using Content.Shared.Power.EntitySystems;
 using Content.Shared.Audio;
 using Robust.Shared.Timing;
-using Robust.Shared.GameObjects;
 using Content.Shared.Ghost;
 
 namespace Content.Shared._Starlight.MassDriver.EntitySystems;
@@ -70,7 +68,7 @@ public abstract partial class SharedMassDriverSystem : EntitySystem
             // Preventing Ghosts from activating mass drivers
             entities.RemoveWhere(_ghostQuery.HasComp);
 
-            int entitiesCount = entities.Count;
+            var entitiesCount = entities.Count;
 
             if (entitiesCount == 0)
             {

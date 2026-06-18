@@ -8,13 +8,13 @@ namespace Content.Shared._Starlight.Access;
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class IdClothingBlockerComponent : Component
 {
-    [DataField("isBlocked")] [AutoNetworkedField]
+    [DataField] [AutoNetworkedField]
     public bool IsBlocked = false;
 
-    [DataField("allowedAccesses")]
-    public List<ProtoId<AccessLevelPrototype>>? AllowedAccesses = new();
+    [DataField]
+    public List<ProtoId<AccessLevelPrototype>>? AllowedAccesses = [];
 
-    [DataField("beepSound")]
+    [DataField]
     public SoundSpecifier BeepSound = new SoundPathSpecifier("/Audio/Effects/beep1.ogg");
 
     [DataField]

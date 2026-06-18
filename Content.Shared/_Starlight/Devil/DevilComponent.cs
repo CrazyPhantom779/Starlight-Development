@@ -12,20 +12,20 @@ namespace Content.Shared._Starlight.Devil;
 public sealed partial class DevilComponent : Component
 {
     [DataField]
-    public List<ProtoId<EntityPrototype>> BaseActions = new()
-    {
+    public List<ProtoId<EntityPrototype>> BaseActions =
+    [
         "ActionSummonDemonicContract",
         "ActionSummonDevilPen",
         "ActionDamnationsMenu",
         "ActionDevilRejuvenate"
-    };
+    ];
 
     /// <summary>
     /// What damnations can the devil use in their contracts?
     /// </summary>
     [DataField]
-    public List<ProtoId<DamnationPrototype>> AvailableDamnations = new()
-    {
+    public List<ProtoId<DamnationPrototype>> AvailableDamnations =
+    [
         "Soul",
         "Pacifism",
         "Blindness",
@@ -42,7 +42,7 @@ public sealed partial class DevilComponent : Component
         "Electricity",
         "Noslip",
         "Mute"
-    };
+    ];
 
     /// <summary>
     /// Damnation that increments the evil-ness of the devil
@@ -53,14 +53,14 @@ public sealed partial class DevilComponent : Component
     /// <summary>
     /// list of people who have been evil'd
     /// </summary>
-    public List<EntityUid> DamnedSouls = new();
+    public List<EntityUid> DamnedSouls = [];
 
     // todo make actual devil names
-    public List<ProtoId<LocalizedDatasetPrototype>> NameSegments = new()
-    {
+    public List<ProtoId<LocalizedDatasetPrototype>> NameSegments =
+    [
         "NamesDevil",
         "NamesDevilTitle"
-    };
+    ];
 
     public LocId NameFormat = "name-format-devil";
 
@@ -107,7 +107,7 @@ public sealed partial class DevilComponent : Component
     /// List of the last times people banished the devil
     /// </summary>
     [AutoNetworkedField, ViewVariables]
-    public Dictionary<EntityUid, TimeSpan> LastBanishedList = new();
+    public Dictionary<EntityUid, TimeSpan> LastBanishedList = [];
 
     /// <summary>
     /// How much damage to take per banish

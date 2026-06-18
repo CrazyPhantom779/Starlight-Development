@@ -32,13 +32,13 @@ public sealed partial class ParsablePaperSystem : EntitySystem
         if (!IsPaperValid(paper)) return null;
         if (!TryComp<PaperComponent>(paper, out var paperComp) || !TryComp<ParsablePaperComponent>(paper, out var parsableComp)) return null;
 
-        string content = paperComp.Content;
+        var content = paperComp.Content;
 
-        Dictionary<string, List<string>> output = new();
+        Dictionary<string, List<string>> output = [];
         foreach (var valuePattern in parsableComp.RequestedValuePatterns)
         {
             var rule = new Regex(valuePattern.Value);
-            List<string> sublist = new();
+            List<string> sublist = [];
 
             foreach (Match match in rule.Matches(content))
             {

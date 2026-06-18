@@ -80,8 +80,8 @@ public sealed partial class SlimeExtractSystem : EntitySystem
         var query = EntityQueryEnumerator<SlimeExtractComponent, SlimeExtractActiveReactionComponent>();
         while (query.MoveNext(out var uid, out var slimeExtractComponent, out var activeReactionComponent))
         {
-            bool wasActivated = false;
-            bool shouldDelete = false;
+            var wasActivated = false;
+            var shouldDelete = false;
             foreach (var reactionPair in activeReactionComponent.ActiveReactions)
             {
                 if (reactionPair.Value <= _gameTiming.CurTime)

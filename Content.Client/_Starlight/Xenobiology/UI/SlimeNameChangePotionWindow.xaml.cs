@@ -74,7 +74,7 @@ public sealed partial class SlimeNameChangePotionWindow : FancyWindow
 
     public void UpdateButtons()
     {
-        ResetLabelButton.Disabled = (LabelLineEdit.Text == _initialNewName);
-        ClearLabelButton.Disabled = (LabelLineEdit.Text == "");
+        ResetLabelButton.Disabled = LabelLineEdit.Text == _initialNewName;
+        ClearLabelButton.Disabled = LabelLineEdit.Text == "";
     }
 }

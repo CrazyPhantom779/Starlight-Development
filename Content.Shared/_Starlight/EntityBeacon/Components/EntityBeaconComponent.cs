@@ -17,9 +17,9 @@ public sealed partial class EntityBeaconComponent : Component
     public int RangeLimit = 40;
 
     [DataField]
-    public List<EntProtoId> EntitiesToSpawn = new();
+    public List<EntProtoId> EntitiesToSpawn = [];
 
-    public HashSet<EntityCoordinates> CoordinatesToSpawn = new();
+    public HashSet<EntityCoordinates> CoordinatesToSpawn = [];
 
     [DataField("nextUpdate", customTypeSerializer: typeof(TimeOffsetSerializer))]
     [AutoPausedField]

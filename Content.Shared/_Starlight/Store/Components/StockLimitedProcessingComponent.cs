@@ -1,7 +1,4 @@
-using System.Collections.Generic;
-using Robust.Shared.GameObjects;
 using Robust.Shared.GameStates;
-using Robust.Shared.Serialization;
 
 namespace Content.Shared.Store.Components;
 
@@ -16,6 +13,6 @@ public sealed partial class StockLimitedProcessingComponent : Component
     /// Dictionary to track which listings are currently being processed.
     /// Key is the listing ID, value is whether the listing is being processed.
     /// </summary>
-    [DataField("processingListings"), AutoNetworkedField]
-    public Dictionary<string, bool> ProcessingListings = new();
+    [DataField, AutoNetworkedField]
+    public Dictionary<string, bool> ProcessingListings = [];
 }

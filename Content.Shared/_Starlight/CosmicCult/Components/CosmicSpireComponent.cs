@@ -28,15 +28,15 @@ public sealed partial class CosmicSpireComponent : Component
     public int CapEntropyBonus = 5;
 
     [DataField]
-    public HashSet<Gas> DrainGases = new()
-    {
+    public HashSet<Gas> DrainGases =
+    [
         Gas.Oxygen,
         Gas.Nitrogen,
         Gas.CarbonDioxide,
         Gas.WaterVapor,
         Gas.Ammonia,
         Gas.NitrousOxide,
-    };
+    ];
 
     [DataField]
     public GasMixture Storage = new();

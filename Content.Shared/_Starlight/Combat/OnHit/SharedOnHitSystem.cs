@@ -1,17 +1,12 @@
 using System.Linq;
-using Content.Shared.Bed.Sleep;
 using Content.Shared.Chemistry;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.EntitySystems;
-using Content.Shared.Clothing.EntitySystems;
 using Content.Shared.Cuffs;
 using Content.Shared.Cuffs.Components;
 using Content.Shared.Damage.Components;
-using Content.Shared.Damage.Events;
-using Content.Shared.Database;
 using Content.Shared.DoAfter;
 using Content.Shared.Effects;
-using Content.Shared.IdentityManagement;
 using Content.Shared.Weapons.Melee.Events;
 using Content.Shared.FixedPoint;
 using Robust.Shared.Audio.Systems;
@@ -63,7 +58,7 @@ public abstract partial class SharedOnHitSystem : EntitySystem
 
             if (!_doAfter.TryStartDoAfter(doAfterEventArgs))
                 continue;
-            _color.RaiseEffect(Color.FromHex("#601653"), new List<EntityUid>(1) { target }, Filter.Pvs(target, entityManager: EntityManager));
+            _color.RaiseEffect(Color.FromHex("#601653"), [target], Filter.Pvs(target, entityManager: EntityManager));
         }
     }
 
@@ -96,7 +91,7 @@ public abstract partial class SharedOnHitSystem : EntitySystem
 
                 _reactiveSystem.DoEntityReaction(target, solution, ReactionMethod.Injection);
                 _solutionContainers.TryAddSolution(targetSoln.Value, solution);
-                _color.RaiseEffect(Color.FromHex("#0000FF"), new List<EntityUid>(1) { target }, Filter.Pvs(target, entityManager: EntityManager));
+                _color.RaiseEffect(Color.FromHex("#0000FF"), [target], Filter.Pvs(target, entityManager: EntityManager));
             }
             if (ent.Comp.Sound is not null && _net.IsServer)
                 _audio.PlayPvs(ent.Comp.Sound, target);

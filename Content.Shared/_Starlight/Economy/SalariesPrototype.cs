@@ -11,8 +11,8 @@ public sealed partial class SalariesPrototype : IPrototype
     public string ID { get; private set; } = default!;
 
     [DataField]
-    public Dictionary<ProtoId<JobPrototype>, int> Jobs = new();
+    public Dictionary<ProtoId<JobPrototype>, int> Jobs = [];
 
     [DataField]
-    public Dictionary<ProtoId<AntagPrototype>, int> Antags = new();
+    public Dictionary<ProtoId<AntagPrototype>, int> Antags = [];
 }

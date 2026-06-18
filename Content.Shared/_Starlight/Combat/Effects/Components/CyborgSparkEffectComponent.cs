@@ -14,18 +14,18 @@ public sealed partial class CyborgSparkEffectComponent : Component
     /// <summary>
     /// The prototype ID of the spark effect entity to spawn.
     /// </summary>
-    [DataField("sparkEffectPrototype")]
+    [DataField]
     public EntProtoId SparkEffectPrototype = "ArmorSparkEffect";
 
     /// <summary>
     /// The sound collection to play when sparks are triggered.
     /// </summary>
-    [DataField("ricochetSoundCollection")]
+    [DataField]
     public ProtoId<SoundCollectionPrototype> RicochetSoundCollection = "armor_ricochet_cyborg";
 
     /// <summary>
     /// Maximum random offset in X and Y directions for spark positioning.
     /// </summary>
-    [DataField("maxOffset")]
+    [DataField]
     public float MaxOffset = 0.3f;
 }

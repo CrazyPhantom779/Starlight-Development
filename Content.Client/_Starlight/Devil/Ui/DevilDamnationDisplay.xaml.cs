@@ -10,8 +10,8 @@ namespace Content.Client._Starlight.Devil.Ui;
 [GenerateTypedNameReferences]
 public sealed partial class DevilDamnationDisplay : Control
 {
-    private Color BenefitColor = Color.FromHex("#3d000a");
-    private Color DisadvantageColour = Color.FromHex("#032b01");
+    private Color _benefitColor = Color.FromHex("#3d000a");
+    private Color _disadvantageColour = Color.FromHex("#032b01");
 
     public DevilDamnationDisplay(DamnationPrototype damnation)
     {
@@ -21,7 +21,7 @@ public sealed partial class DevilDamnationDisplay : Control
         var damnationTitle = Loc.GetString("devil-damnations-ui-damnation-name", ("name", damnation.Name));
         var damnationCost = Loc.GetString("devil-damnations-ui-cost", ("cost", damnation.Cost));
         var damnationDescription = damnation.Description;
-        var damnationBackgroundColor = damnation.Cost >= 0 ? DisadvantageColour : BenefitColor;
+        var damnationBackgroundColor = damnation.Cost >= 0 ? _disadvantageColour : _benefitColor;
 
         DamnationTitle.Title = damnationTitle;
         DamnationCost.SetMarkup(damnationCost);

@@ -15,6 +15,6 @@ public sealed partial class ShipyardConsoleComponent : Component
     public SoundSpecifier ConfirmSound =
         new SoundPathSpecifier("/Audio/Effects/Cargo/ping.ogg");
 
-    [DataField("announcementChannel")]
+    [DataField]
     public ProtoId<RadioChannelPrototype> AnnouncementChannel = "Command";
 }

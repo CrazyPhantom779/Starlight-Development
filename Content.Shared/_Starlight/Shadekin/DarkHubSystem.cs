@@ -3,7 +3,6 @@ using Content.Shared.Teleportation.Components;
 using Content.Shared.Warps;
 using Content.Shared.Whitelist;
 using Robust.Shared.Network;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
 namespace Content.Shared._Starlight.Shadekin;
@@ -51,7 +50,7 @@ public sealed partial class DarkHubSystem : EntitySystem
 
         // No Links? No Portals? Lets return to a random safe warp point on station!
 
-        HashSet<EntityUid> warps = new();
+        HashSet<EntityUid> warps = [];
 
         var query = EntityQueryEnumerator<WarpPointComponent>();
         while (query.MoveNext(out var warpEnt, out var warpPointComp))

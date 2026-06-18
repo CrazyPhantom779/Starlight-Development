@@ -8,7 +8,6 @@ using Content.Shared.Throwing;
 using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Map;
-using Robust.Shared.Timing;
 using Content.Shared.Stunnable;
 using Content.Shared.Charges.Components;
 using Content.Shared.Charges.Systems;
@@ -135,7 +134,7 @@ public abstract partial class SharedJumpSystem : EntitySystem
         return TryJump(performer, targetCoords, jump, target, speed, toPointer, sound, distance, decreaseCharges);
     }
 
-    public void Jump(EntityUid performer, EntityUid target, EntityCoordinates targetCoords,  JumpActionEvent args, float speed = 15f, bool toPointer = false, SoundSpecifier? sound = null, float? distance = null, bool decreaseCharges = false)
+    public void Jump(EntityUid _, EntityUid target, EntityCoordinates targetCoords,  JumpActionEvent args, float speed = 15f, bool toPointer = false, SoundSpecifier? sound = null, float? distance = null, bool decreaseCharges = false)
     {
         if (args.Action == null)
             return;

@@ -13,11 +13,11 @@ public sealed partial class LanguageKnowledgeComponent : Component
     ///     List of languages this entity can speak without any external tools.
     /// </summary>
     [DataField(required: true), AutoNetworkedField]
-    public List<ProtoId<LanguagePrototype>> Speaks = new();
+    public List<ProtoId<LanguagePrototype>> Speaks = [];
 
     /// <summary>
     ///     List of languages this entity can understand without any external tools.
     /// </summary>
     [DataField(required: true), AutoNetworkedField]
-    public List<ProtoId<LanguagePrototype>> Understands = new();
+    public List<ProtoId<LanguagePrototype>> Understands = [];
 }

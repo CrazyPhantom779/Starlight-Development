@@ -12,42 +12,42 @@ public sealed partial class DamnationPrototype : IPrototype
     /// <summary>
     /// Name of the damnation
     /// </summary>
-    [DataField("name")]
+    [DataField]
     public string Name = "DAMNATION!!!!";
 
     /// <summary>
     /// Description of the curse
     /// </summary>
-    [DataField("description")]
+    [DataField]
     public string Description = "THY END IS NOW!!!!";
 
     /// <summary>
     /// Cost of the curse. Negative are punishments, Positive are benefits.
     /// </summary>
-    [DataField("cost")]
+    [DataField]
     public int Cost = 0;
 
     /// <summary>
     /// List of components to add to the player
     /// </summary>
-    [DataField("components")]
-    public ComponentRegistry Components = new();
+    [DataField]
+    public ComponentRegistry Components = [];
 
     /// <summary>
     /// List of components to remove from the player
     /// </summary>
-    [DataField("removedComponents")]
-    public ComponentRegistry RemovedComponents = new();
+    [DataField]
+    public ComponentRegistry RemovedComponents = [];
 
     /// <summary>
     /// List of actions to run
     /// </summary>
-    [DataField("actions")]
-    public List<DamnationAction> Actions = new();
+    [DataField]
+    public List<DamnationAction> Actions = [];
 
     /// <summary>
     /// Should the added components be removed if the damnation is undone?
     /// </summary>
-    [DataField("reverseOnRemove")]
+    [DataField]
     public bool ReverseOnRemove = true;
 }

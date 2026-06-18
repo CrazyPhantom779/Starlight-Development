@@ -88,7 +88,7 @@ public abstract partial class SharedTicketMachineSystem : EntitySystem
             return;
         }
 
-        var ticket = EntityManager.PredictedSpawnAtPosition(component.TicketProtoId, Transform(uid).Coordinates);
+        var ticket = PredictedSpawnAtPosition(component.TicketProtoId, Transform(uid).Coordinates);
         args.Handled = true;
 
         if (TryComp<TicketComponent>(ticket, out var ticketComponent))
@@ -147,7 +147,7 @@ public abstract partial class SharedTicketMachineSystem : EntitySystem
     /// </summary>
     protected void UpdateVisuals(EntityUid uid, TicketMachineComponent component)
     {
-        int paperState = 3;
+        var paperState = 3;
         if (!_containerSystem.TryGetContainer(uid, component.PaperContainerId, out var container))
             return;
         if (container.ContainedEntities.Count == 0)
@@ -171,11 +171,11 @@ public abstract partial class SharedTicketMachineSystem : EntitySystem
         if (currentAmount <= 0)
             return paperStates;
 
-        float percent = (float)currentAmount / (float)maxTickets;
+        var percent = (float)currentAmount / (float)maxTickets;
 
         if (percent >= 1f) return 1;
 
-        int state = (int)Math.Floor(Math.Log(1f / percent, 2)) + 1;
+        var state = (int)Math.Floor(Math.Log(1f / percent, 2)) + 1;
         return Math.Clamp(state, 1, paperStates);
     }
 

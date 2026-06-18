@@ -1,6 +1,5 @@
 using Robust.Shared.Containers;
 using Robust.Shared.GameStates;
-using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Starlight.Xenobiology;
 
@@ -13,19 +12,19 @@ public sealed partial class SlimeProcessorComponent : Component
     /// <summary>
     /// The amount of time it takes to process slime corpses.
     /// </summary>
-    [DataField("processingTime", required: true), AutoNetworkedField]
+    [DataField(required: true), AutoNetworkedField]
     public TimeSpan ProcessingTime = default!;
 
     /// <summary>
     /// How many extracts are obtained per slime corpse.
     /// </summary>
-    [DataField("yieldMultiplier", required: true), AutoNetworkedField]
+    [DataField(required: true), AutoNetworkedField]
     public int YieldMultiplier = default;
 
     /// <summary>
     /// How long between each slime acquire.
     /// </summary>
-    [DataField("slimeAcquireCooldown", required: true), AutoNetworkedField]
+    [DataField(required: true), AutoNetworkedField]
     public TimeSpan SlimeAcquireCooldown = default!;
 
     /// <summary>

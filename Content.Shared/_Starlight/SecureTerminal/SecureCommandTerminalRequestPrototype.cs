@@ -1,6 +1,5 @@
 using Content.Shared.Access;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization;
 
 namespace Content.Shared.Starlight.SecureTerminal;
 
@@ -89,7 +88,7 @@ public sealed partial class SecureCommandTerminalRequestPrototype : IPrototype
 
     /// <summary>Access whitelist for MaintenanceAccess or StationAccess action.</summary>
     [DataField]
-    public List<ProtoId<AccessLevelPrototype>>? AllowedAccesses = new();
+    public List<ProtoId<AccessLevelPrototype>>? AllowedAccesses = [];
 
     /// <summary>Access toggle for MaintenanceAccess or StationAccess action.</summary>
     [DataField]
@@ -108,14 +107,14 @@ public sealed partial class SecureCommandTerminalRequestPrototype : IPrototype
     ///     - [ Ntrep ]
     /// </summary>
     [DataField(required: true)]
-    public List<List<string>> AuthGroups = new();
+    public List<List<string>> AuthGroups = [];
 
     /// <summary>
     /// Human-readable label for each group shown in the Authorization panel.
     /// Must match the length of AuthGroups; falling back to the raw tag names if missing.
     /// </summary>
     [DataField]
-    public List<string> AuthGroupLabels = new();
+    public List<string> AuthGroupLabels = [];
 
     // ── Conditions ────────────────────────────────────────────────────────────
     /// <summary>If true, the request will require a reason, this reason will be logged and if RequiresAdminApproval, will be fully showed to admins.</summary>

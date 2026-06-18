@@ -1,5 +1,3 @@
-using Robust.Shared.Localization;
-
 namespace Content.Shared.Access;
 
 public static class AccessGroupPrototypeExtensions

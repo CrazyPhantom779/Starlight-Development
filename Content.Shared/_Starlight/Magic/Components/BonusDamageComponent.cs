@@ -1,8 +1,6 @@
 using Robust.Shared.GameStates;
 using Content.Shared._Starlight.Magic.Systems;
-using Content.Shared.Damage.Prototypes;
 using Robust.Shared.Serialization;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.Dictionary;
 using Content.Shared.Damage;
 
 namespace Content.Shared._Starlight.Magic.Components;
@@ -21,7 +19,7 @@ namespace Content.Shared._Starlight.Magic.Components;
 [Access(typeof(SharedBonusDamageSystem))]
 public sealed partial class BonusDamageComponent : Component
 {
-    public Dictionary<EntityUid, BonusDamageMod> modifiers = new();
+    public Dictionary<EntityUid, BonusDamageMod> modifiers = [];
 
     // computed totals:
     [DataField, AutoNetworkedField]

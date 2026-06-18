@@ -139,6 +139,6 @@ public sealed partial class RecruitmentComputerBui(EntityUid owner, Enum uiKey) 
         base.Dispose(disposing);
 
         if (disposing)
-            _window?.Dispose();
+            _window?.Close();
     }
 }

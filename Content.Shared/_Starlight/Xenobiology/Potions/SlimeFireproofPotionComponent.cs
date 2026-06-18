@@ -16,6 +16,6 @@ public sealed partial class SlimeFireproofPotionComponent : Component
     /// <summary>
     /// The specific damage set applied to the entity
     /// </summary>
-    [DataField("fireproofDamageSet", required: true), AutoNetworkedField]
+    [DataField(required: true), AutoNetworkedField]
     public ProtoId<DamageModifierSetPrototype> FireproofDamageSet = default!;
 }

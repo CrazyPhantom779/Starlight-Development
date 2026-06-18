@@ -11,13 +11,13 @@ public sealed partial class DepartmentObjectiveComponent : Component
     /// Locale id for the objective title.
     /// It is passed a "department" argument.
     /// </summary>
-    [DataField(required: true), ViewVariables(VVAccess.ReadWrite)]
+    [DataField(required: true)]
     public LocId Title = string.Empty;
 
     /// <summary>
     /// ProtoID of Target Department
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField]
     public ProtoId<DepartmentPrototype>? TargetDepartment;
 
     [DataField]

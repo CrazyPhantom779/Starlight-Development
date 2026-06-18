@@ -2,7 +2,6 @@
 using Content.Shared._Starlight.Medical.Limbs;
 using Content.Shared.Body.Components;
 using Content.Shared.Body.Systems;
-using Content.Shared.Starlight.Medical.Surgery;
 using Robust.Shared.Containers;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization;
@@ -38,13 +37,13 @@ public sealed partial class BodyPartComponent : Component
     /// Child body parts attached to this body part.
     /// </summary>
     [DataField, AutoNetworkedField]
-    public Dictionary<string, BodyPartSlot> Children = new();
+    public Dictionary<string, BodyPartSlot> Children = [];
 
     /// <summary>
     /// Organs attached to this body part.
     /// </summary>
     [DataField, AutoNetworkedField]
-    public Dictionary<string, OrganSlot> Organs = new();
+    public Dictionary<string, OrganSlot> Organs = [];
 
     /// <summary>
     /// These are only for VV/Debug do not use these for gameplay/systems
@@ -54,7 +53,7 @@ public sealed partial class BodyPartComponent : Component
     {
         get
         {
-            List<ContainerSlot> temp = new();
+            List<ContainerSlot> temp = [];
             var containerSystem = IoCManager.Resolve<IEntityManager>().System<SharedContainerSystem>();
 
             foreach (var slotId in Children.Keys)
@@ -71,7 +70,7 @@ public sealed partial class BodyPartComponent : Component
     {
         get
         {
-            List<ContainerSlot> temp = new();
+            List<ContainerSlot> temp = [];
             var containerSystem = IoCManager.Resolve<IEntityManager>().System<SharedContainerSystem>();
 
             foreach (var slotId in Organs.Keys)
@@ -91,9 +90,10 @@ public sealed partial class BodyPartComponent : Component
 [DataRecord]
 public partial struct BodyPartSlot
 {
-    [DataField("id")]
+    [DataField]
     public string Id = "";
-    [DataField("type")]
+
+    [DataField]
     public BodyPartType Type;
 
     public BodyPartSlot() { }

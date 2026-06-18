@@ -14,18 +14,18 @@ public sealed partial class ArmorSparkEffectComponent : Component
     /// <summary>
     /// The prototype ID of the spark effect entity to spawn.
     /// </summary>
-    [DataField("sparkEffectPrototype")]
+    [DataField]
     public EntProtoId SparkEffectPrototype = "ArmorSparkEffect";
 
     /// <summary>
     /// The sound collection ID to play when sparks occur.
     /// </summary>
-    [DataField("ricochetSoundCollection")]
+    [DataField]
     public ProtoId<SoundCollectionPrototype> RicochetSoundCollection = "armor_ricochet";
 
     /// <summary>
     /// Maximum random offset for spark positioning within the tile.
     /// </summary>
-    [DataField("maxOffset")]
+    [DataField]
     public float MaxOffset = 0.4f;
 }

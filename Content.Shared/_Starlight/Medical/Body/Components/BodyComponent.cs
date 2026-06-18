@@ -33,8 +33,8 @@ public sealed partial class BodyComponent : Component
     public string BloodType = "O+";
 
     [ViewVariables]
-    public static List<string> BloodTypeList = new List<string>()
-    {
+    public static List<string> BloodTypeList =
+    [
         "O+",
         "O-",
         "A+",
@@ -43,7 +43,7 @@ public sealed partial class BodyComponent : Component
         "B-",
         "AB+",
         "AB-",
-    };
+    ];
 
     [DataField, AutoNetworkedField]
     public SoundSpecifier GibSound = new SoundCollectionSpecifier("gib");
@@ -57,5 +57,5 @@ public sealed partial class BodyComponent : Component
 
     [ViewVariables]
     [DataField, AutoNetworkedField]
-    public HashSet<EntityUid> LegEntities = new();
+    public HashSet<EntityUid> LegEntities = [];
 }

@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 using Content.Shared.Medical.SuitSensor;
 
@@ -33,7 +32,7 @@ public sealed partial class MailCompanionComponent : Component
 
     public MailCompanionStatus Status = MailCompanionStatus.Idle;
 
-    public Dictionary<string, SuitSensorStatus> ConnectedSensors = new();
+    public Dictionary<string, SuitSensorStatus> ConnectedSensors = [];
 
     public TimeSpan LastSensorDataReceivedAt = TimeSpan.Zero;
 }

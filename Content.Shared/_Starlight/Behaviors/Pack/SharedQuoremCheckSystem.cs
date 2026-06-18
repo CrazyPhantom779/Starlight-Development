@@ -21,7 +21,7 @@ public abstract partial class SharedQuoremCheckSystem : EntitySystem
     [Dependency] private EntityLookupSystem _entityLookup = default!;
     [Dependency] private IRobustRandom _random = default!;
 
-    protected Dictionary<int, HashSet<EntityUid>> _packGroups = new Dictionary<int, HashSet<EntityUid>>();
+    protected Dictionary<int, HashSet<EntityUid>> _packGroups = [];
     private int _nextId;
     public override void Initialize()
     {
@@ -36,7 +36,7 @@ public abstract partial class SharedQuoremCheckSystem : EntitySystem
     private void OnComponentInit(Entity<QuoremCheckComponent> ent, ref ComponentInit args)
     {
        ent.Comp.PackId = _nextId;
-       _packGroups.Add(_nextId, new HashSet<EntityUid>(){ent});
+       _packGroups.Add(_nextId, [ent]);
        _nextId ++;
     }
 
@@ -106,7 +106,7 @@ public abstract partial class SharedQuoremCheckSystem : EntitySystem
         // Remove this pack from the list of packs
         _packGroups.Remove(component.PackId, out var pack);
 
-        pack ??= new HashSet<EntityUid>();
+        pack ??= [];
 
         // Combine packs
         _packGroups[targetComponent.PackId].UnionWith(pack);

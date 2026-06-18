@@ -1,5 +1,3 @@
-using Robust.Shared.Random;
-
 namespace Content.Shared.Starlight;
 
 public static class ListExtensions

@@ -7,12 +7,12 @@ public sealed partial class BodyPrototype : IPrototype
 {
     [IdDataField] public string ID { get; private set; } = default!;
 
-    [DataField("name")]
+    [DataField]
     public string Name { get; private set; } = "";
 
-    [DataField("root")] public string Root { get; private set; } = string.Empty;
+    [DataField] public string Root { get; private set; } = string.Empty;
 
-    [DataField("slots")] public Dictionary<string, BodyPrototypeSlot> Slots { get; private set; } = new();
+    [DataField] public Dictionary<string, BodyPrototypeSlot> Slots { get; private set; } = [];
 
     private BodyPrototype() { }
 

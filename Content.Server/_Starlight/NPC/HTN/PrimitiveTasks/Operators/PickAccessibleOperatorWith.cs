@@ -1,9 +1,7 @@
-using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Content.Server.NPC.Pathfinding;
 using Robust.Shared.Map;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 
 namespace Content.Server.NPC.HTN.PrimitiveTasks.Operators;
@@ -24,29 +22,29 @@ public sealed partial class PickWebTileOperator : HTNOperator
     /// <summary>
     /// Blackboard key that holds the max search range (float).
     /// </summary>
-    [DataField("rangeKey", required: true)]
+    [DataField(required: true)]
     public string RangeKey = string.Empty;
 
     /// <summary>
     /// Blackboard key where the chosen <see cref="EntityCoordinates"/> will be stored.
     /// </summary>
-    [DataField("targetCoordinates")]
+    [DataField]
     public string TargetCoordinates = "TargetCoordinates";
 
     /// <summary>
     /// Where the pathfinding result will be stored (removed after execution).
     /// </summary>
-    [DataField("pathfindKey")]
+    [DataField]
     public string PathfindKey = NPCBlackboard.PathfindKey;
 
     /// <summary>
     /// Prototype ID of the entity that must be present on the destination tile.
     /// Example: "SpiderWeb"
     /// </summary>
-    [DataField("tileEntityPrototype")]
+    [DataField]
     public string TileEntityPrototype = string.Empty;
 
-    [DataField("tileEntityComponent")]
+    [DataField]
     public string TileEntityComponent = string.Empty;
 
     public override void Initialize(IEntitySystemManager sysManager)

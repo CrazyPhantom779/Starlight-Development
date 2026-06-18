@@ -2,7 +2,6 @@ using System.Numerics;
 using System.Linq;
 using Content.Shared._Starlight.EntityBeacon.Components;
 using Content.Shared.Maps;
-using Robust.Shared.GameObjects;
 using Robust.Shared.Timing;
 using Robust.Shared.Random;
 using Robust.Shared.Map;
@@ -17,8 +16,6 @@ public sealed partial class EntityBeaconSystem : EntitySystem
     [Dependency] private EntityLookupSystem _lookup = default!;
     [Dependency] protected IGameTiming Timing = default!;
     [Dependency] private IRobustRandom _random = default!;
-    [Dependency] private TileSystem _tile = default!;
-    [Dependency] private ITileDefinitionManager _tiledef = default!;
     [Dependency] private SharedMapSystem _map = default!;
     [Dependency] private TurfSystem _turf = default!;
 
@@ -43,7 +40,7 @@ public sealed partial class EntityBeaconSystem : EntitySystem
             var xform = Transform(uid);
             var centerCoords = xform.Coordinates;
 
-            bool EntitiesEnough = component.CoordinatesToSpawn.Count > 6;
+            var EntitiesEnough = component.CoordinatesToSpawn.Count > 6;
             if (!EntitiesEnough)
             {
                 component.Range = Math.Min(component.RangeLimit, component.Range + 2);
@@ -69,7 +66,7 @@ public sealed partial class EntityBeaconSystem : EntitySystem
                 var entity = _random.Pick(component.EntitiesToSpawn);
                 component.CoordinatesToSpawn.Remove(coordinates);
 
-                EntityManager.PredictedSpawnAtPosition(entity, coordinates);
+                PredictedSpawnAtPosition(entity, coordinates);
             }
         }
     }

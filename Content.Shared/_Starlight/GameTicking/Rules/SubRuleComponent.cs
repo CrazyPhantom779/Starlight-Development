@@ -36,5 +36,5 @@ public sealed partial class SubRuleComponent : Component
     /// The rules that have been spawned
     /// </summary>
     [DataField]
-    public List<EntityUid> Rules = new();
+    public List<EntityUid> Rules = [];
 }

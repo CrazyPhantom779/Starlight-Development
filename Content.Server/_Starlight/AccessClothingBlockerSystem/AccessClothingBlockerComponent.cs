@@ -5,9 +5,9 @@ namespace Content.Server._Starlight.FactionClothingBlockerSystem;
 [RegisterComponent]
 public sealed partial class AccessClothingBlockerComponent : Component
 {
-    [DataField("access", required: false)]
+    [DataField(required: false)]
     public string? Access = null;
 
-    [DataField("beepSound")]
+    [DataField]
     public SoundSpecifier BeepSound = new SoundPathSpecifier("/Audio/Effects/beep1.ogg");
 }

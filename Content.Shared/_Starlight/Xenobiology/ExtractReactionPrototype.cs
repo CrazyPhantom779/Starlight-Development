@@ -18,25 +18,25 @@ public sealed partial class ExtractReactionPrototype : IPrototype
     /// <summary>
     /// The minimum reagent requirements.
     /// </summary>
-    [DataField("requirements", required: true)]
+    [DataField(required: true)]
     public Dictionary<ProtoId<ReagentPrototype>, FixedPoint2> Requirements = default!;
 
     /// <summary>
     /// The effects caused when there is enough of the required reagents.
     /// </summary>
-    [DataField("effects", required: true)]
+    [DataField(required: true)]
     public List<ScaledEntityEffect> Effects = default!;
 
     /// <summary>
     /// Whether the extract should be deleted upon this reaction occuring.
     /// </summary>
-    [DataField("shouldDelete", required: true)]
+    [DataField(required: true)]
     public bool ShouldDelete = default!;
 
     /// <summary>
     /// If nonzero, how long until the effect actually occurs.
     /// </summary>
-    [DataField("delay")]
+    [DataField]
     public TimeSpan Delay = TimeSpan.Zero;
 }
 
@@ -58,18 +58,18 @@ public sealed partial class ScaledEntityEffect
     /// <summary>
     /// The effect.
     /// </summary>
-    [DataField("effect", required: true)]
+    [DataField(required: true)]
     public EntityEffect Effect = default!;
 
     /// <summary>
     /// Increases the scale in proportion to how much reagent was provided.
     /// </summary>
-    [DataField("scalingFactor")]
+    [DataField]
     public FixedPoint2 ScalingFactor = 0;
 
     /// <summary>
     /// A flat modifier added at the end of calculating the scale.
     /// </summary>
-    [DataField("scalingOffset")]
+    [DataField]
     public FixedPoint2 ScalingOffset = 1;
 }

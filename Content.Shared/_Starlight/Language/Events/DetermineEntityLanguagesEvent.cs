@@ -13,13 +13,13 @@ public record struct DetermineEntityLanguagesEvent
     ///     The list of all languages the entity may speak.
     ///     By default, contains the languages this entity speaks intrinsically.
     /// </summary>
-    public HashSet<ProtoId<LanguagePrototype>> SpokenLanguages = new();
+    public HashSet<ProtoId<LanguagePrototype>> SpokenLanguages = [];
 
     /// <summary>
     ///     The list of all languages the entity may understand.
     ///     By default, contains the languages this entity understands intrinsically.
     /// </summary>
-    public HashSet<ProtoId<LanguagePrototype>> UnderstoodLanguages = new();
+    public HashSet<ProtoId<LanguagePrototype>> UnderstoodLanguages = [];
 
     public DetermineEntityLanguagesEvent() { }
 }

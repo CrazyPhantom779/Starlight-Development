@@ -1,6 +1,5 @@
 ﻿using System.Text.RegularExpressions;
 using Content.Shared.CCVar;
-using Robust.Shared.Prototypes; // Starlight
 
 // ReSharper disable CheckNamespace
 

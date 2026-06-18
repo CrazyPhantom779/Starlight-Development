@@ -9,7 +9,7 @@ namespace Content.Shared._Starlight.VentCrawl.Components;
 public sealed partial class VentCrawlTubeComponent : Component
 {
     [AutoNetworkedField]
-    public List<EntityUid> ContainedHolders = new();
+    public List<EntityUid> ContainedHolders = [];
 
     public bool Connected;
 

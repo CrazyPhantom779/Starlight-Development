@@ -38,10 +38,10 @@ public sealed partial class AbductorAttractDoAfterEvent : SimpleDoAfterEvent
     [DataField("coordinates", required: true)]
     public NetCoordinates TargetCoordinates;
 
-    [DataField("victim", required: true)]
+    [DataField(required: true)]
     public NetEntity Victim;
 
-    [DataField("dispencer", required: true)]
+    [DataField(required: true)]
     public NetEntity Dispencer;
 
     private AbductorAttractDoAfterEvent()

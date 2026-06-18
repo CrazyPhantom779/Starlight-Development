@@ -132,7 +132,7 @@ public sealed class BodyPrototypeSerializer : ITypeReader<BodyPrototype, Mapping
             HashSet<string>? connections = null;
             if (slot.TryGet("connections", out SequenceDataNode? slotConnectionsNode))
             {
-                connections = new HashSet<string>();
+                connections = [];
 
                 foreach (var connection in slotConnectionsNode.Cast<ValueDataNode>())
                 {
@@ -143,7 +143,7 @@ public sealed class BodyPrototypeSerializer : ITypeReader<BodyPrototype, Mapping
             Dictionary<string, string>? organs = null;
             if (slot.TryGet("organs", out MappingDataNode? slotOrgansNode))
             {
-                organs = new Dictionary<string, string>();
+                organs = [];
 
                 foreach (var (organKey, organValueNode) in slotOrgansNode)
                 {
@@ -162,7 +162,7 @@ public sealed class BodyPrototypeSerializer : ITypeReader<BodyPrototype, Mapping
             foreach (var connection in connections)
             {
                 var other = allConnections[connection];
-                other.Connections ??= new HashSet<string>();
+                other.Connections ??= [];
                 other.Connections.Add(slotId);
                 allConnections[connection] = other;
             }
@@ -172,7 +172,7 @@ public sealed class BodyPrototypeSerializer : ITypeReader<BodyPrototype, Mapping
 
         foreach (var (slotId, (part, connections, organs)) in allConnections)
         {
-            var slot = new BodyPrototypeSlot(part, connections ?? new HashSet<string>(), organs ?? new Dictionary<string, string>());
+            var slot = new BodyPrototypeSlot(part, connections ?? [], organs ?? []);
             slots.Add(slotId, slot);
         }
 

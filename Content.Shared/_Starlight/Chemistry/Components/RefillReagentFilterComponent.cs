@@ -10,7 +10,7 @@ namespace Content.Shared._Starlight.Chemistry.Components;
 public sealed partial class RefillReagentFilterComponent : Component
 {
     [DataField(required: true)]
-    public HashSet<ProtoId<ReagentPrototype>> Reagents = new();
+    public HashSet<ProtoId<ReagentPrototype>> Reagents = [];
 
     [DataField]
     public LocId Popup = "refill-reagent-filter-unsuitable-reagent";

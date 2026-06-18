@@ -30,13 +30,11 @@ using Content.Shared._FarHorizons.Power.Generation.FissionGenerator;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Emag.Systems;
-using Content.Shared.Flash;
 using Content.Shared.Follower;
 using Content.Shared.Follower.Components;
 using Content.Shared.GameTicking;
 using Content.Shared.Ghost;
 using Content.Shared.Humanoid;
-using Content.Shared.Interaction.Events;
 using Content.Shared.Inventory;
 using Content.Shared.MedicalScanner;
 using Content.Shared.Mind;
@@ -44,7 +42,6 @@ using Content.Shared.Mobs;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.NukeOps;
-using Content.Shared.Nutrition;
 using Content.Shared.Nutrition.Components;
 using Content.Shared.Power.EntitySystems;
 using Content.Shared.Power.Components;
@@ -93,7 +90,7 @@ public sealed partial class AchievementSystem : EntitySystem
 
     private static readonly TimeSpan _achievementHydrationRetryDelay = TimeSpan.FromSeconds(3);
     private const int HauntedGhostFollowerThreshold = 20;
-    private static readonly TimeSpan VentKillWindow = TimeSpan.FromSeconds(30);
+    private static readonly TimeSpan _ventKillWindow = TimeSpan.FromSeconds(30);
     private const float HesDeadJimDamageThreshold = 2000f;
     private const string EthanolReagentId = "Ethanol";
     private const string SalineReagentId = "Saline";
@@ -499,7 +496,7 @@ public sealed partial class AchievementSystem : EntitySystem
         if (!args.IsHit
             || !args.HitEntities.Any(target => HasComp<MobStateComponent>(target))
             || !IsCrewEntity(args.User, requiredDepartmentId: "Security")
-            || TryGetStunbatonCharge(entity, out var charge) && charge >= entity.Comp.EnergyPerUse)
+            || (TryGetStunbatonCharge(entity, out var charge) && charge >= entity.Comp.EnergyPerUse))
         {
             return;
         }
@@ -550,7 +547,7 @@ public sealed partial class AchievementSystem : EntitySystem
 
         if (killerUid != ev.Entity
             && _recentVentCrawlExits.TryGetValue(killerUid, out var lastVentExit)
-            && _timing.CurTime - lastVentExit <= VentKillWindow
+            && _timing.CurTime - lastVentExit <= _ventKillWindow
             && IsCrewEntity(ev.Entity))
         {
             QueueUnlockAchievement(killerSession, "sus");
@@ -703,11 +700,9 @@ public sealed partial class AchievementSystem : EntitySystem
     #region Helpers
 
     private void QueueUnlockAchievement(ICommonSession session, string achievementId, string? characterName = null)
-    {
-        TryUnlockAchievementAsync(session, achievementId, characterName)
+        => TryUnlockAchievementAsync(session, achievementId, characterName)
             .AsTask()
             .FireAndForget();
-    }
 
     public void QueueUnlockAchievement(EntityUid uid, string achievementId)
     {

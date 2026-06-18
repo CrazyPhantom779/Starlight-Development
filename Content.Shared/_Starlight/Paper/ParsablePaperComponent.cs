@@ -13,7 +13,7 @@ public sealed partial class ParsablePaperComponent : Component
     /// List of regex patterns that MUST be matched in order for the paper to be "valid"
     /// </summary>
     [DataField]
-    public List<string> RequiredPatterns = new();
+    public List<string> RequiredPatterns = [];
 
     /// <summary>
     /// Dictionary of regex patterns returning values, and their associated names.
@@ -22,5 +22,5 @@ public sealed partial class ParsablePaperComponent : Component
     /// one of these values still makes the paper "valid" according to RequiredPatterns.
     /// </summary>
     [DataField]
-    public Dictionary<string, string> RequestedValuePatterns = new();
+    public Dictionary<string, string> RequestedValuePatterns = [];
 }

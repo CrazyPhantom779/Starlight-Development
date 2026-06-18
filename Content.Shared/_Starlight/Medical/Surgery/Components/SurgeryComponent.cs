@@ -16,5 +16,5 @@ public sealed partial class SurgeryComponent : Component
     public List<EntProtoId> Requirement = [];
 
     [DataField(required: true), AutoNetworkedField]
-    public List<EntProtoId> Steps = new();
+    public List<EntProtoId> Steps = [];
 }

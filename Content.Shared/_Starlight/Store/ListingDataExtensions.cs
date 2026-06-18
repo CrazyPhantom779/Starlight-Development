@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace Content.Shared.Store;
 
 /// <summary>
@@ -7,7 +5,7 @@ namespace Content.Shared.Store;
 /// </summary>
 public static class ListingDataExtensions
 {
-    private static readonly Dictionary<string, Dictionary<string, object>> _metadata = new();
+    private static readonly Dictionary<string, Dictionary<string, object>> _metadata = [];
 
     /// <summary>
     /// Gets the metadata for a listing.
@@ -35,7 +33,7 @@ public static class ListingDataExtensions
     {
         if (!_metadata.TryGetValue(listing.ID, out var metadata))
         {
-            metadata = new Dictionary<string, object>();
+            metadata = [];
             _metadata[listing.ID] = metadata;
         }
 

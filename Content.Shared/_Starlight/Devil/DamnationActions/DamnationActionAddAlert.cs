@@ -6,7 +6,7 @@ namespace Content.Shared._Starlight.Devil.DamnationActions;
 public sealed partial class DamnationActionAddAlert : DamnationAction
 {
     [DataField]
-    List<ProtoId<AlertPrototype>> Alerts = new();
+    List<ProtoId<AlertPrototype>> Alerts = [];
 
     private AlertsSystem _alerts = default!;
 

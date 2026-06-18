@@ -9,7 +9,7 @@ namespace Content.Shared._Starlight.Traits.Effects;
 public sealed partial class AddStatusEffect : BaseTraitEffect
 {
     [DataField(required: true)]
-    public HashSet<EntProtoId> StatusEffects { get; private set; } = new();
+    public HashSet<EntProtoId> StatusEffects { get; private set; } = [];
 
     public override void Apply(TraitEffectContext ctx)
     {

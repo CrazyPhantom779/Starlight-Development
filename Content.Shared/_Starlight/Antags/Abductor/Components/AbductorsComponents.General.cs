@@ -1,9 +1,5 @@
 using Content.Shared.Actions;
-using Content.Shared.Communications;
-using Content.Shared.Ninja.Systems;
 using Robust.Shared.GameStates;
-using Robust.Shared.Map;
-using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Starlight.Antags.Abductor;
 
@@ -60,7 +56,7 @@ public sealed partial class AbductorComponent : Component
 [RegisterComponent, Access(typeof(SharedAbductorSystem))]
 public sealed partial class AbductConditionComponent : Component
 {
-    [DataField("abducted"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
     public int Abducted;
     [DataField("hashset"), ViewVariables(VVAccess.ReadWrite)]
     public HashSet<NetEntity> AbductedHashs = [];

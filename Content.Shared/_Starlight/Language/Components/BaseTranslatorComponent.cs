@@ -8,20 +8,20 @@ public abstract partial class BaseTranslatorComponent : Component
     ///   The list of additional languages this translator allows the wielder to speak.
     /// </summary>
     [DataField, AutoNetworkedField]
-    public List<ProtoId<LanguagePrototype>> Spoken = new();
+    public List<ProtoId<LanguagePrototype>> Spoken = [];
 
     /// <summary>
     ///   The list of additional languages this translator allows the wielder to understand.
     /// </summary>
     [DataField, AutoNetworkedField]
-    public List<ProtoId<LanguagePrototype>> Understood = new();
+    public List<ProtoId<LanguagePrototype>> Understood = [];
 
     /// <summary>
     ///   The languages the wielding MUST know in order for this translator to have effect.
     ///   The field <see cref="RequiresAll"/> indicates whether all of them are required, or just one.
     /// </summary>
     [DataField, AutoNetworkedField]
-    public List<ProtoId<LanguagePrototype>> Requires = new();
+    public List<ProtoId<LanguagePrototype>> Requires = [];
 
     /// <summary>
     ///   If true, the wielder must understand all languages in <see cref="Requires"/> to speak <see cref="Spoken"/>,

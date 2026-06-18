@@ -51,5 +51,5 @@ public sealed partial class PlumbingFilterComponent : Component
     ///     Multiple reagents can be filtered simultaneously.
     /// </summary>
     [DataField, AutoNetworkedField]
-    public HashSet<ProtoId<ReagentPrototype>> FilteredReagents = new();
+    public HashSet<ProtoId<ReagentPrototype>> FilteredReagents = [];
 }

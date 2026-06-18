@@ -1,4 +1,3 @@
-using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Starlight.Power.BluespaceHarvester;
@@ -13,8 +12,9 @@ public sealed partial class BluespaceHarvesterComponent : Component
     public TimeSpan LastUpdate;
 
     [DataField]
-    public List<float> LevelPowerDraw = new() // Power draw required per level
-    {
+    public List<float> LevelPowerDraw =
+    // Power draw required per level
+    [
         1_000f, // 1      | 1 KW
         5_000f, // 2      | 5 KW
         50_000f, // 3     | 50 KW
@@ -25,7 +25,7 @@ public sealed partial class BluespaceHarvesterComponent : Component
         10_000_000f, // 8 | 10 MW
         25_000_000f, //9  | 25 MW
         100_000_000f //10 | 100 MW
-    };
+    ];
 
     [DataField] public float PointsPerLevel = 2f;
 
@@ -41,12 +41,12 @@ public sealed partial class BluespaceHarvesterComponent : Component
     [DataField] public float BasePortalChancePerSecond = 0.005f; // 0.5% per second at level 7
     [DataField] public float PortalChancePerLevelAboveThreshold = 0.01f; // +1% per level above threshold
     [DataField] public EntProtoId PortalPrototype = "BluespaceHarvesterPortal";
-    [DataField] public List<EntProtoId> PortalMobPrototypes = new()
-    {
+    [DataField] public List<EntProtoId> PortalMobPrototypes =
+    [
         "MobBluespaceHarvesterMiGo",
         "MobBluespaceHarvesterBlankBody",
         "MobBluespaceHarvesterOtherthing"
-    };
+    ];
 
     [DataField] public int MinMobsPerPortal = 2;
     [DataField] public int MaxMobsPerPortal = 5;

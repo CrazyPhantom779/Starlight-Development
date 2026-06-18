@@ -24,7 +24,7 @@ public sealed partial class HysteriaVisionComponent : Component
     /// Visual disguises shown to this client while hysteria vision is active.
     /// </summary>
     [DataField, AutoNetworkedField]
-    public List<HysteriaDisguiseSprite> DisguiseSprites = new();
+    public List<HysteriaDisguiseSprite> DisguiseSprites = [];
 }
 
 /// <summary>

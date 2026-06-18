@@ -16,7 +16,7 @@ public sealed partial class HasComponentsCondition : EntityConditionBase<HasComp
     public override string EntityConditionGuidebookText(IPrototypeManager prototype)
     {
 
-        List<String> componentNames = new();
+        List<String> componentNames = [];
 
         foreach (var registration in Components)
             componentNames.Add(registration.Key);

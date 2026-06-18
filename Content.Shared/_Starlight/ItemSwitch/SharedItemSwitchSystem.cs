@@ -6,11 +6,8 @@ using Content.Shared.Interaction.Events;
 using Content.Shared.Item;
 using Content.Shared.Item.ItemToggle.Components;
 using Content.Shared.Popups;
-using Content.Shared.Temperature;
 using Content.Shared.Toggleable;
 using Content.Shared.Verbs;
-using Content.Shared.Wieldable;
-using Robust.Shared.Audio;
 using Robust.Shared.Audio.Systems;
 using Robust.Shared.Network;
 
@@ -64,7 +61,7 @@ public abstract partial class SharedItemSwitchSystem : EntitySystem
         if (!args.CanAccess || !args.CanInteract || !ent.Comp.OnActivate || ent.Comp.States.Count == 0) return;
 
         var user = args.User;
-        int addedVerbs = 0;
+        var addedVerbs = 0;
 
         foreach (var state in ent.Comp.States)
         {

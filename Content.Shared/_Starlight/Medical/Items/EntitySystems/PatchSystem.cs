@@ -6,7 +6,6 @@ using Content.Shared.DoAfter;
 using Content.Shared.Interaction;
 using Content.Shared.Interaction.Events;
 using Content.Shared.IdentityManagement;
-using Content.Shared.Damage;
 using Content.Shared.Audio;
 using Content.Shared.Popups;
 using Content.Shared.Chemistry.Reagent;
@@ -131,7 +130,7 @@ public sealed partial class PatchSystem : EntitySystem
 
             if (_solutionContainerSystem.TryGetInjectableSolution(uid, out var injectableSolution, out _) && injectableSolution != null)
             {
-                for (int i = patchUser.ReagentsToInsert.Count - 1; i >= 0; i--)
+                for (var i = patchUser.ReagentsToInsert.Count - 1; i >= 0; i--)
                 {
                     var reagent = patchUser.ReagentsToInsert[i];
                     var quantityToInsert = reagent.Quantity >= patchUser.ReagentInjectAmount ? 0.5 : reagent.Quantity;

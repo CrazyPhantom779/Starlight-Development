@@ -50,7 +50,7 @@ public sealed partial class PlumbingReactorComponent : Component
     ///     When all targets are met, the buffer triggers reactions and moves products to output.
     /// </summary>
     [DataField, AutoNetworkedField]
-    public Dictionary<ProtoId<ReagentPrototype>, FixedPoint2> ReagentTargets = new();
+    public Dictionary<ProtoId<ReagentPrototype>, FixedPoint2> ReagentTargets = [];
 
     /// <summary>
     ///     Target temperature for the buffer solution in Kelvin.

@@ -5,7 +5,6 @@ using Content.Server.Station.Systems;
 using Content.Shared._Starlight.CosmicCult.Components;
 using Content.Shared._Starlight.CosmicCult;
 using Content.Shared.Maps;
-using Content.Shared.Station.Components;
 using Robust.Shared.Map.Components;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;

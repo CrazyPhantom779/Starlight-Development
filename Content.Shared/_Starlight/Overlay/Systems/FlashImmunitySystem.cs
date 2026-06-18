@@ -77,7 +77,7 @@ public sealed partial class FlashImmunitySystem : EntitySystem
 
     public bool HasFlashImmunityVisionBlockers(EntityUid uid)
     {
-        if (EntityManager.TryGetComponent(uid, out FlashImmunityComponent? flashImmunityComponent))
+        if (TryComp(uid, out FlashImmunityComponent? flashImmunityComponent))
         {
             if (flashImmunityComponent.BlocksSpecialVision)
                 return true;
@@ -89,7 +89,7 @@ public sealed partial class FlashImmunitySystem : EntitySystem
             var slots = _inventory.GetSlotEnumerator((uid, inventoryComp), SlotFlags.WITHOUT_POCKET);
             while (slots.MoveNext(out var slot))
             {
-                if (slot.ContainedEntity != null && EntityManager.TryGetComponent(slot.ContainedEntity, out FlashImmunityComponent? wornFlashImmunityComponent))
+                if (slot.ContainedEntity != null && TryComp(slot.ContainedEntity, out FlashImmunityComponent? wornFlashImmunityComponent))
                 {
                     if (wornFlashImmunityComponent.BlocksSpecialVision)
                         return true;

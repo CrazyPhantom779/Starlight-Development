@@ -5,6 +5,6 @@ namespace Content.Shared._Starlight.Xenobiology.Potions;
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class SlimeNameChangePotionComponent : Component
 {
-    [DataField("assignedName"), AutoNetworkedField]
+    [DataField, AutoNetworkedField]
     public string AssignedName = string.Empty;
 }

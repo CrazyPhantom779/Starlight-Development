@@ -1,8 +1,6 @@
 using System.Numerics;
-using Robust.Shared.Maths;
 using Robust.Shared.Utility;
 using Robust.Shared.Serialization;
-using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Shared.Starlight.Utility;
 
@@ -14,7 +12,7 @@ public sealed partial class ExtendedSpriteSpecifier
     /// <summary>
     /// Basic SpriteSpecifier
     /// </summary>
-    [DataField("sprite")]
+    [DataField]
     public SpriteSpecifier Sprite { get; internal set; }
 
     /// <summary>

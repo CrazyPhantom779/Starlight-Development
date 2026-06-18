@@ -16,7 +16,7 @@ public sealed partial class CrawlUnderObjectsComponent : Component
     ///     Required for re-adding the collision mask.
     /// </summary>
     [DataField, AutoNetworkedField]
-    public List<(string key, int originalMask)> ChangedFixtures = new();
+    public List<(string key, int originalMask)> ChangedFixtures = [];
 
     [DataField]
     public float SneakSpeedModifier = 0.5f;

@@ -1,4 +1,3 @@
-using Content.Shared.Damage.Systems;
 using Content.Shared.Movement.Systems;
 using Content.Shared.Stunnable;
 using Content.Shared.Weapons.Hitscan.Components;

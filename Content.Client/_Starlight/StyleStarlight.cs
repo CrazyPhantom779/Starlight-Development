@@ -15,7 +15,6 @@ using Robust.Client.ResourceManagement;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Client.UserInterface.CustomControls;
-using Robust.Shared.Graphics;
 using static Robust.Client.UserInterface.StylesheetHelpers;
 
 namespace Content.Client._Starlight;
@@ -434,7 +433,6 @@ public sealed class StyleStarlight : StyleBase
             Texture = squareTex,
             ContentMarginLeftOverride = 10
         };
-
 
         // NanoHeading
         var nanoHeadingTex = resCache.GetTexture("/Textures/_Starlight/Interface/Nano/nanoheading.svg.96dpi.png");

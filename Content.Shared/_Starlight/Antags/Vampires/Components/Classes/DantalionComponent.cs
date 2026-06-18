@@ -17,7 +17,7 @@ public sealed partial class DantalionComponent : VampireClassComponent
 	///     Runtime tracking of enthralled entities
 	/// </summary>
 	[ViewVariables(VVAccess.ReadOnly)]
-	public HashSet<EntityUid> Thralls = new();
+	public HashSet<EntityUid> Thralls = [];
 
 	/// <summary>
 	///     Total thrall slots consumed. Does not decrease when thralls are lost.
@@ -42,7 +42,7 @@ public sealed partial class DantalionComponent : VampireClassComponent
 	/// </summary>
     [ViewVariables(VVAccess.ReadOnly)]
     [AutoNetworkedField]
-	public List<EntityUid> BloodBondLinkedThralls = new();
+	public List<EntityUid> BloodBondLinkedThralls = [];
 
     [DataField, AutoNetworkedField]
     public EntProtoId BloodBondBeamPrototype = string.Empty;

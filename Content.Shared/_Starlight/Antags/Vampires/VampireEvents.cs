@@ -146,10 +146,10 @@ public sealed partial class VampireRejuvenateIIActionEvent : InstantActionEvent
     public FixedPoint2 ReagentPurgeAmount = FixedPoint2.New(10);
 
     [DataField]
-    public HashSet<string> PurgedMetabolismGroups = new()
-    {
+    public HashSet<string> PurgedMetabolismGroups =
+    [
         "Poison",
-    };
+    ];
 
     [DataField]
     public int HealTicks = 5;
@@ -544,7 +544,7 @@ public sealed partial class VampireSubspaceSwapActionEvent : EntityTargetActionE
     public TimeSpan HysteriaDuration = TimeSpan.FromSeconds(15);
 
     [DataField(required: true)]
-    public List<HysteriaDisguiseSprite> HysteriaDisguiseSprites = new();
+    public List<HysteriaDisguiseSprite> HysteriaDisguiseSprites = [];
 }
 
 public sealed partial class VampireDecoyActionEvent : InstantActionEvent
@@ -636,7 +636,7 @@ public sealed partial class VampireMassHysteriaActionEvent : InstantActionEvent
     public TimeSpan HysteriaDuration = TimeSpan.FromSeconds(30);
 
     [DataField(required: true)]
-    public List<HysteriaDisguiseSprite> HysteriaDisguiseSprites = new();
+    public List<HysteriaDisguiseSprite> HysteriaDisguiseSprites = [];
 
     [DataField]
     public SoundSpecifier Sound = new SoundPathSpecifier("/Audio/_Starlight/Effects/vampire/sound_hallucinations_im_here1.ogg");
@@ -666,8 +666,8 @@ public sealed partial class VampireBloodSwellActionEvent : InstantActionEvent
     public ProtoId<DamageTypePrototype> MeleeBonusDamageType = "Blunt";
 
     [DataField]
-    public HashSet<string> ReducedDamageTypes = new()
-    {
+    public HashSet<string> ReducedDamageTypes =
+    [
         "Blunt",
         "Slash",
         "Piercing",
@@ -675,7 +675,7 @@ public sealed partial class VampireBloodSwellActionEvent : InstantActionEvent
         "Cold",
         "Shock",
         "Caustic",
-    };
+    ];
 
     [DataField]
     public float IncomingDamageMultiplier = 0.5f;

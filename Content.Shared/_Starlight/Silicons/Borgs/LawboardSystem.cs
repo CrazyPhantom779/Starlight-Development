@@ -2,7 +2,6 @@ using Content.Shared.Examine;
 using Content.Shared.Silicons.Laws;
 using Content.Shared.Silicons.Laws.Components;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Localization;
 
 namespace Content.Shared._Starlight.Silicons.Borgs;
 
@@ -32,7 +31,7 @@ public sealed partial class LawboardSystem : EntitySystem
             : "Unknown";
         var description = $"[color=cyan]An electronics board containing the [color=yellow]{lawsetName}[/color] lawset.[/color]\n[color=orange]Uploaded Laws:[/color]";
 
-        int lawNum = lawsetProto.StartAtZero ? 0 : 1;
+        var lawNum = lawsetProto.StartAtZero ? 0 : 1;
         foreach (var lawId in lawsetProto.Laws)
         {
             if (_prototype.TryIndex<SiliconLawPrototype>(lawId, out var lawProto))

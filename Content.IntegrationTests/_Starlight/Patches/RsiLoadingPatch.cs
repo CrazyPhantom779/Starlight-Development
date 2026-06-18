@@ -18,7 +18,7 @@ namespace Content.IntegrationTests._Starlight.Patches;
 /// </summary>
 internal static class RsiLoadingPatch
 {
-    private static Hook _hook;
+    private static Hook s_hook;
 
     private static readonly HashSet<string> _realImageRsiPaths = [
         "Effects/clicktest.rsi",
@@ -52,13 +52,13 @@ internal static class RsiLoadingPatch
             return;
         }
 
-        _hook = new Hook(original, LoadImagesReplacement);
+        s_hook = new Hook(original, LoadImagesReplacement);
     }
 
     internal static void Unpatch()
     {
-        _hook?.Dispose();
-        _hook = null;
+        s_hook?.Dispose();
+        s_hook = null;
     }
 
     private static Image<Rgba32>[] LoadImagesReplacement(

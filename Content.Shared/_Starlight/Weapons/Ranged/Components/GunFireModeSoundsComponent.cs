@@ -16,5 +16,5 @@ public sealed partial class GunFireModeSoundsComponent : Component
     /// Maps fire mode index → gunshot sound override.
     /// </summary>
     [DataField(required: true), AutoNetworkedField]
-    public Dictionary<int, SoundSpecifier> Sounds = new();
+    public Dictionary<int, SoundSpecifier> Sounds = [];
 }

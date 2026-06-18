@@ -13,7 +13,7 @@ public sealed partial class SlimeSplitOperator : HTNOperator
     /// <summary>
     /// The amount of slimes to split into
     /// </summary>
-    [DataField("splitAmount", required: true)]
+    [DataField(required: true)]
     public int SplitAmount = 0!;
 
     public override void Initialize(IEntitySystemManager sysManager)

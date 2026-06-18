@@ -34,7 +34,7 @@ public partial class ThavenMood
     /// A list of mood IDs that this mood will conflict with.
     /// </summary>
     [DataField]
-    public HashSet<ProtoId<ThavenMoodPrototype>> Conflicts = new();
+    public HashSet<ProtoId<ThavenMoodPrototype>> Conflicts = [];
 
     /// <summary>
     /// Additional localized words for the <see cref="MoodDesc"/>, for things like random
@@ -42,7 +42,7 @@ public partial class ThavenMood
     /// Gets randomly picked from datasets in <see cref="MoodVarDatasets"/>.
     /// </summary>
     [ViewVariables(VVAccess.ReadWrite)]
-    public Dictionary<string, string> MoodVars = new();
+    public Dictionary<string, string> MoodVars = [];
 
     public (string, object)[] GetLocArgs()
     {
@@ -88,7 +88,7 @@ public sealed partial class ThavenMoodPrototype : ThavenMood, IPrototype
     /// for localizing <see cref="ThavenMood.MoodName"/> and <see cref="ThavenMood.MoodDesc"/>.
     /// </summary>
     [DataField("moodVars")]
-    public Dictionary<string, ProtoId<DatasetPrototype>> MoodVarDatasets = new();
+    public Dictionary<string, ProtoId<DatasetPrototype>> MoodVarDatasets = [];
 
     /// <summary>
     /// If false, prevents the same variable from being rolled twice when rolling

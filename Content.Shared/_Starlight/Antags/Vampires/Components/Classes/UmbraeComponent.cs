@@ -1,5 +1,4 @@
 using Robust.Shared.GameStates;
-using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
 
 namespace Content.Shared._Starlight.Antags.Vampires.Components.Classes;
@@ -65,7 +64,7 @@ public sealed partial class UmbraeComponent : VampireClassComponent
     /// <summary>
     /// List of placed shadow snare traps
     /// </summary>
-    public List<EntityUid> PlacedSnares = new();
+    public List<EntityUid> PlacedSnares = [];
 
     /// <summary>
     /// Maximum number of shadow snares that can be placed

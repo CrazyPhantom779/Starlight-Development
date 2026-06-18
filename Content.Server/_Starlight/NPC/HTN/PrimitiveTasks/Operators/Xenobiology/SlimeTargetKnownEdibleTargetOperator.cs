@@ -20,13 +20,13 @@ public sealed partial class SlimeTargetKnownEdibleTargetOperator : HTNOperator
     /// <summary>
     /// Target entity to eat.
     /// </summary>
-    [DataField("targetKey", required: true)]
+    [DataField(required: true)]
     public string TargetKey = string.Empty;
 
     /// <summary>
     /// Target entitycoordinates to move to.
     /// </summary>
-    [DataField("targetMoveKey", required: true)]
+    [DataField(required: true)]
     public string TargetMoveKey = string.Empty;
 
     public override void Initialize(IEntitySystemManager sysManager)

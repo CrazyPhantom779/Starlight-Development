@@ -4,7 +4,6 @@ using Content.Shared._Starlight.Language.Components;
 using Content.Shared._Starlight.Language.Events;
 using Content.Shared._Starlight.Language.Systems;
 using Content.Shared._Starlight.Magic.Components;
-using Content.Shared.Destructible;
 using Content.Shared.Popups;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
@@ -84,7 +83,7 @@ public sealed partial class TowerOfBabelSystem : EntitySystem
 
     private void TowerRemoved(Entity<TowerOfBabelComponent> ent)
     {
-        var towerEnumerator = EntityManager.EntityQueryEnumerator<TowerOfBabelComponent>();
+        var towerEnumerator = EntityQueryEnumerator<TowerOfBabelComponent>();
         towerEnumerator.MoveNext(out var _, out var _); //the tower being destroyed
         if (towerEnumerator.MoveNext(out var _, out var _))
             return; //there is a 2nd tower that is NOT detroyed. so dont reset languages yet.
@@ -101,7 +100,7 @@ public sealed partial class TowerOfBabelSystem : EntitySystem
 
     private void OnLanguageKnowledgeInit(ref LanguageKnowledgeInitEvent ev)
     {
-        if (!EntityManager.EntityQueryEnumerator<TowerOfBabelComponent>().MoveNext(out var _, out var _))
+        if (!EntityQueryEnumerator<TowerOfBabelComponent>().MoveNext(out var _, out var _))
             return; //if there is not atleast 1 tower of babel in existence do not shuttle languages.
         var ent = ev.Entity;
 

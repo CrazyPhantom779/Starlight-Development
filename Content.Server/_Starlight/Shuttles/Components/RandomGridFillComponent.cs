@@ -14,7 +14,7 @@ public sealed partial class RandomGridFillComponent : Component
     /// <summary>
     /// path to weight mapping
     /// </summary>
-    [DataField("pathWeights", required: true)]
+    [DataField(required: true)]
     public Dictionary<ResPath, float> PathWeights = new();
 
     /// <summary>

@@ -3,6 +3,6 @@
 [RegisterComponent]
 public sealed partial class RicochetableComponent : Component
 {
-    [ViewVariables(VVAccess.ReadWrite), DataField("chance")]
+    [ViewVariables(VVAccess.ReadWrite), DataField]
     public float Chance = 1f;
 }

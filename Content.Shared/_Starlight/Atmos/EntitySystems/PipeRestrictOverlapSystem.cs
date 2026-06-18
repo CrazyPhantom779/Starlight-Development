@@ -1,7 +1,6 @@
 using System.Linq;
 using Content.Shared.Atmos;
 using Content.Shared.Atmos.Components;
-using Content.Shared._Starlight.Atmos;
 using Content.Shared._Starlight.Atmos.Components;
 using Content.Shared.NodeContainer;
 using Content.Shared.Popups;
@@ -20,7 +19,7 @@ public sealed partial class PipeRestrictOverlapSystem : EntitySystem
     [Dependency] private SharedPopupSystem _popup = default!;
     [Dependency] private SharedTransformSystem _xform = default!;
 
-    private readonly List<EntityUid> _anchoredEntities = new();
+    private readonly List<EntityUid> _anchoredEntities = [];
     private EntityQuery<NodeContainerComponent> _nodeContainerQuery;
 
     public readonly record struct ProposedPipe(

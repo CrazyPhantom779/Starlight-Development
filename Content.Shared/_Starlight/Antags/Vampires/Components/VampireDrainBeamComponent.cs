@@ -16,7 +16,7 @@ public sealed partial class VampireDrainBeamComponent : Component
     /// Active beam connections where this entity is the source
     /// </summary>
     [DataField]
-    public Dictionary<EntityUid, DrainBeamConnection> ActiveBeams = new();
+    public Dictionary<EntityUid, DrainBeamConnection> ActiveBeams = [];
 }
 
 /// <summary>

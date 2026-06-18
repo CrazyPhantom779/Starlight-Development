@@ -1,9 +1,5 @@
-using Content.Shared.Actions;
-using Content.Shared.Communications;
-using Content.Shared.Ninja.Systems;
 using Robust.Shared.GameStates;
 using Robust.Shared.Map;
-using Robust.Shared.Prototypes;
 
 namespace Content.Shared.Starlight.Antags.Abductor;
 
@@ -17,10 +13,10 @@ public sealed partial class AbductorGizmoComponent : Component
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]
 public sealed partial class AbductorVictimComponent : Component
 {
-    [DataField("position"), AutoNetworkedField]
+    [DataField, AutoNetworkedField]
     public EntityCoordinates? Position;
 
-    [DataField("organ"), AutoNetworkedField]
+    [DataField, AutoNetworkedField]
     public AbductorOrganType Organ = AbductorOrganType.None;
 
     [DataField]
@@ -30,7 +26,7 @@ public sealed partial class AbductorVictimComponent : Component
 [RegisterComponent, NetworkedComponent, Access(typeof(SharedAbductorSystem)), AutoGenerateComponentState]
 public sealed partial class AbductorOrganComponent : Component
 {
-    [DataField("organ"), AutoNetworkedField]
+    [DataField, AutoNetworkedField]
     public AbductorOrganType Organ;
 }
 

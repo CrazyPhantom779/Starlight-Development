@@ -24,7 +24,7 @@ public sealed partial class SlimeSystem : EntitySystem
     [Dependency] private IRobustRandom _robustRandom = default!;
     [Dependency] private SharedAudioSystem _audioSystem = default!;
 
-    public List<SlimeSplitRecord> SlimeSplitRecords = new();
+    public List<SlimeSplitRecord> SlimeSplitRecords = [];
 
     public sealed class SlimeSplitRecord(Entity<SlimeComponent?> slime, int splitAmount)
     {
@@ -82,7 +82,7 @@ public sealed partial class SlimeSystem : EntitySystem
         if (TryComp<HungerComponent>(slime, out var hunger))
             newNutrition = _hungerSystem.GetHunger(hunger) / split_amount;
         var random = _robustRandom.GetRandom();
-        for (int i = 0; i < split_amount; i++)
+        for (var i = 0; i < split_amount; i++)
         {
             string protoName;
             if (slime.Comp.MutationChance >= 1.0f && slime.Comp.MutationOnMaxSplit != null)

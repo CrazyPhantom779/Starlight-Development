@@ -1,6 +1,4 @@
 ﻿using Content.Shared._Starlight.Medical.Limbs;
-using Content.Shared.Humanoid;
-using Content.Shared.Humanoid.Prototypes;
 using Content.Shared.Whitelist;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;

@@ -12,7 +12,7 @@ namespace Content.Shared._Starlight.Magic.Components;
 [Access(typeof(SharedBonusScalarSystem))]
 public sealed partial class BonusScalarComponent : Component
 {
-    public Dictionary<EntityUid, BonusScalarCoefficients> modifiers = new();
+    public Dictionary<EntityUid, BonusScalarCoefficients> modifiers = [];
 
     // computed totals:
 

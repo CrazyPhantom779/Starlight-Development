@@ -1,8 +1,3 @@
-using Robust.Shared.GameStates;
-using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
-using Robust.Shared.Timing;
-
 namespace Content.Shared._Starlight.Railroading;
 
 [RegisterComponent]

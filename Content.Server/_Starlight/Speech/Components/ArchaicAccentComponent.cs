@@ -6,8 +6,7 @@ namespace Content.Server.Speech.Components;
 [Access(typeof(ArchaicAccentSystem))]
 public sealed partial class ArchaicAccentComponent : Component
 {
-    [ViewVariables(VVAccess.ReadWrite)]
-    [DataField("forsoothChance")]
+    [DataField]
     public float ForsoothChance = 0.15f;
 
     [ViewVariables]

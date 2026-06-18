@@ -7,10 +7,6 @@ namespace Content.Server.Cargo.Components;
 [RegisterComponent]
 public sealed partial class CargoGasPalletComponent : Component, IGasMixtureHolder
 {
-    /// <summary>
-    /// The name of the pipe inlet
-    /// </summary>
-    [ViewVariables(VVAccess.ReadWrite)]
     [DataField("inlet")]
     public string InletName { get; set; } = "pipe";
 
@@ -23,6 +19,6 @@ public sealed partial class CargoGasPalletComponent : Component, IGasMixtureHold
     /// <summary>
     /// The maximum pressure to which this will accept gasses
     /// </summary>
-    [DataField("maxPressure")]
+    [DataField]
     public float MaxPressure { get; set; } = 4500;
 }

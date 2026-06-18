@@ -34,7 +34,7 @@ public sealed partial class ShowNullSpaceSystem : SharedShowNullSpaceSystem
             || !clothing.Slots.HasFlag(args.SlotFlags))
             return;
 
-        EntityManager.CopyComponent(uid, args.Equipee, component);
+        CopyComp(uid, args.Equipee, component);
     }
 
     private void OnUnequipped(EntityUid uid, ShowNullSpaceComponent component, GotUnequippedEvent args) =>

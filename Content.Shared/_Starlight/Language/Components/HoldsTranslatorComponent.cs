@@ -9,5 +9,5 @@ namespace Content.Shared._Starlight.Language.Components;
 public sealed partial class HoldsTranslatorComponent : Component
 {
     [DataField, AutoNetworkedField]
-    public HashSet<EntityUid> Translators = new();
+    public HashSet<EntityUid> Translators = [];
 }

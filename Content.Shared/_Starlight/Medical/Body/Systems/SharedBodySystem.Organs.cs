@@ -168,7 +168,7 @@ public partial class SharedBodySystem
         where T : IComponent
     {
         if (!Resolve(entity, ref entity.Comp))
-            return new List<Entity<T, OrganComponent>>();
+            return [];
 
         var query = GetEntityQuery<T>();
         var list = new List<Entity<T, OrganComponent>>(3);

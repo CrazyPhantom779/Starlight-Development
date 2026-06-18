@@ -7,7 +7,7 @@ namespace Content.Shared.Starlight.Medical.Items.Components;
 public sealed partial class PatchUserComponent : Component
 {
     [DataField]
-    public List<ReagentQuantity> ReagentsToInsert = new();
+    public List<ReagentQuantity> ReagentsToInsert = [];
 
     [DataField("nextUpdate", customTypeSerializer: typeof(TimeOffsetSerializer))]
     public TimeSpan NextUpdateTime;

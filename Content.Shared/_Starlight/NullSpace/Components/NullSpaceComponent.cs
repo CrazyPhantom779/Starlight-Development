@@ -7,5 +7,5 @@ namespace Content.Shared._Starlight.NullSpace;
 [RegisterComponent, NetworkedComponent]
 public sealed partial class NullSpaceComponent : Component
 {
-    public List<ProtoId<NpcFactionPrototype>> SuppressedFactions = new();
+    public List<ProtoId<NpcFactionPrototype>> SuppressedFactions = [];
 }

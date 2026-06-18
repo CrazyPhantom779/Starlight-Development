@@ -6,7 +6,6 @@ using Content.Shared.Body.Part;
 using Content.Shared.DragDrop;
 using Content.Shared.Gibbing;
 using Content.Shared.Inventory;
-using Robust.Shared.Audio.Systems;
 using Robust.Shared.Containers;
 using Robust.Shared.Map;
 using Robust.Shared.Utility;
@@ -139,11 +138,15 @@ public partial class SharedBodySystem
         frontier.Enqueue(rootSlot);
 
         // Child -> Parent connection.
-        var cameFrom = new Dictionary<string, string>();
-        cameFrom[rootSlot] = rootSlot;
+        var cameFrom = new Dictionary<string, string>
+        {
+            [rootSlot] = rootSlot
+        };
         // Maps slot to its relevant entity.
-        var cameFromEntities = new Dictionary<string, EntityUid>();
-        cameFromEntities[rootSlot] = rootPartId;
+        var cameFromEntities = new Dictionary<string, EntityUid>
+        {
+            [rootSlot] = rootPartId
+        };
 
         while (frontier.TryDequeue(out var currentSlotId))
         {

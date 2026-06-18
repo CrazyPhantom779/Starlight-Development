@@ -24,8 +24,8 @@ public sealed partial class ActiveBloodSwellComponent : Component
     public ProtoId<DamageTypePrototype> MeleeBonusDamageType = "Blunt";
 
     [DataField]
-    public HashSet<string> ReducedDamageTypes = new()
-    {
+    public HashSet<string> ReducedDamageTypes =
+    [
         "Blunt",
         "Slash",
         "Piercing",
@@ -33,7 +33,7 @@ public sealed partial class ActiveBloodSwellComponent : Component
         "Cold",
         "Shock",
         "Caustic",
-    };
+    ];
 
     [DataField, AutoNetworkedField]
     public float IncomingDamageMultiplier = 0.5f;

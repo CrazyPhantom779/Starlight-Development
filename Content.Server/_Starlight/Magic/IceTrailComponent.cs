@@ -12,7 +12,7 @@ public sealed partial class IceTrailComponent : Component
     /// How often to spawn IceCrust debris (in seconds).
     /// Default is 0.05 seconds for a more continuous trail.
     /// </summary>
-    [DataField("spawnInterval")]
+    [DataField]
     public float SpawnInterval = 0.05f;
 
     /// <summary>
@@ -23,18 +23,18 @@ public sealed partial class IceTrailComponent : Component
     /// <summary>
     /// Probability (0.0 to 1.0) of spawning ice instead of snow.
     /// </summary>
-    [DataField("iceChance")]
+    [DataField]
     public float IceChance = 0.55f;
 
     /// <summary>
     /// The entity ID for ice crust debris (IceCrust).
     /// </summary>
-    [DataField("iceEntityId")]
+    [DataField]
     public string IceEntityId = "IceCrust";
 
     /// <summary>
     /// The tile ID for snow floor (FloorSnow).
     /// </summary>
-    [DataField("snowTileId")]
+    [DataField]
     public string SnowTileId = "FloorSnow";
 }

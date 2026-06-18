@@ -1,4 +1,3 @@
-using Content.Shared._Starlight.TapeRecorder;
 using Content.Shared.Whitelist;
 using Robust.Shared.GameStates;
 
@@ -13,7 +12,7 @@ public sealed partial class TapeCassetteComponent : Component
     /// A list of all recorded voice, containing timestamp, name and spoken words
     /// </summary>
     [DataField]
-    public List<TapeCassetteRecordedMessage> RecordedData = new();
+    public List<TapeCassetteRecordedMessage> RecordedData = [];
 
     /// <summary>
     /// The current position within the tape we are at, in seconds
@@ -57,7 +56,7 @@ public sealed partial class TapeCassetteComponent : Component
     /// Temporary storage for all heard messages that need processing
     /// </summary>
     [DataField]
-    public List<TapeCassetteRecordedMessage> Buffer = new();
+    public List<TapeCassetteRecordedMessage> Buffer = [];
 
     /// <summary>
     /// Whitelist for tools that can be used to respool a damaged tape.

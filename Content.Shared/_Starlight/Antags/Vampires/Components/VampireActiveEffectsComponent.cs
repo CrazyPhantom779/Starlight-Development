@@ -17,9 +17,9 @@ public sealed partial class ActiveVampireRejuvenateComponent : Component
     [DataField(customTypeSerializer: typeof(TimeOffsetSerializer))] [AutoPausedField]
     public TimeSpan NextTick;
 
-    [DataField] public Dictionary<string, FixedPoint2> HealGroups = new();
+    [DataField] public Dictionary<string, FixedPoint2> HealGroups = [];
 
-    [DataField] public Dictionary<string, FixedPoint2> HealTypes = new();
+    [DataField] public Dictionary<string, FixedPoint2> HealTypes = [];
 }
 
 [RegisterComponent, AutoGenerateComponentPause]

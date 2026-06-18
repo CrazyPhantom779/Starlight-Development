@@ -174,8 +174,8 @@ public sealed partial class SharedVentCrawlSystem
 
         Vector2 inputVec = holder.CurrentDirection.ToVec();
 
-        float rightDot = Vector2.Dot(inputVec, right);
-        float forwardDot = Vector2.Dot(inputVec, forward);
+        var rightDot = Vector2.Dot(inputVec, right);
+        var forwardDot = Vector2.Dot(inputVec, forward);
 
         var absRight = Math.Abs(rightDot);
         var absForward = Math.Abs(forwardDot);

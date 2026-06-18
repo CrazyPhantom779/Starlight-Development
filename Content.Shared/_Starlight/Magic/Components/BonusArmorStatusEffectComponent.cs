@@ -1,4 +1,3 @@
-using Robust.Shared.GameStates;
 using Content.Shared._Starlight.Magic.Systems;
 using Content.Shared.Damage;
 
@@ -34,13 +33,13 @@ public sealed partial class BonusArmorStatusEffectComponent : Component
     /// <summary>
     /// Stamina damage reduction
     /// </summary>
-    [DataField("staminaDamageModifier")]
+    [DataField]
     public float StaminaDamageModifier = 1.0f;
 
     /// <summary>
     /// Explosion resistance
     /// </summary>
-    [DataField("explosionResistance")]
+    [DataField]
     public float ExplosionResistance = 1.0f;
 }
 

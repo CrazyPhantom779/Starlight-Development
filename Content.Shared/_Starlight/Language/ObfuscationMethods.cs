@@ -11,7 +11,7 @@ public abstract partial class ObfuscationMethod
     /// </summary>
     public static readonly ObfuscationMethod Default = new ReplacementObfuscation
     {
-        Replacement = new List<string> { "<?>" }
+        Replacement = ["<?>"]
     };
 
     /// <summary>
@@ -42,7 +42,7 @@ public sealed partial class RandomObfuscation : ObfuscationMethod
         const string Chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         message = message.ToUpper();
 
-        for (int i = 0; i < Chars.Length; i++)
+        for (var i = 0; i < Chars.Length; i++)
         {
             message = message.Replace(Chars[i], Chars[context.PseudoRandomNumber(message.GetHashCode() + i, 0, Chars.Length - 1)]);
         }

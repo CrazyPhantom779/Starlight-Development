@@ -20,19 +20,19 @@ public sealed partial class JumpOperator : HTNOperator, IHtnConditionalShutdown
     /// <summary>
     /// When to shut the task down.
     /// </summary>
-    [DataField("shutdownState")]
+    [DataField]
     public HTNPlanState ShutdownState { get; private set; } = HTNPlanState.TaskFinished;
 
     /// <summary>
     /// When we're finished jumping to the target should we remove its key?
     /// </summary>
-    [DataField("removeKeyOnFinish")]
+    [DataField]
     public bool RemoveKeyOnFinish = true;
 
     /// <summary>
     /// Target Coordinates to jump to. This gets removed after execution.
     /// </summary>
-    [DataField("targetKey")]
+    [DataField]
     public string TargetKey = "TargetCoordinates";
 
     public override void Initialize(IEntitySystemManager sysManager)

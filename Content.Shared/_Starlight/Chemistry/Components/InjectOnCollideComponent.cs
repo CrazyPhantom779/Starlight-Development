@@ -1,6 +1,5 @@
 using Content.Shared.Chemistry.Reagent;
 using Content.Shared.Whitelist;
-using Robust.Shared.Audio;
 
 namespace Content.Shared._Starlight.Chemistry.Components;
 
@@ -10,7 +9,7 @@ public sealed partial class InjectOnCollideComponent : Component
     /// <summary>
     /// Reagent(s) to inject on collision.
     /// </summary>
-    [DataField("reagents")]
+    [DataField]
     public List<ReagentQuantity> Reagents;
 
     /// <summary>

@@ -1,4 +1,3 @@
-using Content.Shared.Paper;
 using Robust.Shared.Audio;
 using Robust.Shared.GameStates;
 
@@ -8,7 +7,7 @@ namespace Content.Shared._Starlight.Paper;
 public sealed partial class MultistampComponent : Component
 {
     [ViewVariables, AutoNetworkedField]
-    public List <EntityUid> Stamps = new();
+    public List <EntityUid> Stamps = [];
 
     [ViewVariables, AutoNetworkedField]
     public int CurrentEntry = 0;

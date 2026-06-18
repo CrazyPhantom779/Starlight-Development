@@ -14,7 +14,6 @@ using Robust.Shared.Utility;
 #region Starlight
 using Content.Shared.Starlight.Medical.Surgery.Events;
 using Robust.Shared.Physics;
-using Robust.Shared.Physics.Systems;
 using Content.Shared._Starlight.Medical.Body.Part;
 using Content.Shared._Starlight.Medical.Body.Events;
 #endregion Starlight
@@ -759,7 +758,7 @@ public partial class SharedBodySystem
         where T : IComponent
     {
         if (!Resolve(uid, ref part))
-            return new List<(T Comp, OrganComponent Organ)>();
+            return [];
 
         var query = GetEntityQuery<T>();
         var list = new List<(T Comp, OrganComponent Organ)>();
@@ -856,7 +855,7 @@ public partial class SharedBodySystem
         }
 
         var query = GetEntityQuery<T>();
-        comps = new List<(EntityUid AdjacentId, T Component)>();
+        comps = [];
 
         foreach (var adjacentId in GetBodyPartAdjacentParts(partId, part))
         {

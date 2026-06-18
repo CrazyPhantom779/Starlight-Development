@@ -5,30 +5,30 @@ using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Starlight.GhostTheme;
 
-[Prototype("ghostTheme")]
+[Prototype]
 public sealed partial class GhostThemePrototype : IPrototype
 {
     [IdDataField]
     public string ID { get; private set; } = default!;
 
-    [DataField("name")]
+    [DataField]
     public string Name { get; private set; } = string.Empty;
 
-    [DataField("description")]
+    [DataField]
     public string Description { get; private set; } = string.Empty;
 
-    [DataField("spriteSpecifier", required: true)]
+    [DataField(required: true)]
     public ExtendedSpriteSpecifier SpriteSpecifier { get; private set; } = default!;
 
-    [DataField("colorizeable")]
+    [DataField]
     public bool Colorizeable = false;
 
-    [DataField("private")]
+    [DataField]
     public bool Private = false;
 
-    [DataField("trail")]
+    [DataField]
     public TrailSettings? Trail = null;
 
-    [DataField("requirements")]
+    [DataField]
     public List<BaseRequirement> Requirements = [];
 }

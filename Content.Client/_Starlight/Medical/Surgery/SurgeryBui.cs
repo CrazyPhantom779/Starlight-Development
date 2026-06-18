@@ -459,10 +459,12 @@ public sealed partial class SurgeryBui : BoundUserInterface
     }
     protected override void Dispose(bool disposing)
     {
-        base.Dispose(disposing);
-
         if (disposing)
-            _window?.Dispose();
-        _hands.OnPlayerItemAdded -= OnPlayerItemAdded;
+        {
+            _window?.Orphan();
+            _hands.OnPlayerItemAdded -= OnPlayerItemAdded;
+        }
+
+        base.Dispose(disposing);
     }
 }

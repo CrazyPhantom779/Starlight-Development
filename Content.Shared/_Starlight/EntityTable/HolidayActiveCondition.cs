@@ -1,7 +1,6 @@
 using Content.Shared._Starlight.EntityTable;
 using Content.Shared.EntityTable.EntitySelectors;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization;
 
 namespace Content.Shared.EntityTable.Conditions;
 
@@ -11,7 +10,7 @@ namespace Content.Shared.EntityTable.Conditions;
 [DataDefinition]
 public sealed partial class HolidayActiveCondition : EntityTableCondition
 {
-    [DataField("holiday", required: true)]
+    [DataField(required: true)]
     public string Holiday = string.Empty;
 
     protected override bool EvaluateImplementation(EntityTableSelector root, IEntityManager entMan, IPrototypeManager proto, EntityTableContext ctx)

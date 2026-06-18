@@ -1,4 +1,3 @@
-using Robust.Shared.GameStates;
 using Content.Shared._Starlight.Magic.Systems;
 using Content.Shared.Damage;
 using Robust.Shared.Serialization;
@@ -12,7 +11,7 @@ namespace Content.Shared._Starlight.Magic.Components;
 [Access(typeof(SharedBonusArmorSystem))]
 public sealed partial class BonusArmorComponent : Component
 {
-    public Dictionary<EntityUid, BonusArmor> modifiers = new();
+    public Dictionary<EntityUid, BonusArmor> modifiers = [];
 }
 
 [DataDefinition]

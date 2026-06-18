@@ -153,7 +153,7 @@ public sealed partial class ShadekinSystem : EntitySystem
         var oppositeMapDiff = (-lightRot).RotateVec(mapDiff);
         var angle = oppositeMapDiff.ToWorldAngle();
 
-        if (angle == double.NaN && _transform.ContainsEntity(targetUid, lightUid) || _transform.ContainsEntity(lightUid, targetUid))
+        if ((angle == double.NaN && _transform.ContainsEntity(targetUid, lightUid)) || _transform.ContainsEntity(lightUid, targetUid))
         {
             angle = 0f;
         }

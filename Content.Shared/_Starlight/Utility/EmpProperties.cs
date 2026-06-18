@@ -1,6 +1,4 @@
-using Robust.Shared.Utility;
 using Robust.Shared.Serialization;
-using Robust.Shared.Serialization.Manager.Attributes;
 
 namespace Content.Shared.Starlight.Utility;
 
@@ -9,19 +7,19 @@ namespace Content.Shared.Starlight.Utility;
 public sealed partial class EmpProperties
 {
 
-    [DataField("range"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
     public float Range = 1.0f;
 
     /// <summary>
     /// How much energy will be consumed per battery in range
     /// </summary>
-    [DataField("energyConsumption"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
     public float EnergyConsumption;
 
     /// <summary>
     /// How long it disables targets in seconds
     /// </summary>
-    [DataField("disableDuration"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
     public TimeSpan DisableDuration = TimeSpan.FromSeconds(60);
 
     public EmpProperties(float range, float energyConsumption, TimeSpan disableDuration)

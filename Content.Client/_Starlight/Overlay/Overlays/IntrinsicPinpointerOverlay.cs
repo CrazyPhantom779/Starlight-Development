@@ -4,7 +4,6 @@ using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Client.Player;
 using Robust.Shared.Enums;
-using Robust.Shared.GameObjects;
 using Robust.Shared.Utility;
 
 namespace Content.Client._Starlight.Overlay.Overlays;
@@ -67,8 +66,8 @@ public sealed class IntrinsicPinpointerOverlay : Robust.Client.Graphics.Overlay
         const float Size = 96f;
         const float Margin = 16f;
         var center = new Vector2(
-            Margin + Size * 0.5f,
-            bounds.Height - Margin - Size * 0.5f);
+            Margin + (Size * 0.5f),
+            bounds.Height - Margin - (Size * 0.5f));
 
         // Draw dark semi-transparent background circle so the arrow is readable against any map.
         DrawBackground(screen, center, Size);

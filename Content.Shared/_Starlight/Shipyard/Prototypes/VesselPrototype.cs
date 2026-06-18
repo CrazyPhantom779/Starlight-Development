@@ -15,37 +15,37 @@ public sealed partial class VesselPrototype : IPrototype
     ///     Vessel name.
     /// </summary>
     [ViewVariables]
-    [DataField("name")] public string Name = string.Empty;
+    [DataField] public string Name = string.Empty;
 
     /// <summary>
     ///     Short description of the vessel.
     /// </summary>
     [ViewVariables]
-    [DataField("description")] public string Description = string.Empty;
+    [DataField] public string Description = string.Empty;
 
     /// <summary>
     ///     The price of the vessel
     /// </summary>
-    [DataField("price", required: true)]
+    [DataField(required: true)]
     public int Price { get; private set; }
 
     /// <summary>
     ///     The prototype category of the product. (e.g. Small, Medium, Large, Emergency, Special etc.)
     /// </summary>
-    [DataField("category")]
+    [DataField]
     public string Category { get; private set; } = string.Empty;
 
     /// <summary>
     ///     The prototype group of the product. (e.g. Civilian, Syndicate, Contraband etc.)
     ///     Todo: This is currently unused.
     /// </summary>
-    [DataField("group")]
+    [DataField]
     public string Group { get; private set; } = string.Empty;
 
     /// <summary>
     ///     Relative directory path to the given shuttle, i.e. `/Maps/Shuttles/yourshittle.yml`
     /// </summary>
-    [DataField("shuttlePath", required: true)]
+    [DataField(required: true)]
     public ResPath ShuttlePath { get; private set; } = default!;
 
     /// <summary>

@@ -18,25 +18,25 @@ public sealed partial class PhysicalSocialInteractionPrototype : IPrototype
     /// String will be used to fetch the localized message to be played if the interaction succeeds.
     /// Nullable in case none is specified on the yaml prototype.
     /// </summary>
-    [DataField("interactString")]
+    [DataField]
     public LocId? InteractString;
 
     /// <summary>
     /// Sound effect to be played when the interaction succeeds.
     /// Nullable in case no path is specified on the yaml prototype.
     /// </summary>
-    [DataField("interactSound")]
+    [DataField]
     public SoundSpecifier? InteractSound;
 
     /// <summary>
     /// If set, shows a message to all surrounding players but NOT the current player.
     /// </summary>
-    [DataField("messagePerceivedByOthers")]
+    [DataField]
     public LocId? MessagePerceivedByOthers;
 
     /// <summary>
     /// Will the sound effect be perceived by entities not involved in the interaction?
     /// </summary>
-    [DataField("soundPerceivedByOthers")]
+    [DataField]
     public bool SoundPerceivedByOthers = true;
 }

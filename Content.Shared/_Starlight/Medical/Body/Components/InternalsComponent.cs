@@ -14,7 +14,7 @@ public sealed partial class InternalsComponent : Component
     public EntityUid? GasTankEntity;
 
     [DataField, AutoNetworkedField]
-    public HashSet<EntityUid> BreathTools = new();
+    public HashSet<EntityUid> BreathTools = [];
 
     /// <summary>
     /// Toggle Internals delay when the target is not you.

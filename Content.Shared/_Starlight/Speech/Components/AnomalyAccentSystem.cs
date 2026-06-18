@@ -19,7 +19,7 @@ public sealed partial class AnomalyAccentSystem : EntitySystem
         var message = args.Message.Text;
 
         var words = message.Split(' ');
-        for (int i = 0; i < words.Length; i++)
+        for (var i = 0; i < words.Length; i++)
         {
             words[i] = ApplyAnomalyToWord(words[i]);
             words[i] = ApplyCaseChange(words[i]);

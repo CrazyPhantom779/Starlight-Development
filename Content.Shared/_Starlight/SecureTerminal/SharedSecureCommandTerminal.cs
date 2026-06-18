@@ -81,13 +81,13 @@ public sealed class SecureTerminalProposalState
     public string RequestId = string.Empty;
 
     /// <summary>Display name + job-title of each person who has signed.</summary>
-    public List<(string Name, string Job)> AuthorizedBy = new();
+    public List<(string Name, string Job)> AuthorizedBy = [];
 
     /// <summary>True if the corresponding auth-group has been satisfied.</summary>
-    public List<bool> GroupsSatisfied = new();
+    public List<bool> GroupsSatisfied = [];
 
     /// <summary>Human-readable label per auth-group, e.g. "Captain / HoS".</summary>
-    public List<string> GroupLabels = new();
+    public List<string> GroupLabels = [];
 
     /// <summary>
     /// When the action will fire (CurTime, server-side).

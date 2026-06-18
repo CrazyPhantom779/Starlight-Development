@@ -4,12 +4,12 @@ namespace Content.Shared.Damage.Components;
 [RegisterComponent]
 public sealed partial class InjectOnHitComponent : Component
 {
-    [DataField("reagents")]
+    [DataField]
     public List<ReagentQuantity> Reagents;
 
     [DataField("limit")]
     public float? ReagentLimit;
-    [DataField("sound")]
+    [DataField]
     public SoundSpecifier? Sound;
 }
 [ByRefEvent]

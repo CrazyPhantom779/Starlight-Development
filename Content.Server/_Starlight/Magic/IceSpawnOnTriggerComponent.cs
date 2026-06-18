@@ -11,31 +11,31 @@ public sealed partial class IceSpawnOnTriggerComponent : Component
     /// The radius of the ice circle to spawn when hitting a humanoid (in tiles).
     /// Default is 2 tiles for a smaller area.
     /// </summary>
-    [DataField("radius")]
+    [DataField]
     public float Radius = 2f;
 
     /// <summary>
     /// Only spawn the ice circle if the projectile hits a humanoid mob.
     /// If false, will spawn ice on any trigger event.
     /// </summary>
-    [DataField("requireHumanoid")]
+    [DataField]
     public bool RequireHumanoid = true;
 
     /// <summary>
     /// Probability (0.0 to 1.0) of spawning ice instead of snow.
     /// </summary>
-    [DataField("iceChance")]
+    [DataField]
     public float IceChance = 0.60f;
 
     /// <summary>
     /// The entity ID for ice crust debris (IceCrust).
     /// </summary>
-    [DataField("iceEntityId")]
+    [DataField]
     public string IceEntityId = "IceCrust";
 
     /// <summary>
     /// The tile ID for snow floor (FloorSnow).
     /// </summary>
-    [DataField("snowTileId")]
+    [DataField]
     public string SnowTileId = "FloorSnow";
 }

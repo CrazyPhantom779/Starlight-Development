@@ -11,5 +11,5 @@ public sealed partial class PhysicalSocialInteractionReceiverComponent : Compone
     /// Anything defined in this list will be ADDED to the parents list, if it exists
     /// </summary>
     [DataField, AlwaysPushInheritance]
-    public List<ProtoId<PhysicalSocialInteractionPrototype>> InteractionPrototypes = new();
+    public List<ProtoId<PhysicalSocialInteractionPrototype>> InteractionPrototypes = [];
 }

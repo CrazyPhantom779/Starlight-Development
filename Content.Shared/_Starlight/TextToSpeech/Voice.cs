@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using Content.Shared.Humanoid;
 using Robust.Shared.Prototypes;
 
@@ -8,22 +5,22 @@ namespace Content.Shared.Starlight.TextToSpeech;
 /// <summary>
 /// Prototype represent TTS voices
 /// </summary>
-[Prototype("voice")]
+[Prototype]
 public sealed partial class VoicePrototype : IPrototype
 {
     [IdDataField]
     public string ID { get; private set; } = default!;
 
-    [DataField("voice")]
+    [DataField]
     public int Voice { get; private set; }
 
-    [DataField("name")]
+    [DataField]
     public string Name { get; private set; } = string.Empty;
 
-    [DataField("sex", required: true)]
+    [DataField(required: true)]
     public Sex Sex { get; private set; } = default!;
 
-    [DataField("silicon")]
+    [DataField]
     public bool Silicon { get; private set; } = false;
 
     [DataField]

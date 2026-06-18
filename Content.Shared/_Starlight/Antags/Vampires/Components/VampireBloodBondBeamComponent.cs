@@ -16,7 +16,7 @@ public sealed partial class VampireBloodBondBeamComponent : Component
     /// Active beam connections where this entity is the source
     /// </summary>
     [DataField]
-    public Dictionary<EntityUid, BloodBondBeamConnection> ActiveBeams = new();
+    public Dictionary<EntityUid, BloodBondBeamConnection> ActiveBeams = [];
 }
 
 /// <summary>

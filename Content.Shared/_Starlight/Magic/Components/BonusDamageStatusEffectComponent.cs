@@ -1,7 +1,5 @@
 using Robust.Shared.GameStates;
 using Content.Shared._Starlight.Magic.Systems;
-using Content.Shared.Damage.Prototypes;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.Dictionary;
 using Content.Shared.Damage;
 
 namespace Content.Shared._Starlight.Magic.Components;
@@ -13,7 +11,7 @@ namespace Content.Shared._Starlight.Magic.Components;
 [Access(typeof(SharedBonusDamageSystem))]
 public sealed partial class BonusDamageStatusEffectComponent : Component
 {
-    [DataField("damage", required: true)]
+    [DataField(required: true)]
     public DamageSpecifier Damage = new();
 
     [DataField]

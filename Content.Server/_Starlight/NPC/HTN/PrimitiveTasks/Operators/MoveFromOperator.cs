@@ -38,7 +38,7 @@ public sealed partial class MoveFromOperator : HTNOperator, IHtnConditionalShutd
     /// <summary>
     /// When to shut the task down.
     /// </summary>
-    [DataField("shutdownState")]
+    [DataField]
     public HTNPlanState ShutdownState { get; private set; } = HTNPlanState.TaskFinished;
 
     /// <summary>

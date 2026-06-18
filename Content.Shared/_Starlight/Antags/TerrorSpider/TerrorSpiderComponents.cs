@@ -1,6 +1,4 @@
-﻿using Content.Shared.Actions;
 ﻿using Content.Shared.Actions.Components;
-using Content.Shared.DoAfter;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization;
 
@@ -31,12 +29,12 @@ public sealed partial class TerrorPrincessComponent : Component
     public string Briefing = "terror-spider-princess-briefing";
 
     [DataField]
-    public List<EntProtoId> Eggs = new()
-    {
+    public List<EntProtoId> Eggs =
+    [
         "TerrorRedEggSpiderFertilized",
         "TerrorGreenSpiderFertilized",
         "TerrorGrayEggSpiderFertilized"
-    };
+    ];
 
     [DataField]
     public EntProtoId<ActionComponent> LayEggActionId = "ActionEggsLaying";

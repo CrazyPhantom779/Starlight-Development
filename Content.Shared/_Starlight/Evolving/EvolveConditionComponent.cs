@@ -9,6 +9,6 @@ public sealed partial class EvolveConditionComponent : Component
 {
     [DataField, ViewVariables(VVAccess.ReadWrite)]
     public EvolveType? ConditionType;
-    [DataField("count"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
     public int Count = 0;
 }

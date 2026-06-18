@@ -136,5 +136,5 @@ public sealed partial class SpeechOverrideInfo
     ///     This is horrible.
     /// </remarks>
     [DataField]
-    public Dictionary<InGameICChatType, LocId> MessageWrapOverrides = new();
+    public Dictionary<InGameICChatType, LocId> MessageWrapOverrides = [];
 }

@@ -69,11 +69,9 @@ namespace Content.Server.Body.Components
         // TODO HYPEROXIA?
 
         [DataField(required: true)]
-        [ViewVariables(VVAccess.ReadWrite)]
         public DamageSpecifier Damage = default!;
 
         [DataField(required: true)]
-        [ViewVariables(VVAccess.ReadWrite)]
         public DamageSpecifier DamageRecovery = default!;
 
         [DataField]

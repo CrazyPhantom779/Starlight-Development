@@ -11,7 +11,6 @@ using Content.Shared.Administration.Logs;
 using Content.Shared.Alert;
 using Content.Shared.Database;
 using Content.Shared.Examine;
-using Content.Shared.Roles.Components;
 using Robust.Server.Player;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;

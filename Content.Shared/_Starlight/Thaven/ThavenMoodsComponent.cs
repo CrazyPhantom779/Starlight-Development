@@ -21,7 +21,7 @@ public sealed partial class ThavenMoodsComponent : Component
     /// The non-shared moods that are active.
     /// </summary>
     [DataField, AutoNetworkedField]
-    public List<ThavenMood> Moods = new();
+    public List<ThavenMood> Moods = [];
 
     /// <summary>
     /// Whether to allow emagging to add a random wildcard mood.
@@ -42,7 +42,7 @@ public sealed partial class ThavenMoodsComponent : Component
     /// will grab 1 mood from each of these datasets on round start/map init
     /// </summary>
     [DataField(serverOnly: true)]
-    public List<ProtoId<DatasetPrototype>> MoodDatasets =  new() { SharedThavenMoodSystem.YesAndDataset, SharedThavenMoodSystem.NoAndDataset };
+    public List<ProtoId<DatasetPrototype>> MoodDatasets =  [SharedThavenMoodSystem.YesAndDataset, SharedThavenMoodSystem.NoAndDataset];
 
     /// <summary>
     /// what dataset will the "wildcard" mood be pulled from

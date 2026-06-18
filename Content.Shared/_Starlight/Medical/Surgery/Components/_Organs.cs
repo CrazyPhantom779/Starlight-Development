@@ -58,10 +58,10 @@ public sealed partial class FunctionalOrganComponent : Component
 public sealed partial class TaggedOrganComponent : Component
 {
     [DataField]
-    public List<ProtoId<TagPrototype>> AddTags = new();
+    public List<ProtoId<TagPrototype>> AddTags = [];
 
     [DataField]
-    public List<ProtoId<TagPrototype>> RemoveTags = new();
+    public List<ProtoId<TagPrototype>> RemoveTags = [];
 }
 
 [RegisterComponent, NetworkedComponent, AutoGenerateComponentState]

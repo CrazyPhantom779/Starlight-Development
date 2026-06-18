@@ -1,6 +1,5 @@
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization;
 
 namespace Content.Shared._Starlight.Xenobiology;
 
@@ -11,14 +10,14 @@ public sealed partial class SlimeExtractComponent : Component
     /// What occurs when this extract receives some specific reagent.
     /// Each entry is a reagent reaction, consisting of the requirements and then the response
     /// </summary>
-    [DataField("extractReactions"), AutoNetworkedField]
-    public List<ProtoId<ExtractReactionPrototype>> ExtractReactions = new();
+    [DataField, AutoNetworkedField]
+    public List<ProtoId<ExtractReactionPrototype>> ExtractReactions = [];
 
     /// <summary>
     /// The name of the container that holds the solution.
     /// Needed so that the slime extract can communicate with the container itself.
     /// </summary>
-    [DataField("containerName", required: true), AutoNetworkedField]
+    [DataField(required: true), AutoNetworkedField]
     public string ContainerName = string.Empty;
 
     /// <summary>
@@ -42,5 +41,5 @@ public sealed partial class SlimeExtractActiveReactionComponent : Component
     /// The reactions currently active on this reagent, along with the timestamps of their activation.
     /// </summary>
     [ViewVariables, AutoNetworkedField]
-    public Dictionary<ProtoId<ExtractReactionPrototype>, TimeSpan> ActiveReactions = new();
+    public Dictionary<ProtoId<ExtractReactionPrototype>, TimeSpan> ActiveReactions = [];
 }

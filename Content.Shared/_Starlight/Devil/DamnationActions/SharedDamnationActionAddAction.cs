@@ -6,7 +6,7 @@ namespace Content.Shared._Starlight.Devil.DamnationActions;
 public abstract partial class SharedDamnationActionAddAction : DamnationAction
 {
     [DataField]
-    public List<ProtoId<EntityPrototype>> Actions = new();
+    public List<ProtoId<EntityPrototype>> Actions = [];
 
     protected SharedActionsSystem _actions = default!;
 

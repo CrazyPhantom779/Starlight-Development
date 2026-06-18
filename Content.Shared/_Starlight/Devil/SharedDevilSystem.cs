@@ -1,6 +1,5 @@
 using System.Linq;
 using System.Text.RegularExpressions;
-using System.Xml;
 using Content.Shared._Starlight.Paper;
 using Content.Shared.Examine;
 using Content.Shared.Paper;
@@ -63,8 +62,8 @@ public abstract partial class SharedDevilSystem : EntitySystem
             return null;
 
         InfernalContractData data;
-        data.Damnations = new();
-        data.InvalidDamnations = new();
+        data.Damnations = [];
+        data.InvalidDamnations = [];
         data.Cost = 0;
 
         // welcome to serialization hell

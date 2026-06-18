@@ -24,7 +24,7 @@ public sealed partial class PlumbingInletComponent : Component
     ///     has its own isolated network.
     /// </summary>
     [DataField]
-    public List<string> InletNames = new() { "inlet" };
+    public List<string> InletNames = ["inlet"];
 
     /// <summary>
     ///     Amount to transfer per update, shared across all inlets.
@@ -36,5 +36,5 @@ public sealed partial class PlumbingInletComponent : Component
     ///     Round-robin indices for fair outlet selection.
     ///     Tracks which outlet to start from when pulling from multiple sources on each network.
     /// </summary>
-    public Dictionary<string, int> RoundRobinIndices = new();
+    public Dictionary<string, int> RoundRobinIndices = [];
 }

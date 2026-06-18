@@ -1,7 +1,6 @@
 using Content.Shared._Starlight.Medical.Body.Systems;
 using Content.Shared.Chemistry.Components;
 using Content.Shared.Chemistry.Reagent;
-using Content.Shared.Nutrition.EntitySystems;
 using Content.Shared.Whitelist;
 using Robust.Shared.GameStates;
 using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom;
@@ -70,7 +69,7 @@ namespace Content.Shared.Body.Components
         ///     Used to track how long each reagent has been in the stomach
         /// </summary>
         [ViewVariables]
-        public readonly List<ReagentDelta> ReagentDeltas = new();
+        public readonly List<ReagentDelta> ReagentDeltas = [];
 
         /// <summary>
         ///     Used to track quantity changes when ingesting & digesting reagents

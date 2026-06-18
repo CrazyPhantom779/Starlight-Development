@@ -51,13 +51,13 @@ public sealed partial class TraitPrototype : IPrototype
     /// Effects are applied in order.
     /// </summary>
     [DataField]
-    public List<BaseTraitEffect> Effects = new();
+    public List<BaseTraitEffect> Effects = [];
 
     /// <summary>
     /// Other traits that are mutually exclusive with this one.
     /// </summary>
     [DataField]
-    public List<ProtoId<TraitPrototype>> Conflicts = new();
+    public List<ProtoId<TraitPrototype>> Conflicts = [];
 
     /// <summary>
     /// Don't apply this trait to entities this whitelist IS NOT valid for.

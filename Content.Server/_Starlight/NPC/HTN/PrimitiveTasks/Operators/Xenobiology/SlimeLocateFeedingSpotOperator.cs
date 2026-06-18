@@ -24,7 +24,7 @@ public sealed partial class SlimeLocateFeedingSpotOperator : HTNOperator
     /// <summary>
     /// Target entitycoordinates to move to.
     /// </summary>
-    [DataField("targetMoveKey", required: true)]
+    [DataField(required: true)]
     public string TargetMoveKey = string.Empty;
 
     public override void Initialize(IEntitySystemManager sysManager)

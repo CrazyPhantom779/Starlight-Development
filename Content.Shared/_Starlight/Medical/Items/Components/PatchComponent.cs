@@ -12,7 +12,7 @@ public sealed partial class PatchComponent : Component
         /// How long it takes to apply patch.
         /// </summary>
         [ViewVariables(VVAccess.ReadWrite)]
-        [DataField("delay")]
+        [DataField]
         public float Delay = 3f;
 
         /// <summary>

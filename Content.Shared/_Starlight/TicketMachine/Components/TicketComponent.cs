@@ -9,7 +9,7 @@ namespace Content.Shared._Starlight.TicketMachine.Components;
 [AutoGenerateComponentState]
 public sealed partial class TicketComponent : Component
 {
-    [AutoNetworkedField, DataField("number")]
+    [AutoNetworkedField, DataField]
     public int Number = 0;
 
     /// <summary>

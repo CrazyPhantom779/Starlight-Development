@@ -12,7 +12,7 @@ public sealed partial class RemCompsEffect : BaseTraitEffect
     /// The component names to remove from the entity.
     /// </summary>
     [DataField(required: true, customTypeSerializer: typeof(CustomHashSetSerializer<string, ComponentNameSerializer>))]
-    public HashSet<string> Components = new();
+    public HashSet<string> Components = [];
 
     public override void Apply(TraitEffectContext ctx)
     {

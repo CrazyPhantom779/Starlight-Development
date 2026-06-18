@@ -122,7 +122,7 @@ public abstract partial class SharedSurgerySystem
             var tool = args.Tools.FirstOrDefault(x => HasComp(x, reg.Component.GetType()));
             if (tool == default) return;
 
-            var specificToolComp = EntityManager.GetComponents(tool)
+            var specificToolComp = AllComps(tool)
                 .OfType<ISurgeryToolComponent>();
 
             SoundSpecifier? endSound = null;
@@ -294,7 +294,7 @@ public abstract partial class SharedSurgerySystem
         }
 
         var duration = stepComp.Duration;
-        float SmallestSuccessRate = 1f;
+        var SmallestSuccessRate = 1f;
 
         foreach (var tool in validTools)
             if (TryComp(tool, out SurgeryToolComponent? toolComp))
@@ -302,7 +302,7 @@ public abstract partial class SharedSurgerySystem
                 var toolSpeed = 1f;
                 var toolSuccessRate = 1f;
                 SoundSpecifier? startSound = null;
-                var specificToolComp = EntityManager.GetComponents(tool)
+                var specificToolComp = AllComps(tool)
                     .OfType<ISurgeryToolComponent>();
 
                 foreach(var usedTool in specificToolComp)
@@ -381,8 +381,8 @@ public abstract partial class SharedSurgerySystem
             {
                 if (!_entitySystem.TryGetSingleton(requirement, out var requiredEnt)
                     || !TryComp(requiredEnt, out SurgeryComponent? requiredComp)
-                    || !PreviousStepsComplete(body, part, (requiredEnt, requiredComp), step)
-                    && IsSurgeryValid(body, part, requirement, step, out _, out _, out _))
+                    || (!PreviousStepsComplete(body, part, (requiredEnt, requiredComp), step)
+                    && IsSurgeryValid(body, part, requirement, step, out _, out _, out _)))
                     return false;
             }
         }

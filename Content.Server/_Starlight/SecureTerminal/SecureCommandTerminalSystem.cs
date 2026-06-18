@@ -6,7 +6,6 @@ using Content.Server.Chat.Systems;
 using Content.Server.GameTicking;
 using Content.Server.Popups;
 using Content.Server.Station.Systems;
-using Content.Server.Starlight.AlertArmory;
 using Content.Shared.Access.Systems;
 using Content.Shared.Database;
 using Content.Shared.Popups;
@@ -30,6 +29,7 @@ using Content.Shared.Doors.Systems;
 using Content.Shared.Toggleable;
 using Content.Server._Starlight.Administration.Systems;
 using Content.Shared._NullLink;
+using Content.Server._Starlight.AlertArmory;
 
 namespace Content.Server.Starlight.SecureTerminal;
 

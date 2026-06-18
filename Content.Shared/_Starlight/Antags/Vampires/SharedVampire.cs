@@ -40,7 +40,7 @@ public readonly record struct VampireLocateTarget(NetEntity Target, string Displ
 [Serializable, NetSerializable]
 public sealed partial class VampireLocateBuiState : BoundUserInterfaceState
 {
-    public List<VampireLocateTarget> Targets { get; init; } = new();
+    public List<VampireLocateTarget> Targets { get; init; } = [];
 }
 
 [Serializable, NetSerializable]

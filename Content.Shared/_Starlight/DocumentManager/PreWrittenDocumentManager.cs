@@ -17,7 +17,7 @@ public sealed partial class PreWrittenDocumentManager: IEntityEventSubscriber
     /// <summary>
     ///     Dictionary of file name -> document contents.
     /// </summary>
-    private Dictionary<string, string> _nameToDocument = new();
+    private Dictionary<string, string> _nameToDocument = [];
 
     private const string DocumentsPath = "/Documents/";
     private const string FallbackLocalization = "en-US";

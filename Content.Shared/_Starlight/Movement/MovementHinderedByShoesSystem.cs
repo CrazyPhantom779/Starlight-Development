@@ -24,7 +24,7 @@ public sealed partial class MovementHinderedByShoesSystem : EntitySystem
             return;
 
 
-        float hinderModifier = 0f;
+        var hinderModifier = 0f;
 
         foreach (var legEntity in body.LegEntities)
         {

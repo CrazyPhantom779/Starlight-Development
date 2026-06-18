@@ -21,13 +21,13 @@ public sealed partial class VampireComponent : Component
     /// Default abilities, they will be added at start.
     /// </summary>
     [DataField]
-    public List<EntProtoId> BaseVampireActions = new()
-    {
+    public List<EntProtoId> BaseVampireActions =
+    [
         "ActionVampireToggleFangs",
         "ActionVampireGlare",
         "ActionVampireRejuvenateI",
         "ActionVampireSleep"
-    };
+    ];
 
     /// <summary>
     /// Core action ids that systems need to manage explicitly.
@@ -36,11 +36,11 @@ public sealed partial class VampireComponent : Component
     public EntProtoId ClassSelectActionId = "ActionClassSelectId";
 
     [DataField]
-    public List<EntProtoId> RejuvenateActions = new()
-    {
+    public List<EntProtoId> RejuvenateActions =
+    [
         "ActionVampireRejuvenateI",
         "ActionVampireRejuvenateII"
-    };
+    ];
 
     /// <summary>
     /// Lifetime total blood drunk. Used for unlocking abilities.
@@ -157,7 +157,7 @@ public sealed partial class VampireComponent : Component
     /// <summary>
     /// Action entities of the vampire, used as ActionId -> EntityUid.
     /// </summary>
-    public Dictionary<EntProtoId, EntityUid> ActionEntities = new();
+    public Dictionary<EntProtoId, EntityUid> ActionEntities = [];
 
     /// <summary>
     /// Determines whether the vampire is drinking at the moment
@@ -167,7 +167,7 @@ public sealed partial class VampireComponent : Component
     /// <summary>
     /// tracking how much blood was drunk from each target.
     /// </summary>
-    public Dictionary<EntityUid, int> BloodDrunkFromTargets = new();
+    public Dictionary<EntityUid, int> BloodDrunkFromTargets = [];
 
     [DataField]
     public int MaxBloodPerTarget = 200;

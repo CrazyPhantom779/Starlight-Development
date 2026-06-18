@@ -12,7 +12,7 @@ public sealed partial class AddCompsEffect : BaseTraitEffect
     /// The components to add to the entity.
     /// </summary>
     [DataField(required: true)]
-    public ComponentRegistry Components = new();
+    public ComponentRegistry Components = [];
 
     public override void Apply(TraitEffectContext ctx)
     {

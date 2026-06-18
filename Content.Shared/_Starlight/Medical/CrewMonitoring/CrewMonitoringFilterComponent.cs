@@ -8,24 +8,24 @@ public sealed partial class CrewMonitoringFilterComponent : Component
     /// <summary>
     ///     List of departments which this console can see. If empty, unrestricted.
     /// </summary>
-    [DataField("shownDepartments"), ViewVariables(VVAccess.ReadWrite)]
-    public List<string> ShownDepartments = new();
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public List<string> ShownDepartments = [];
 
     /// <summary>
     ///     Always show crew with tracking implants in addition.
     /// </summary>
-    [DataField("alwaysShowTrackingImplants"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
     public bool AlwaysShowTrackingImplants = false;
 
     /// <summary>
     ///     Only show crew who are wounded or dead.
     /// <summary>
-    [DataField("onlyShowWoundedOrDead"), ViewVariables(VVAccess.ReadWrite)]
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
     public bool OnlyShowWoundedOrDead = false;
 
     /// <summary>
     ///     List of factions the console can see.
     /// </summary>
-    [DataField("shownFactions"), ViewVariables(VVAccess.ReadWrite)]
-    public List<string> ShownFactions = new() { "crew" };
+    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    public List<string> ShownFactions = ["crew"];
 }

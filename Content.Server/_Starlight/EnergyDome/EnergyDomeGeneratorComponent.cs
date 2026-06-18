@@ -33,7 +33,7 @@ public sealed partial class EnergyDomeGeneratorComponent : Component
     public bool CanDeviceNetworkUse = false;
 
     //Dome
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField]
     public EntProtoId DomePrototype = "EnergyDomeSmallRed";
 
     [DataField]

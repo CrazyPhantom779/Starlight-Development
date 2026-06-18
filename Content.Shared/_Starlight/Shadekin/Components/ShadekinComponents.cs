@@ -24,8 +24,8 @@ public sealed partial class ShadekinComponent : Component
     [AutoNetworkedField, ViewVariables]
     public ShadekinState CurrentState { get; set; } = ShadekinState.Dark;
 
-    [DataField("thresholds", required: true)]
-    public SortedDictionary<FixedPoint2, ShadekinState> Thresholds = new();
+    [DataField(required: true)]
+    public SortedDictionary<FixedPoint2, ShadekinState> Thresholds = [];
 
     /// <summary>
     /// whether to flicker lights or not. default on

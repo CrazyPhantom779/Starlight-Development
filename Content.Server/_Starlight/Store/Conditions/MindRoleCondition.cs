@@ -10,13 +10,13 @@ public sealed partial class MindRoleCondition : ListingCondition
     /// <summary>
     /// A whitelist of antag roles that can purchase this listing. Only one needs to be found.
     /// </summary>
-    [DataField("whitelist", customTypeSerializer: typeof(PrototypeIdHashSetSerializer<AntagPrototype>))]
+    [DataField(customTypeSerializer: typeof(PrototypeIdHashSetSerializer<AntagPrototype>))]
     public HashSet<string>? Whitelist;
 
     /// <summary>
     /// A blacklist of antag roles that cannot purchase this listing. Only one needs to be found.
     /// </summary>
-    [DataField("blacklist", customTypeSerializer: typeof(PrototypeIdHashSetSerializer<AntagPrototype>))]
+    [DataField(customTypeSerializer: typeof(PrototypeIdHashSetSerializer<AntagPrototype>))]
     public HashSet<string>? Blacklist;
 
     public override bool Condition(ListingConditionArgs args)

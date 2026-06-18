@@ -12,7 +12,7 @@ public sealed partial class SharedTimedSpawnerSystem : EntitySystem
     [Dependency] private IGameTiming _timing = default!;
     [Dependency] private IRobustRandom _random = default!;
 
-    private readonly List<(EntityUid uid, TimedSpawnerComponent comp)> _toFire = new();
+    private readonly List<(EntityUid uid, TimedSpawnerComponent comp)> _toFire = [];
 
     public override void Initialize()
     {

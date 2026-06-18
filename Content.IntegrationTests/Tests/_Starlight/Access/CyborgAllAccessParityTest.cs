@@ -67,7 +67,6 @@ public sealed class CyborgAllAccessParityTest
                     $"Resources/Prototypes/Access/misc.yml, " +
                     $"or remove them from CyborgAllAccess.");
             }
-
         });
 
         await pair.CleanReturnAsync();

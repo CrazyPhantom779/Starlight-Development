@@ -19,7 +19,7 @@ public sealed class MsgUpdatePlayerStatus : NetMessage
 
             var resourcesCount = buffer.ReadInt32();
             resources.EnsureCapacity(resourcesCount);
-            for (int i = 0; i < resourcesCount; i++)
+            for (var i = 0; i < resourcesCount; i++)
             {
                 var key = buffer.ReadString();
                 var value = buffer.ReadDouble();

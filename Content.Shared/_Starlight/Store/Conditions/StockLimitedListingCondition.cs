@@ -1,7 +1,3 @@
-using System.Collections.Generic;
-using Content.Shared.IdentityManagement;
-using Content.Shared.Store;
-using Content.Shared.Store.Components;
 using Robust.Shared.Serialization;
 
 namespace Content.Shared.Store.Conditions;
@@ -16,50 +12,50 @@ public sealed partial class StockLimitedListingCondition : ListingCondition
     /// <summary>
     /// The maximum number of times this item can be purchased globally.
     /// </summary>
-    [DataField("stockLimit")]
+    [DataField]
     public int StockLimit = 1;
 
     /// <summary>
     /// The current number of times this item has been purchased.
     /// </summary>
-    [DataField("currentStock")]
+    [DataField]
     public int CurrentStock = 0;
 
     /// <summary>
     /// The name of the last person to purchase this item.
     /// </summary>
-    [DataField("lastPurchaser")]
+    [DataField]
     public string? LastPurchaser = null;
 
     /// <summary>
     /// Dictionary to track which listings have been modified by this condition.
     /// Key is the listing ID, value is whether the listing has been modified.
     /// </summary>
-    private static readonly Dictionary<string, bool> _modifiedListings = new();
+    private static readonly Dictionary<string, bool> _modifiedListings = [];
 
     /// <summary>
     /// Dictionary to track the current stock of each listing.
     /// Key is the listing ID, value is the current stock.
     /// </summary>
-    private static readonly Dictionary<string, int> _stockCounts = new();
+    private static readonly Dictionary<string, int> _stockCounts = [];
 
     /// <summary>
     /// Dictionary to track the maximum stock limit of each listing.
     /// Key is the listing ID, value is the maximum stock limit.
     /// </summary>
-    private static readonly Dictionary<string, int> _stockLimits = new();
+    private static readonly Dictionary<string, int> _stockLimits = [];
 
     /// <summary>
     /// Dictionary to track the last purchaser of each listing.
     /// Key is the listing ID, value is the name of the last purchaser.
     /// </summary>
-    private static readonly Dictionary<string, string> _lastPurchasers = new();
+    private static readonly Dictionary<string, string> _lastPurchasers = [];
 
     /// <summary>
     /// Dictionary to track whether a listing is out of stock.
     /// Key is the listing ID, value is whether the listing is out of stock.
     /// </summary>
-    private static readonly Dictionary<string, bool> _outOfStock = new();
+    private static readonly Dictionary<string, bool> _outOfStock = [];
 
     public override bool Condition(ListingConditionArgs args)
     {

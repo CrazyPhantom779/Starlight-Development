@@ -15,7 +15,7 @@ public sealed partial class SlimeEatOperator : HTNOperator
     /// <summary>
     /// Target entity to eat.
     /// </summary>
-    [DataField("targetKey", required: true)]
+    [DataField(required: true)]
     public string TargetKey = string.Empty;
 
     public override void Initialize(IEntitySystemManager sysManager)

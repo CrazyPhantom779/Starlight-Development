@@ -21,7 +21,7 @@ public sealed partial class AdminVerbSystem : EntitySystem
         => SubscribeLocalEvent<GetVerbsEvent<Verb>>(AddVerbs);
     private void AddVerbs(GetVerbsEvent<Verb> args)
     {
-        if (!EntityManager.TryGetComponent(args.User, out ActorComponent? actor))
+        if (!TryComp(args.User, out ActorComponent? actor))
             return;
 
         var player = actor.PlayerSession;

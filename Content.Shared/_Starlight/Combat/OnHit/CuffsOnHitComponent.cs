@@ -14,7 +14,7 @@ public sealed partial class CuffsOnHitComponent : Component
     [DataField]
     public TimeSpan Duration = TimeSpan.FromSeconds(1);
 
-    [DataField("sound")]
+    [DataField]
     public SoundSpecifier? Sound;
 }
 [ByRefEvent]

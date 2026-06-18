@@ -1,5 +1,4 @@
 using System.Numerics;
-using Content.Shared._Starlight.Weapon.Components;
 using Content.Shared.Damage.Components;
 using Content.Shared.Damage.Systems;
 using Content.Shared.Inventory;
@@ -11,8 +10,6 @@ using Content.Shared.Weapons.Ranged.Systems;
 using Robust.Shared.Map;
 
 //linq
-using System.Linq;
-using Content.Shared.Weapons.Ranged.Events;
 using Content.Shared.Examine;
 
 namespace Content.Shared.Starlight.Knockback;
@@ -108,7 +105,7 @@ public abstract partial class SharedKnockbackSystem : EntitySystem
     private bool GetKnockbackData(Entity<KnockbackByUserTagComponent> ent, EntityUid user, out KnockbackData data)
     {
         KnockbackData totalData = new();
-        bool hadAnyMatches = false;
+        var hadAnyMatches = false;
         //get all matching tags
         foreach (var tag in ent.Comp.DoestContain.Keys)
         {
@@ -128,7 +125,7 @@ public abstract partial class SharedKnockbackSystem : EntitySystem
 
     private float CalculateKnockback(EntityUid user, KnockbackData data)
     {
-        float knockback = data.Knockback;
+        var knockback = data.Knockback;
         //If we have no slips, cut the knockback in half
         if (CheckForNoSlips(user))
         {
@@ -143,7 +140,7 @@ public abstract partial class SharedKnockbackSystem : EntitySystem
 
     private bool CheckForNoSlips(EntityUid uid)
     {
-        if (EntityManager.TryGetComponent(uid, out NoSlipComponent? flashImmunityComponent))
+        if (TryComp(uid, out NoSlipComponent? flashImmunityComponent))
         {
             return true;
         }
@@ -154,7 +151,7 @@ public abstract partial class SharedKnockbackSystem : EntitySystem
             var slots = _inventory.GetSlotEnumerator((uid, inventoryComp), SlotFlags.WITHOUT_POCKET);
             while (slots.MoveNext(out var slot))
             {
-                if (slot.ContainedEntity != null && EntityManager.TryGetComponent(slot.ContainedEntity, out NoSlipComponent? wornNoSlipComponent))
+                if (slot.ContainedEntity != null && TryComp(slot.ContainedEntity, out NoSlipComponent? wornNoSlipComponent))
                 {
                     return true;
                 }

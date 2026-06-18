@@ -12,12 +12,12 @@ namespace Content.Shared._Starlight.Magic.Components;
 [Access(typeof(MobThresholdStatusEffectSystem))]
 public sealed partial class MobThresholdsStatusEffectComponent : Component
 {
-    [DataField("thresholds", required: true)]
-    public SortedDictionary<FixedPoint2, MobState> Thresholds = new();
+    [DataField(required: true)]
+    public SortedDictionary<FixedPoint2, MobState> Thresholds = [];
 
     /// <summary>
     /// Whether or not this entity can be revived out of a dead state.
     /// </summary>
-    [DataField("allowRevives")]
+    [DataField]
     public bool AllowRevives;
 }

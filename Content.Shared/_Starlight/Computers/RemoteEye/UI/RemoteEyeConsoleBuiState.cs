@@ -1,5 +1,4 @@
-﻿using Content.Shared.Starlight.Antags.Abductor;
-using Robust.Shared.Serialization;
+﻿using Robust.Shared.Serialization;
 
 namespace Content.Shared._Starlight.Computers.RemoteEye;
 

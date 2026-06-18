@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using Robust.Shared.GameStates;
 
 namespace Content.Shared._Starlight.Plumbing.Components;
@@ -23,7 +22,7 @@ public sealed partial class PlumbingOutletComponent : Component
     ///     (e.g. the filter) can list several names.
     /// </summary>
     [DataField]
-    public List<string> OutletNames = new() { "outlet" };
+    public List<string> OutletNames = ["outlet"];
 
     /// <summary>
     ///     If true, this outlet can be pulled from. If false, it's blocked.

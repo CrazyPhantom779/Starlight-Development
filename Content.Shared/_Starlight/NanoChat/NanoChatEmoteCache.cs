@@ -123,7 +123,7 @@ public static class NanoChatEmoteCache
         EnsureCacheLoaded();
         return _categoryCache!.TryGetValue(category, out var emotes)
             ? new List<EmoteData>(emotes)
-            : new List<EmoteData>();
+            : [];
     }
 
     /// <summary>
@@ -143,8 +143,8 @@ public static class NanoChatEmoteCache
             return;
 
         var prototypeManager = IoCManager.Resolve<IPrototypeManager>();
-        _emoteCache = new Dictionary<string, EmoteData>();
-        _categoryCache = new Dictionary<string, List<EmoteData>>();
+        _emoteCache = [];
+        _categoryCache = [];
         var categories = new HashSet<string>();
 
         foreach (var proto in prototypeManager.EnumeratePrototypes<NanoChatEmotePrototype>())
@@ -172,7 +172,7 @@ public static class NanoChatEmoteCache
             categories.Add(proto.Category);
 
             if (!_categoryCache.ContainsKey(proto.Category))
-                _categoryCache[proto.Category] = new List<EmoteData>();
+                _categoryCache[proto.Category] = [];
 
             _categoryCache[proto.Category].Add(emoteData);
         }

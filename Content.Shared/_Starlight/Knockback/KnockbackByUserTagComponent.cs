@@ -8,7 +8,7 @@ namespace Content.Shared.Starlight.Knockback;
 public sealed partial class KnockbackByUserTagComponent : Component
 {
     [DataField, AutoNetworkedField]
-    public Dictionary<ProtoId<TagPrototype>, KnockbackData> DoestContain = new();
+    public Dictionary<ProtoId<TagPrototype>, KnockbackData> DoestContain = [];
 }
 
 [DataDefinition]

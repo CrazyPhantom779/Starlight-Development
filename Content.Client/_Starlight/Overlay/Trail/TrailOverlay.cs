@@ -190,7 +190,7 @@ public sealed class TrailOverlay : Robust.Client.Graphics.Overlay
             var sample = samples[i];
             float t = i / (float)(count - 1);
 
-            float alpha = t * t * (3f - 2f * t);
+            float alpha = t * t * (3f - (2f * t));
             alpha *= comp.TrailColor.A;
 
             if (alpha < 0.05f)
