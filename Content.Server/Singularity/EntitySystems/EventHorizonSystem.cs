@@ -2,6 +2,7 @@ using System.Numerics;
 using Content.Server.Administration.Logs;
 using Content.Server.Singularity.Events;
 using Content.Shared.Database;
+using Content.Shared.Maps;
 using Content.Shared.Mind.Components;
 using Content.Shared.Singularity.Components;
 using Content.Shared.Singularity.EntitySystems;
@@ -34,6 +35,7 @@ public sealed partial class EventHorizonSystem : SharedEventHorizonSystem
     [Dependency] private SharedTransformSystem _xformSystem = default!;
     [Dependency] private SharedMapSystem _mapSystem = default!;
     [Dependency] private TagSystem _tagSystem = default!;
+    [Dependency] private ITileDefinitionManager _tileDefinitionManager = default!;
     #endregion Dependencies
 
     private static readonly ProtoId<TagPrototype> HighRiskItemTag = "HighRiskItem";
@@ -284,6 +286,13 @@ public sealed partial class EventHorizonSystem : SharedEventHorizonSystem
     /// </summary>
     public bool CanConsumeTile(Entity<EventHorizonComponent> hungry, TileRef tile, Entity<MapGridComponent> grid)
     {
+        // Starlight Start: Toggle for singularity eating indestructible tiles
+        if (hungry.Comp.IgnoreIndestructibleTiles &&
+            _tileDefinitionManager[tile.Tile.TypeId] is ContentTileDefinition tileDefinition &&
+            tileDefinition.Indestructible)
+            return false;
+        // Starlight End
+
         foreach (var blockingEntity in _mapSystem.GetAnchoredEntities(grid, tile.GridIndices))
         {
             if (!CanConsumeEntity(hungry, blockingEntity, hungry.Comp))

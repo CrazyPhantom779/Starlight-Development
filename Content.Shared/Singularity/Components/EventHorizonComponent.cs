@@ -74,6 +74,11 @@ public sealed partial class EventHorizonComponent : Component
     [ViewVariables(VVAccess.ReadWrite)]
     public TimeSpan TargetConsumePeriod = TimeSpan.FromSeconds(0.5);
 
+    // Starlight Start: Toggle for singularity eating indestructible tiles
+    [DataField]
+    public bool IgnoreIndestructibleTiles = true;
+    // Starlight End
+
     /// <summary>
     /// The next time at which this consumed everything it overlapped with.
     /// </summary>
