@@ -51,6 +51,7 @@ tiles-rough-metal-floor = rough metal floor
 tiles-rusty-metal-floor = rusty metal floor
 tiles-steel-grate-floor = steel grate floor
 tiles-tech-greeb-floor = tech maints greeb floor
+tiles-bluespace-floor = bluespace floor
 
 # Developer tiles for mapping
 tiles-floor-dev-floor = [dev] floor

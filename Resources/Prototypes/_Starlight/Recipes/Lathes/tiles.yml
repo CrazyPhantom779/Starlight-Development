@@ -187,3 +187,11 @@
   parent: BaseSteelTileRecipe
   id: FloorTileItemTechGreeb
   result: FloorTileItemTechGreeb
+
+- type: latheRecipe
+  parent: BaseSteelTileRecipe
+  id: FloorTileItemBluespace
+  result: FloorTileItemBluespace
+  materials:
+    Steel: 250
+    BluespaceCrystal: 500

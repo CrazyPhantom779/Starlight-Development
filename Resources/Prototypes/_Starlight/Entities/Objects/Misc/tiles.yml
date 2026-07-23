@@ -792,3 +792,36 @@
       - FloorAstroDirt
   - type: Stack
     stackType: FloorTileAstroDirt
+
+- type: entity
+  id: FloorTileItemBluespace
+  parent: FloorTileItemBase
+  name: bluespace tile
+  description: A mysterious blue tile.
+  suffix: 1
+  components:
+  - type: Sprite
+    sprite: _Starlight/Objects/Tiles/tiles.rsi
+    state: bluespace
+  - type: FloorTile
+    outputs:
+      - Plating
+      - FloorBluespace
+  - type: Stack
+    stackType: FloorTileBluespace
+
+- type: entity
+  parent: FloorTileItemBluespace
+  id: FloorTileItemBluespace25
+  suffix: 25
+  components:
+    - type: Stack
+      count: 25
+
+- type: entity
+  parent: FloorTileItemBluespace
+  id: FloorTileItemBluespace30
+  suffix: 30
+  components:
+    - type: Stack
+      count: 30

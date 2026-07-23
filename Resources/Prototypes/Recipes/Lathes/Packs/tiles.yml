@@ -47,6 +47,7 @@
   - FloorTileItemRustyMetal
   - FloorTileItemSteelGrate
   - FloorTileItemTechGreeb
+  - FloorTileItemBluespace
   # Starlight End
 
 - type: latheRecipePack

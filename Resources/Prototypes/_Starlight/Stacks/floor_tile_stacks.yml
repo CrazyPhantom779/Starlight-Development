@@ -263,3 +263,9 @@
   name: stack-tech-greeb-floor
   spawn: FloorTileItemTechGreeb
   maxCount: 30
+
+- type: stack
+  id: FloorTileBluespace
+  name: stack-bluespace-floor
+  spawn: FloorTileItemBluespace
+  maxCount: 30

@@ -920,3 +920,16 @@
   parent: FloorDevFloor
   name: tiles-floor-dev-service
   sprite: /Textures/_Starlight/Tiles/dev_service.png
+
+- type: tile
+  id: FloorBluespace
+  name: tiles-bluespace-floor
+  sprite: /Textures/_Starlight/Tiles/bluespace_tile.png
+  baseTurf: Plating
+  isSubfloor: false
+  deconstructTools: [ Prying ]
+  footstepSounds:
+    collection: FootstepFloor
+  itemDrop: FloorTileItemBluespace
+  heatCapacity: 10000
+  indestructible: true
