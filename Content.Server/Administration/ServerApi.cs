@@ -487,13 +487,22 @@ public sealed partial class ServerApi : IPostInjectInit
             }
 
             InfoResponse.MapInfo? mapInfo = null;
-            if (_gameMapManager.GetSelectedMap() is { } mapPrototype)
+            if (_gameMapManager.GetSelectedMaps() is { } mapPrototypes) // Starlight Edit: Dual Stations
             {
-                mapInfo = new InfoResponse.MapInfo
-                {
-                    Id = mapPrototype.ID,
-                    Name = mapPrototype.MapName
-                };
+                // Starlight edit Start: Dual Stations, get the first valid map
+                var mapPrototype = mapPrototypes.FirstOrDefault(m => m != null);
+                mapInfo = mapPrototype != null
+                    ? new InfoResponse.MapInfo
+                    {
+                        Id = mapPrototype.ID,
+                        Name = mapPrototype.MapName
+                    }
+                    : new InfoResponse.MapInfo
+                    {
+                        Id = Loc.GetString("game-ticker-no-map-selected"),
+                        Name = Loc.GetString("game-ticker-no-map-selected")
+                    };
+                // Starlight edit End
             }
 
             var gameRules = new List<string>();

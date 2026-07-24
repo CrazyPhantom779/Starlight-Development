@@ -10,6 +10,7 @@ using Robust.Shared.ContentPack;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Random;
 using Robust.Shared.Utility;
+using Content.Shared._Starlight.CCVar; // Starlight
 
 namespace Content.Server.Maps;
 
@@ -25,9 +26,9 @@ public sealed partial class GameMapManager : IGameMapManager
     [ViewVariables(VVAccess.ReadOnly)]
     private readonly Queue<string> _previousMaps = new();
     [ViewVariables(VVAccess.ReadOnly)]
-    private GameMapPrototype? _configSelectedMap;
+    private List<GameMapPrototype?>? _configSelectedMaps; // Starlight Edit: Dual Stations
     [ViewVariables(VVAccess.ReadOnly)]
-    private GameMapPrototype? _selectedMap; // Don't change this value during a round!
+    private List<GameMapPrototype?>? _selectedMaps; // Don't change this value during a round! // Starlight Edit: Dual Stations
     [ViewVariables(VVAccess.ReadOnly)]
     private bool _mapRotationEnabled;
     [ViewVariables(VVAccess.ReadOnly)]
@@ -43,25 +44,25 @@ public sealed partial class GameMapManager : IGameMapManager
         {
             if (TryLookupMap(value, out GameMapPrototype? map))
             {
-                _configSelectedMap = map;
+                _configSelectedMaps = map != null ? [map] : null; // Starlight Edit: Dual Stations
                 return;
             }
 
             if (string.IsNullOrEmpty(value))
             {
-                _configSelectedMap = default!;
+                _configSelectedMaps = default!; // Starlight Edit: Dual Stations
                 return;
             }
 
             if (_configurationManager.GetCVar<bool>(CCVars.UsePersistence))
             {
                 var startMap = _configurationManager.GetCVar<string>(CCVars.PersistenceMap);
-                _configSelectedMap = _prototypeManager.Index<GameMapPrototype>(startMap);
+                _configSelectedMaps = [_prototypeManager.Index<GameMapPrototype>(startMap)]; // Starlight Edit: Dual Stations
 
                 var mapPath = new ResPath(value);
-                if (_resMan.UserData.Exists(mapPath))
+                if (_resMan.UserData.Exists(mapPath) && _configSelectedMaps != null && _configSelectedMaps[0] != null) // Starlight Edit: Dual Stations
                 {
-                    _configSelectedMap = _configSelectedMap.Persistence(mapPath);
+                    _configSelectedMaps[0] = _configSelectedMaps[0]?.Persistence(mapPath); // Starlight Edit: Dual Stations
                     _log.Info($"Using persistence map from {value}");
                     return;
                 }
@@ -129,58 +130,106 @@ public sealed partial class GameMapManager : IGameMapManager
         return _prototypeManager.EnumeratePrototypes<GameMapPrototype>();
     }
 
-    public GameMapPrototype? GetSelectedMap()
+    public List<GameMapPrototype?> GetSelectedMaps() // Starlight Edit: Dual Stations
     {
-        return _configSelectedMap ?? _selectedMap;
+        return _configSelectedMaps ?? _selectedMaps ?? new List<GameMapPrototype?>(); // Starlight Edit: Dual Stations
     }
 
-    public void ClearSelectedMap()
+    public void ClearSelectedMaps() // Starlight Edit: Dual Stations
     {
-        _selectedMap = default!;
+        _selectedMaps = default!; // Starlight Edit: Dual Stations
     }
 
     public bool TrySelectMapIfEligible(string gameMap)
     {
         if (!TryLookupMap(gameMap, out var map) || !IsMapEligible(map))
             return false;
-        _selectedMap = map;
+
+        // Starlight edit Start: Dual Stations
+        _selectedMaps ??= [];
+
+        _selectedMaps.Add(map);
+        // Starlight edit End
         return true;
     }
 
-    public void SelectMap(string gameMap)
+    // Starlight Start: Dual Stations
+    public string GetMapString()
+        => _selectedMaps == null || _selectedMaps.Count == 0
+            ? "No map selected"
+            : string.Join(", ", _selectedMaps.Select(map => map?.MapName ?? Loc.GetString("discord-round-notifications-unknown-map")));
+
+    public int GetStationCount()
+        => _configurationManager.GetCVar(StarlightCCVars.StationCount);
+
+    public bool TrySelectMapsIfEligible(List<string> gameMaps)
     {
-        if (!TryLookupMap(gameMap, out var map))
-            throw new ArgumentException($"The map \"{gameMap}\" is invalid!");
-        _selectedMap = map;
+        _selectedMaps = [];
+        foreach (var gameMap in gameMaps)
+        {
+            if (!TryLookupMap(gameMap, out var map) || !IsMapEligible(map))
+                return false;
+            _selectedMaps.Add(map);
+        }
+        return true;
+    }
+    // Starlight End: Dual Stations
+
+    // Starlight edit Start: Dual Stations
+    public void SelectMaps(List<string> gameMaps)
+    {
+        _selectedMaps = [];
+        foreach (var gameMap in gameMaps)
+        {
+            if (!TryLookupMap(gameMap, out var map))
+                throw new ArgumentException($"The map \"{gameMap}\" is invalid!");
+            _selectedMaps.Add(map);
+        }
     }
 
-    public void SelectMapRandom()
+    public void SelectMapsRandom()
     {
         var maps = CurrentlyEligibleMaps().ToList();
-        _selectedMap = _random.Pick(maps);
+        _selectedMaps = [];
+        for (var i = 0; i < GetStationCount(); i++)
+        {
+            if (maps.Count == 0)
+                break;
+            _selectedMaps.Add(_random.Pick(maps));
+        }
     }
 
-    public void SelectMapFromRotationQueue(bool markAsPlayed = false)
+    public void SelectMapsFromRotationQueue(bool markAsPlayed = false)
     {
-        var map = GetFirstInRotationQueue();
+        _selectedMaps = [];
+        for (var i = 0; i < GetStationCount(); i++)
+        {
+            if (_previousMaps.Count == 0)
+                break;
 
-        _selectedMap = map;
-
-        if (markAsPlayed)
-            EnqueueMap(map.ID);
+            var map = GetFirstInRotationQueue();
+            _selectedMaps.Add(map);
+            if (markAsPlayed)
+                EnqueueMap(map.ID);
+        }
     }
+    // Starlight edit End: Dual Stations
 
-    public void SelectMapByConfigRules()
+    public void SelectMapsByConfigRules() // Starlight Edit: Dual Stations
     {
         if (_mapRotationEnabled)
         {
-            _log.Info("selecting the next map from the rotation queue");
-            SelectMapFromRotationQueue(true);
+            // Starlight edit Start: Dual Stations
+            _log.Info("selecting the next maps from the rotation queue");
+            SelectMapsFromRotationQueue(true);
+            // Starlight edit End
         }
         else
         {
-            _log.Info("selecting a random map");
-            SelectMapRandom();
+            // Starlight edit Start: Dual Stations
+            _log.Info("selecting random maps");
+            SelectMapsRandom();
+            // Starlight edit End
         }
     }
 
@@ -191,8 +240,14 @@ public sealed partial class GameMapManager : IGameMapManager
 
     private bool IsMapEligible(GameMapPrototype map)
     {
-        return map.MaxPlayers >= _playerManager.PlayerCount &&
-               map.MinPlayers <= _playerManager.PlayerCount &&
+        // Starlight Start: Dual Stations
+        var modifiedPlayerCount = _playerManager.PlayerCount / GetStationCount(); //make sure its minimum 1
+        modifiedPlayerCount = Math.Max(modifiedPlayerCount, 1);
+        // Starlight End: Dual Stations
+        // Starlight edit Start: Dual Stations
+        return map.MaxPlayers >= modifiedPlayerCount &&
+               map.MinPlayers <= modifiedPlayerCount &&
+        // Starlight edit End
                map.Conditions.All(x => x.Check(map)) &&
                _entityManager.System<GameTicker>().IsMapEligible(map);
     }

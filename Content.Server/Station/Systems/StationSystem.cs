@@ -22,7 +22,7 @@ using Content.Shared.Shuttles.Components;
 using Robust.Server.GameObjects;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.Markdown.Mapping;
-using Content.Shared._Starlight.Shuttles.Components;
+using Content.Shared.Warps;
 // Starlight End
 
 namespace Content.Server.Station.Systems;
@@ -436,6 +436,28 @@ public sealed partial class StationSystem : SharedStationSystem
 
         var ev = new StationPostInitEvent((station, data));
         RaiseLocalEvent(station, ref ev, true);
+
+        // Starlight Start: Dual Stations
+        //get all of the warp points
+        var warps = EntityQueryEnumerator<WarpPointComponent>();
+        while (warps.MoveNext(out var ent, out var comp))
+        {
+            //get the grid uid
+            var gridUid = Transform(ent).GridUid;
+
+            if (gridUid == null)
+                continue;
+
+            //check if they match any of the grids in the station
+            if (!data.Grids.Contains(gridUid.Value))
+                continue;
+
+            //try to get station component
+            comp.Location = name + " " + comp.Location;
+            //dirty
+            Dirty(ent, comp);
+        }
+        // Starlight End
 
         return station;
     }

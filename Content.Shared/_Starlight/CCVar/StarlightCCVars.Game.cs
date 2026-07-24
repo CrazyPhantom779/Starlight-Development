@@ -1,3 +1,5 @@
+using Content.Shared.Administration;
+using Content.Shared.CCVar.CVarAccess;
 using Robust.Shared.Configuration;
 
 namespace Content.Shared._Starlight.CCVar;
@@ -56,4 +58,10 @@ public sealed partial class StarlightCCVars
     /// </summary>
     public static readonly CVarDef<float> NukeRoundRestartTime =
         CVarDef.Create("game.nuke_round_restart_time", 20f, CVar.SERVERONLY);
+
+    /// How many stations to run in the coming round
+    /// </summary>
+    [CVarControl(AdminFlags.Adminchat)]
+    public static readonly CVarDef<int> StationCount =
+        CVarDef.Create("game.station_count", 1, CVar.SERVERONLY | CVar.ARCHIVE);
 }

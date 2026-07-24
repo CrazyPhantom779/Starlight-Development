@@ -95,8 +95,15 @@ namespace Content.Server.GameTicking
         /// </remarks>
         private void LoadMaps()
         {
-            if (_map.MapExists(DefaultMap))
-                return;
+            /* if (_map.MapExists(DefaultMap))
+                return; */
+
+            //check if all the maps exist
+            foreach (var map in DefaultMaps)
+            {
+                if (_map.MapExists(map))
+                    return;
+            }
 
             AddGamePresetRules();
 
@@ -104,34 +111,55 @@ namespace Content.Server.GameTicking
 
             // the map might have been force-set by something
             // (i.e. votemap or forcemap)
-            var mainStationMap = _gameMapManager.GetSelectedMap();
-            if (mainStationMap == null)
+            var mainStationMaps = _gameMapManager.GetSelectedMaps();
+            if (mainStationMaps == null || mainStationMaps.Count == 0 || mainStationMaps.All(m => m == null))
             {
                 // otherwise set the map using the config rules
-                _gameMapManager.SelectMapByConfigRules();
-                mainStationMap = _gameMapManager.GetSelectedMap();
+                _gameMapManager.SelectMapsByConfigRules();
+                mainStationMaps = _gameMapManager.GetSelectedMaps();
             }
 
             // Small chance the above could return no map.
             // ideally SelectMapByConfigRules will always find a valid map
-            if (mainStationMap != null)
+            //starlight start
+            var defaultMaps = new List<string>();
+            if (mainStationMaps != null)
             {
-                maps.Add(mainStationMap);
+                //add them if the maps are valid
+                foreach (var map in mainStationMaps)
+                {
+                    if (map != null)
+                    {
+                        maps.Add(map);
+                        defaultMaps.Add(map.ID);
+                    }
+                    else
+                    {
+                        Log.Info($"Map is null, skipping.");
+                    }
+                }
+                //starlight end
             }
             else
             {
                 throw new Exception("invalid config; couldn't select a valid station map!");
             }
 
-            if (CurrentPreset?.MapPool != null &&
-                _prototypeManager.TryIndex<GameMapPoolPrototype>(CurrentPreset.MapPool, out var pool) &&
-                !pool.Maps.Contains(mainStationMap.ID))
+            foreach (var map in mainStationMaps)
             {
-                var msg = Loc.GetString("game-ticker-start-round-invalid-map",
-                    ("map", mainStationMap.MapName),
-                    ("mode", Loc.GetString(CurrentPreset.ModeTitle)));
-                Log.Debug(msg);
-                SendServerMessage(msg);
+                if (map != null)
+                {
+                    if (CurrentPreset?.MapPool != null &&
+                                _prototypeManager.TryIndex<GameMapPoolPrototype>(CurrentPreset.MapPool, out var pool) &&
+                                !pool.Maps.Contains(map.ID))
+                        {
+                            var msg = Loc.GetString("game-ticker-start-round-invalid-map",
+                                ("map", map.MapName),
+                                ("mode", Loc.GetString(CurrentPreset.ModeTitle)));
+                            Log.Debug(msg);
+                            SendServerMessage(msg);
+                        }
+                }
             }
 
             // Let game rules dictate what maps we should load.
@@ -140,17 +168,25 @@ namespace Content.Server.GameTicking
             if (maps.Count == 0)
             {
                 _map.CreateMap(out var mapId, runMapInit: false);
-                DefaultMap = mapId;
+                //starlight
+                DefaultMaps.Add(mapId);
                 return;
             }
 
+            DefaultMaps.Clear(); //starlight, just in case, idk if this gets auto cleared or not
             for (var i = 0; i < maps.Count; i++)
             {
                 LoadGameMap(maps[i], out var mapId);
                 DebugTools.Assert(!_map.IsInitialized(mapId));
 
-                if (i == 0)
-                    DefaultMap = mapId;
+
+                //starlight account for list format
+                //check based on prototype ID
+                var protoID = maps[i].ID;
+                if (defaultMaps.Contains(protoID))
+                {
+                    DefaultMaps.Add(mapId);
+                }
             }
         }
 
@@ -423,7 +459,11 @@ namespace Content.Server.GameTicking
             }
 
             // MapInitialize *before* spawning players, our codebase is too shit to do it afterwards...
-            _map.InitializeMap(DefaultMap);
+            //starlight for each loop
+            foreach (var map in DefaultMaps)
+            {
+                _map.InitializeMap(map);
+            }
 
             StartGamePresetRules(); // Starlight - Start any map-attached game rules
 
@@ -734,7 +774,7 @@ namespace Content.Server.GameTicking
 
             _bugManager.Restart(); // Starlight
 
-            _gameMapManager.ClearSelectedMap();
+            _gameMapManager.ClearSelectedMaps();
 
             // Clear up any game rules.
             ClearGameRules();
@@ -818,7 +858,14 @@ namespace Content.Server.GameTicking
                 if (_webhookIdentifier == null)
                     return;
 
-                var mapName = _gameMapManager.GetSelectedMap()?.MapName ?? Loc.GetString("discord-round-notifications-unknown-map");
+                var mapnamescombined = _gameMapManager.GetSelectedMaps()?.Select(x => x?.MapName).ToList();
+
+                var mapName = "";
+                foreach (var map in _gameMapManager.GetSelectedMaps())
+                {
+                    mapName += map?.MapName ?? Loc.GetString("discord-round-notifications-unknown-map");
+                }
+
                 var greekIndicator = GreekRegex.Match(_cfg.GetCVar(CVars.GameHostName));
                 var content = Loc.GetString("discord-round-notifications-started", ("id", RoundId), ("map", mapName), ("serverIndicator", greekIndicator.Value));
 

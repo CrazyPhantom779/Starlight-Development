@@ -13,6 +13,9 @@ using Robust.Shared;
 using Robust.Shared.Configuration;
 using Robust.Shared.Network;
 using Robust.Shared.Timing;
+// Starlight Start
+using System.Linq;
+// Starlight End
 
 namespace Content.Server._Starlight.BugReports;
 
@@ -100,7 +103,12 @@ public sealed partial class BugReportManager : IBugReportManager, IPostInjectIni
         {
             metadata.Add("round time", _timing.CurTime.Subtract(ticker.RoundStartTimeSpan).ToString("hh':'mm':'ss"));
             metadata.Add("round type", Loc.GetString(ticker.CurrentPreset?.ModeTitle ?? "bug-report-report-unknown"));
-            metadata.Add("map", _map.GetSelectedMap()?.MapName ?? Loc.GetString("bug-report-report-unknown"));
+            // Starlight edit Start: Dual Stations, get possible names
+            var maps = _map.GetSelectedMaps();
+            var mapNames = maps != null && maps.Count > 0 ? string.Join(", ", maps.Select(m
+                => m?.MapName)) : Loc.GetString("bug-report-report-unknown");
+                metadata.Add("map", mapNames);
+            // Starlight edit End
         }
 
         serverActor.BugReport(

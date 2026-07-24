@@ -580,11 +580,16 @@ namespace Content.Server.GameTicking
                 return spawn;
             }
 
-            if (_map.MapExists(DefaultMap))
+            // Starlight edit Start: for loop added
+            foreach (var map in DefaultMaps)
             {
-                var mapUid = _map.GetMapOrInvalid(DefaultMap);
-                if (!TerminatingOrDeleted(mapUid))
-                    return new EntityCoordinates(mapUid, Vector2.Zero);
+                if (_map.MapExists(map))
+                {
+                    var mapUid = _map.GetMapOrInvalid(map);
+                    if (!TerminatingOrDeleted(mapUid))
+                        return new EntityCoordinates(mapUid, Vector2.Zero);
+                }
+            // Starlight edit End
             }
 
             // Just pick a point at this point I guess.
