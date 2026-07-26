@@ -18,6 +18,7 @@ using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
 using Content.Shared.Emag.Systems; //Starlight
 using Content.Shared._Starlight.Railroading.Events; // starlight
+using Content.Shared.Station; // Starlight-edit: Dual-Stations mail origin
 
 namespace Content.Shared.Delivery;
 
@@ -37,6 +38,7 @@ public abstract partial class SharedDeliverySystem : EntitySystem
     [Dependency] private NameModifierSystem _nameModifier = default!;
     [Dependency] private EmagSystem _emag = default!; //Starlight
     [Dependency] private AccessReaderSystem _accessReader = default!; //Starlight
+    [Dependency] private SharedStationSystem _stationSystem = default!; // Starlight-edit: Dual-Stations mail origin
     private static readonly ProtoId<TagPrototype> TrashTag = "Trash";
     private static readonly ProtoId<TagPrototype> RecyclableTag = "Recyclable";
 
@@ -69,6 +71,14 @@ public abstract partial class SharedDeliverySystem : EntitySystem
             }
 
             args.PushText(Loc.GetString("delivery-recipient-examine", ("recipient", recipientName), ("job", jobTitle)));
+
+            // Starlight Start: Show recipient's origin station.
+            if (ent.Comp.RecipientStation is { } recipientStationUid && Exists(recipientStationUid))
+            {
+                var originStationName = _stationSystem.GetStationDisplayName(recipientStationUid);
+                args.PushText(Loc.GetString("delivery-recipient-origin-station-examine", ("station", originStationName)));
+            }
+            // Starlight End
         }
 
         if (ent.Comp.IsLocked)
