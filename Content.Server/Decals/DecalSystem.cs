@@ -154,8 +154,14 @@ namespace Content.Server.Decals
             if (!TryComp(ev.Grid, out DecalGridComponent? newComp))
                 return;
 
+            // Starlight Start
+            var newGridComp = Comp<MapGridComponent>(ev.Grid);
+            var refWorld = _mapSystem.GridTileToWorld(ev.Grid, newGridComp, Vector2i.Zero);
+            var tileOffset = (Vector2) _mapSystem.TileIndicesFor(ev.OldGrid, Comp<MapGridComponent>(ev.OldGrid), refWorld);
+            // Starlight End
+
             // Transfer decals over to the new grid.
-            var enumerator = _mapSystem.GetAllTilesEnumerator(ev.Grid, Comp<MapGridComponent>(ev.Grid));
+            var enumerator = _mapSystem.GetAllTilesEnumerator(ev.Grid, newGridComp); // Starlight Edit: Comp<MapGridComponent>(ev.Grid) -> newGridComp
 
             var oldChunkCollection = oldComp.ChunkCollection.ChunkCollection;
             var chunkCollection = newComp.ChunkCollection.ChunkCollection;
@@ -164,11 +170,15 @@ namespace Content.Server.Decals
             {
                 var tilePos = (Vector2) tile.Value.GridIndices;
                 var chunkIndices = GetChunkIndices(tilePos);
+                // Starlight Start
+                var oldTilePos = tilePos + tileOffset;
+                var oldChunkIndices = GetChunkIndices(oldTilePos);
+                // Starlight End
 
-                if (!oldChunkCollection.TryGetValue(chunkIndices, out var oldChunk))
+                if (!oldChunkCollection.TryGetValue(oldChunkIndices, out var oldChunk)) // Starlight Edit: chunkIndices -> oldChunkIndices
                     continue;
 
-                var bounds = new Box2(tilePos - _boundsMinExpansion, tilePos + _boundsMaxExpansion);
+                var bounds = new Box2(oldTilePos - _boundsMinExpansion, oldTilePos + _boundsMaxExpansion); // Starlight Edit: tilePos -> oldTilePos
                 var toRemove = new RemQueue<uint>();
 
                 // Starlight Start: Only create a chunk if the tile contains decals that need to move.
@@ -183,11 +193,14 @@ namespace Content.Server.Decals
 
                     var newDecalId = newComp.ChunkCollection.NextDecalId++;
                     newChunk ??= chunkCollection.GetOrNew(chunkIndices); // Starlight Edit: Only create a new chunk if we need to move a decal into it.
-                    newChunk.Decals[newDecalId] = decal;
+
+                    var newDecal = decal.WithCoordinates(decal.Coordinates - tileOffset); // Starlight: Translate decal coordinates to new grid
+
+                    newChunk.Decals[newDecalId] = newDecal; // Starlight Edit: decal -> newDecal
                     newComp.DecalIndex[newDecalId] = chunkIndices;
                     toRemove.Add(oldDecalId);
                     movedDecals = true; // Starlight
-                    RecordUpsertDelta(ev.Grid, chunkIndices, newDecalId, decal); // Starlight
+                    RecordUpsertDelta(ev.Grid, chunkIndices, newDecalId, newDecal); // Starlight Edit: decal -> newDecal
                 }
 
                 // Starlight Start: Avoid creating and dirtying chunks if nothing happened.
@@ -199,17 +212,17 @@ namespace Content.Server.Decals
                 {
                     oldChunk.Decals.Remove(oldDecalId);
                     oldComp.DecalIndex.Remove(oldDecalId);
-                    RecordRemovalDelta(ev.OldGrid, chunkIndices, oldDecalId); // Starlight
+                    RecordRemovalDelta(ev.OldGrid, oldChunkIndices, oldDecalId); // Starlight Edit: chunkIndices -> oldChunkIndices
                 }
 
                 DirtyChunk(ev.Grid, chunkIndices, newChunk!); // Starlight Edit: Only dirty the new chunk if we moved a decal into it.
 
                 if (oldChunk.Decals.Count == 0)
-                    oldChunkCollection.Remove(chunkIndices);
+                    oldChunkCollection.Remove(oldChunkIndices); // Starlight Edit: chunkIndices -> oldChunkIndices
 
                 // Starlight edit Start: Dirty the old chunk because the moved decals were removed.
                 // if (toRemove.List?.Count > 0)
-                DirtyChunk(ev.OldGrid, chunkIndices, oldChunk);
+                DirtyChunk(ev.OldGrid, oldChunkIndices, oldChunk);
                 // Starlight edit End
             }
         }
