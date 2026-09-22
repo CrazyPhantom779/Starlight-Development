@@ -1,4 +1,5 @@
 using System.Linq;
+using Content.Server._Starlight.Holograms.Components;
 using Content.Shared._Starlight.Holograms;
 using Content.Shared.Power;
 

@@ -1,3 +1,4 @@
+using Content.Server._Starlight.Holograms.Components;
 using Content.Server.Silicons.Laws;
 using Content.Shared._Moffstation.BladeServer;
 using Content.Shared._Starlight.Holograms;

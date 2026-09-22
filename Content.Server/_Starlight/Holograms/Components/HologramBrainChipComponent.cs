@@ -1,4 +1,4 @@
-namespace Content.Server._Starlight.Holograms;
+namespace Content.Server._Starlight.Holograms.Components;
 
 /// <summary>
 /// Stores a mind for holographic projection.

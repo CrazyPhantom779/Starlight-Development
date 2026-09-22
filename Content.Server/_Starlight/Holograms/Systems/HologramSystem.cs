@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Content.Server._Starlight.Holograms.Components;
 using Content.Server.Access.Systems;
 using Content.Server.Body.Components;
 using Content.Server.Clothing.Systems;
@@ -19,9 +20,11 @@ using Content.Shared.Humanoid;
 using Content.Shared.Mind;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Movement.Components;
 using Content.Shared.Popups;
 using Content.Shared.Preferences;
 using Content.Shared.Roles.Jobs;
+using Content.Shared.Slippery;
 using Content.Shared.Whitelist;
 using Robust.Server.GameObjects;
 using Robust.Server.Player;
@@ -31,6 +34,7 @@ using Robust.Shared.GameObjects.Components.Localization;
 using Robust.Shared.Map;
 using Robust.Shared.Player;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization.Manager;
 
 namespace Content.Server._Starlight.Holograms.Systems;
 
@@ -53,6 +57,7 @@ public sealed partial class HologramSystem : SharedHologramSystem
     [Dependency] private StationSystem _station = default!;
     [Dependency] private SharedJobSystem _job = default!;
     [Dependency] private OutfitSystem _outfit = default!;
+    [Dependency] private ISerializationManager _serialization = default!;
 
     public readonly Dictionary<EntityUid, EntityUid> HologramsWaitingForMind = [];
 
@@ -86,10 +91,12 @@ public sealed partial class HologramSystem : SharedHologramSystem
         if (!TryGetProjectingMind(mindId, out var mind, out var client))
             return false;
 
-        var prototype = bodyChip?.HologramPrototype ?? DefaultHologramPrototype;
+        var prototype = ResolveProjectionPrototype(bodyChip);
         var mob = Spawn(prototype, coords);
 
         _transform.AttachToGridOrMap(mob);
+        PrepareHardlightBody(mob);
+        ApplyScannedBodyData(mob, bodyChip);
         PrepareHardlightBody(mob);
 
         var profile = TryApplyHumanoidProfile(mob, mindId, mind, bodyChip);
@@ -129,10 +136,12 @@ public sealed partial class HologramSystem : SharedHologramSystem
 
     public EntityUid SpawnAutonomousHologram(HologramBodyChipComponent bodyChip, EntityCoordinates coords)
     {
-        var prototype = bodyChip.HologramPrototype ?? DefaultHologramPrototype;
+        var prototype = ResolveProjectionPrototype(bodyChip);
         var mob = Spawn(prototype, coords);
 
         _transform.AttachToGridOrMap(mob);
+        PrepareHardlightBody(mob);
+        ApplyScannedBodyData(mob, bodyChip);
         PrepareHardlightBody(mob);
         TryApplyBodyChipProfile(mob, bodyChip);
 
@@ -189,6 +198,8 @@ public sealed partial class HologramSystem : SharedHologramSystem
         ApplyDefaultProjectionSettings(mob, projected);
 
         EnsureComp<MindContainerComponent>(mob);
+        EnsureComp<MovementIgnoreGravityComponent>(mob);
+        EnsureComp<NoSlipComponent>(mob);
 
         RemCompDeferred<RespiratorComponent>(mob);
         RemCompDeferred<BloodstreamComponent>(mob);
@@ -198,6 +209,34 @@ public sealed partial class HologramSystem : SharedHologramSystem
 
         _grammar.SetProperNoun((mob, grammar), true);
         _grammar.SetGender((mob, grammar), Gender.Neuter);
+    }
+
+    private EntProtoId ResolveProjectionPrototype(HologramBodyChipComponent? bodyChip)
+    {
+        if (bodyChip?.ScannedBody is { } scanned)
+            return scanned.ProjectionPrototype;
+
+        return bodyChip?.HologramPrototype ?? DefaultHologramPrototype;
+    }
+
+    private void ApplyScannedBodyData(EntityUid mob, HologramBodyChipComponent? bodyChip)
+    {
+        if (bodyChip?.ScannedBody is not { } scanned)
+            return;
+
+        foreach (var (_, component) in scanned.ComponentCopies)
+        {
+            var type = component.GetType();
+
+            if (HasComp(mob, type))
+                RemComp(mob, type);
+
+            var copy = _serialization.CreateCopy(component, notNullableOverride: true);
+            AddComp(mob, copy);
+        }
+
+        if (!string.IsNullOrWhiteSpace(scanned.Name))
+            _meta.SetEntityName(mob, scanned.Name);
     }
 
     private bool TryGetProjectingMind(
@@ -411,7 +450,8 @@ public sealed partial class HologramSystem : SharedHologramSystem
 
     private void ApplyDefaultProjectionSettings(EntityUid mob, HologramProjectedComponent projected)
     {
-        projected.GracePeriod = TimeSpan.FromSeconds(2);
+        projected.GracePeriod = TimeSpan.FromSeconds(0.2);
+        projected.OcclusionGracePeriod = TimeSpan.FromSeconds(0.15);
         projected.ValidationInterval = TimeSpan.FromSeconds(0.05);
         projected.SetEyeTarget = false;
         projected.EffectPrototype ??= "EffectHologramProjectionBeam";

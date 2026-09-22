@@ -255,3 +255,197 @@
     softness: 0.4
     color: "#00FFFF"
     energy: 5
+
+- type: entity
+  name: scanned hologram
+  parent: BaseMob
+  id: MobHologramScannedBody
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Hologram
+    shaderName: HologramProjection
+    color1: "#65b8e2"
+    color2: "#3a6981"
+    hue: 0.64
+    saturation: 0.95
+    alpha: 0.82
+    intensity: 1.6
+    colorBlend: 0.6
+    scanlineOpacity: 0.45
+    noiseOpacity: 0.35
+    flickerStrength: 0.2
+    lineScrollSpeed: 0.14
+    defaultVisibility: 0.9
+    offset: 0, 0
+  - type: HologramProjected
+    gracePeriod: 0.2
+    occlusionGracePeriod: 0.15
+    validationInterval: 0.05
+    setEyeTarget: false
+    validProjectorWhitelist:
+      tags:
+      - HoloProjectorServer
+      - HoloProjectorCamera
+    effectPrototype: EffectHologramProjectionBeam
+  - type: MovementIgnoreGravity
+  - type: NoSlip
+  - type: Stealth
+    lastVisibility: 0.9
+  - type: Input
+    context: "human"
+  - type: InputMover
+  - type: MobMover
+  - type: Clickable
+  - type: InteractionOutline
+  - type: Sprite
+    drawdepth: Mobs
+    layers: []
+  - type: Physics
+    bodyType: KinematicController
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape: !type:PhysShapeCircle
+          radius: 0.35
+        density: 25
+        mask:
+        - MobMask
+        layer:
+        - MobLayer
+  - type: MovementSpeedModifier
+    baseWalkSpeed: 3.5
+    baseSprintSpeed: 5
+  - type: Body
+    prototype: HologramAnimal
+  - type: DoAfter
+  - type: Pullable
+  - type: Examiner
+  - type: Puller
+  - type: StandingState
+  - type: Alerts
+  - type: MobState
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      100: Critical
+      200: Dead
+  - type: Stamina
+  - type: Damageable
+    damageContainer: Biological
+    damageModifierSet: HologramHardlight
+  - type: HealthExaminable
+    examinableTypes:
+    - Blunt
+    - Slash
+    - Piercing
+    - Heat
+    - Shock
+    - Cold
+    - Caustic
+  - type: MindContainer
+    showExamineInfo: true
+  - type: Actions
+  - type: HologramActionGrant
+    grantConsoleAction: true
+    grantLawsAction: true
+  - type: Eye
+  - type: CombatMode
+    canDisarm: true
+  - type: UserInterface
+    interfaces:
+      enum.SiliconLawsUiKey.Key:
+        type: SiliconLawBoundUserInterface
+      enum.HologramConsoleUiKey.Key:
+        type: HologramConsoleBoundUserInterface
+  - type: SiliconLawBound
+  - type: SiliconLawProvider
+    laws: Drone
+  - type: TypingIndicator
+    proto: robot
+  - type: Emoting
+  - type: Grammar
+    attributes:
+      proper: true
+  - type: PointLight
+    radius: 0.8
+    softness: 0.4
+    color: "#00FFFF"
+    energy: 5
+
+
+- type: hologramScanSettings
+  id: DefaultHologramScan
+  humanoidProjectionPrototype: MobHologramHardlight
+  scannedProjectionPrototype: MobHologramScannedBody
+  components:
+  # Visuals
+  - Sprite
+  - DamageStateVisuals
+  - RotationVisuals
+  - ScaleVisuals
+
+  # Body
+  - MovementSpeedModifier
+  - Fixtures
+  - Hands
+
+  # Speech / language / RP flavor
+  - Speech
+  - Vocal
+  - TypingIndicator
+  - Grammar
+  - BodyEmotes
+  - LanguageSpeaker
+  - ForeignerTrait
+  - TextToSpeech
+  - CharacterDescription
+  - CharacterSecrets
+  - ExploitableInfo
+  - MindSecrets
+  - RoleplayInfo
+
+  blacklist:
+  - Transform
+  - MetaData
+  - Actor
+  - MindContainer
+  - UserInterface
+  - Actions
+  - Hologram
+  - HologramProjected
+  - HologramConsole
+  - HologramActionGrant
+  - HologramBrainChip
+  - HologramBodyChip
+  - HologramBladeServer
+  - HTN
+  - NpcFactionMember
+  - GhostRole
+  - GhostTakeoverAvailable
+  - RandomMetadata
+  - Respirator
+  - Bloodstream
+  - Temperature
+  - TemperatureDamage
+  - Perishable
+  - Hunger
+  - Thirst
+  - Metabolizer
+  - DiseaseCarrier
+  - SolutionContainerManager
+  - MeleeChemicalInjector
+  - Reactive
+  - Butcherable
+  - Damageable
+  - MobThresholds
+  - MeleeWeapon
+  - Gun
+  - RechargeBasicEntityAmmo
+  - Explosive
+  - Storage
+  - EntityStorage
+  - ItemSlots
+  - ContainerContainer
+  - SiliconLawBound
+  - SiliconLawProvider
+  - HologramBladeLawProvider

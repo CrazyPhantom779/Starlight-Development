@@ -1,4 +1,4 @@
-namespace Content.Server._Starlight.Holograms;
+namespace Content.Server._Starlight.Holograms.Components;
 
 /// <summary>
 /// A blade server that stores hologram data via brain and body chips.

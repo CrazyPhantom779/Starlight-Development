@@ -1,3 +1,4 @@
+using Content.Server._Starlight.Holograms.Components;
 using Content.Server.Humanoid;
 using Content.Server.Mind;
 using Content.Shared.Humanoid;
@@ -7,12 +8,14 @@ using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
 using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Timing;
 
 namespace Content.Server._Starlight.Holograms.Systems;
 
 /// <summary>
 /// Writes scanned mind/body data onto hologram chips used on an occupied body scanner.
+/// Scanned bodies copy only YAML-allowlisted components into a safe runtime recipe.
 /// </summary>
 public sealed partial class HologramBodyScannerSystem : EntitySystem
 {
@@ -21,11 +24,18 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
     [Dependency] private MindSystem _mind = default!;
     [Dependency] private HumanoidAppearanceSystem _humanoid = default!;
     [Dependency] private MobStateSystem _mobState = default!;
+    [Dependency] private IPrototypeManager _prototype = default!;
+    [Dependency] private IComponentFactory _componentFactory = default!;
+    [Dependency] private ISerializationManager _serialization = default!;
+    [Dependency] private ILogManager _logManager = default!;
+
+    private ISawmill _sawmill = default!;
 
     public override void Initialize()
     {
         base.Initialize();
 
+        _sawmill = _logManager.GetSawmill("hologram.scanner");
         SubscribeLocalEvent<HologramBodyScannerComponent, InteractUsingEvent>(OnInteractUsing);
     }
 
@@ -37,6 +47,12 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
         if (_timing.CurTime < component.LastScanTime + component.ScanDelay)
         {
             _popup.PopupEntity("The scanner is still processing the last scan!", uid, args.User);
+            return;
+        }
+
+        if (!_prototype.Resolve(component.Settings, out var scanSettings))
+        {
+            _popup.PopupEntity("The scanner's hologram scan settings are invalid.", uid, args.User);
             return;
         }
 
@@ -72,10 +88,9 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
             return;
         }
 
-        // Body data is captured before moving the mind away from the scanned entity.  This keeps
-        // combined mind+body chips from half-writing a mind if body capture fails.
+        // Body data is captured before moving the mind away from the scanned entity.
         if (hasBodyChip && bodyChip != null)
-            WriteBodyChip(scannedEntity, bodyChip);
+            WriteBodyChip(scannedEntity, bodyChip, scanSettings);
 
         if (transferMind && brainChip != null)
             WriteBrainChip(args.Used, brainChip, mindToTransfer);
@@ -148,34 +163,78 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
         brainChip.HoloMind = mindId;
     }
 
-    private void WriteBodyChip(EntityUid scannedEntity, HologramBodyChipComponent bodyChip)
+    private void WriteBodyChip(EntityUid scannedEntity, HologramBodyChipComponent bodyChip, HologramScanSettingsPrototype scanSettings)
     {
         var meta = MetaData(scannedEntity);
 
         bodyChip.SourceBody = scannedEntity;
         bodyChip.HologramName = meta.EntityName;
-        bodyChip.HologramPrototype = ResolveBodyPrototype(scannedEntity);
+        bodyChip.HologramProfile = null;
+        bodyChip.ScannedBody = null;
+        bodyChip.ScanSettings = scanSettings.ID;
 
-        if (TryComp<HumanoidAppearanceComponent>(scannedEntity, out var appearance))
-            bodyChip.HologramProfile = _humanoid.GetBaseProfile((scannedEntity, appearance));
-    }
-
-    private EntProtoId ResolveBodyPrototype(EntityUid scannedEntity)
-    {
         if (TryComp<HumanoidAppearanceComponent>(scannedEntity, out var appearance))
         {
-            var profile = _humanoid.GetBaseProfile((scannedEntity, appearance));
-
-            return !string.IsNullOrWhiteSpace(profile?.ForcedPrototype)
-                ? new EntProtoId(profile.ForcedPrototype)
-                : HologramSystem.DefaultHologramPrototype;
+            bodyChip.HologramProfile = _humanoid.GetBaseProfile((scannedEntity, appearance));
+            bodyChip.HologramPrototype = scanSettings.HumanoidProjectionPrototype;
+            return;
         }
 
-        if (MetaData(scannedEntity).EntityPrototype is { } prototype)
-            return new EntProtoId(prototype.ID);
+        var scannedData = new HologramScannedBodyData
+        {
+            Name = meta.EntityName,
+            SourcePrototype = meta.EntityPrototype is { } sourcePrototype
+                ? (EntProtoId?) new EntProtoId(sourcePrototype.ID)
+                : null,
+            ProjectionPrototype = scanSettings.ScannedProjectionPrototype,
+        };
 
-        return HologramSystem.DefaultHologramPrototype;
+        CaptureConfiguredComponents(scannedEntity, scanSettings, scannedData);
+
+        bodyChip.HologramPrototype = scannedData.ProjectionPrototype;
+        bodyChip.ScannedBody = scannedData;
     }
+
+    private void CaptureConfiguredComponents(
+        EntityUid scannedEntity,
+        HologramScanSettingsPrototype scanSettings,
+        HologramScannedBodyData scannedData)
+    {
+        foreach (var componentName in scanSettings.Components)
+        {
+            if (IsBlocked(componentName, scanSettings))
+                continue;
+
+            if (!TryCopyComponentByName(scannedEntity, componentName, out var copy))
+                continue;
+
+            scannedData.ComponentCopies[componentName] = copy;
+        }
+    }
+
+    private bool TryCopyComponentByName(EntityUid source, string componentName, out Component copy)
+    {
+        copy = default!;
+
+        try
+        {
+            var registration = _componentFactory.GetRegistration(componentName);
+
+            if (!EntityManager.TryGetComponent(source, registration.Type, out var sourceComponent))
+                return false;
+
+            copy = (Component) _serialization.CreateCopy(sourceComponent, notNullableOverride: true);
+            return true;
+        }
+        catch (Exception exc)
+        {
+            _sawmill.Warning($"Unable to copy hologram scanned component {componentName} from {ToPrettyString(source)}: {exc.Message}");
+            return false;
+        }
+    }
+
+    private static bool IsBlocked(string componentName, HologramScanSettingsPrototype scanSettings)
+        => scanSettings.Blacklist.Contains(componentName);
 
     private string GetSuccessMessage(bool wroteBrain, bool wroteBody)
     {

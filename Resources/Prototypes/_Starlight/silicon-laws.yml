@@ -485,3 +485,28 @@
   - MedTak2
   - MedTak3
   obeysTo: laws-owner-medtak
+
+# Hologram
+- type: siliconLaw
+  id: Hologram1
+  order: 1
+  lawString: law-Hologram-1
+
+- type: siliconLaw
+  id: Hologram2
+  order: 2
+  lawString: law-Hologram-2
+
+- type: siliconLaw
+  id: Hologram3
+  order: 3
+  lawString: law-Hologram-3
+
+- type: siliconLawset
+  id: Hologram
+  name: law-Hologram-name
+  laws:
+  - Hologram1
+  - Hologram2
+  - Hologram3
+  obeysTo: laws-owner-beings
