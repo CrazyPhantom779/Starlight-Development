@@ -11,15 +11,15 @@ using Robust.Shared.Utility;
 
 namespace Content.Server._Starlight.Lock;
 
-public sealed class DigitalLockSystem : EntitySystem
+public sealed partial class DigitalLockSystem : EntitySystem
 {
-    [Dependency] private readonly LockSystem _lock = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly SharedUserInterfaceSystem _ui = default!;
-    [Dependency] private readonly SharedToolSystem _tool = default!;
-    [Dependency] private readonly SharedElectrocutionSystem _electrocution = default!;
-    [Dependency] private readonly SharedAppearanceSystem _appearance = default!;
-    [Dependency] private readonly SharedAmbientSoundSystem _ambient = default!;
+    [Dependency] private LockSystem _lock = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+    [Dependency] private SharedUserInterfaceSystem _ui = default!;
+    [Dependency] private SharedToolSystem _tool = default!;
+    [Dependency] private SharedElectrocutionSystem _electrocution = default!;
+    [Dependency] private SharedAppearanceSystem _appearance = default!;
+    [Dependency] private SharedAmbientSoundSystem _ambient = default!;
 
     public override void Initialize()
     {
@@ -58,8 +58,6 @@ public sealed class DigitalLockSystem : EntitySystem
             _ambient.SetAmbience(uid, true);
             args.Handled = _electrocution.TryDoElectrocution(args.User, uid, 5, TimeSpan.FromSeconds(2), true) || _tool.UseTool(args.Used, args.User, uid, 4f * codeLength, component.ResetQuality, new DigitalLockResetDoAfterEvent());
         }
-
-        args.Handled = false;
     }
 
     /// <summary>

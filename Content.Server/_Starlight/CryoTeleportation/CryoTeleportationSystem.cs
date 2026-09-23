@@ -3,8 +3,8 @@ using Content.Shared._Starlight.Polymorph.Components;
 using Content.Server.Station.Systems;
 using Content.Shared.Bed.Cryostorage;
 using Content.Shared.GameTicking;
-using Content.Shared.Starlight.CryoTeleportation;
-using Content.Shared.Starlight.CCVar;
+using Content.Shared._Starlight.CryoTeleportation;
+using Content.Shared._Starlight.CCVar;
 using Content.Shared.Silicons.Borgs.Components;
 using Content.Shared.Mind;
 using Content.Shared.Mobs;
@@ -21,18 +21,18 @@ using Content.Shared.Station.Components;
 
 namespace Content.Server._Starlight.CryoTeleportation;
 
-public sealed class CryoTeleportationSystem : EntitySystem
+public sealed partial class CryoTeleportationSystem : EntitySystem
 {
-    [Dependency] private readonly CryostorageSystem _cryostorage = default!;
-    [Dependency] private readonly SharedMindSystem _mind = default!;
-    [Dependency] private readonly SharedAudioSystem _audio = default!;
-    [Dependency] private readonly IEntityManager _entity = default!;
-    [Dependency] private readonly IGameTiming _timing = default!;
-    [Dependency] private readonly StationSystem _stationSystem = default!;
-    [Dependency] private readonly TransformSystem _transformSystem = default!;
-    [Dependency] private readonly IPlayerManager _playerMan = default!;
-    [Dependency] private readonly IConfigurationManager _configurationManager = default!;
-    [Dependency] private readonly SharedContainerSystem _container = default!;
+    [Dependency] private CryostorageSystem _cryostorage = default!;
+    [Dependency] private SharedMindSystem _mind = default!;
+    [Dependency] private SharedAudioSystem _audio = default!;
+    [Dependency] private IEntityManager _entity = default!;
+    [Dependency] private IGameTiming _timing = default!;
+    [Dependency] private StationSystem _stationSystem = default!;
+    [Dependency] private TransformSystem _transformSystem = default!;
+    [Dependency] private IPlayerManager _playerMan = default!;
+    [Dependency] private IConfigurationManager _configurationManager = default!;
+    [Dependency] private SharedContainerSystem _container = default!;
 
     public TimeSpan _nextTick = TimeSpan.Zero;
     private readonly TimeSpan _refreshCooldown = TimeSpan.FromSeconds(5);
@@ -71,7 +71,7 @@ public sealed class CryoTeleportationSystem : EntitySystem
             if (stationGrid == null)
                 continue;
 
-            var cryoStorageResult = FindCryoStorage(Transform(stationGrid.Value));
+            var cryoStorageResult = FindCryoStorage(comp.Station.Value);
 
             if (cryoStorageResult == null)
                 continue;
@@ -138,12 +138,36 @@ public sealed class CryoTeleportationSystem : EntitySystem
         comp.UserId = args.Session.UserId;
     }
 
-    private (EntityUid Uid, ContainerSlot Container)? FindCryoStorage(TransformComponent stationGridTransform)
+    /// <summary>
+    /// Finds an non-occupied cryo storage unit on the station's main grid.
+    /// </summary>
+    /// <param name="stationUid">station to be searched for cryo storage</param>
+    /// <returns>
+    /// An available cryo storage unit and its container slot, or null if no available cryo units were found.
+    /// Cryo units that are not on the station's main grid will not be returned, avoiding selecting cryo units off-station,
+    /// such as on the ATS, shuttles, etc., which may be unsafe for storing people or annoying for people to retrieve job equipment.
+    /// </returns>
+    private (EntityUid Uid, ContainerSlot Container)? FindCryoStorage(EntityUid stationUid)
     {
+        var stationData = EntityManager.GetComponentOrNull<StationDataComponent>(stationUid);
+
+        // if the whole station is gone, we're not putting anyone into cryo storage anyway
+        if(stationData == null)
+            return null;
+
+        // main station grid check. if the main grids is (somehow) empty, fallbackt o any grid in station data
+        var grids = stationData.MainGrids.Count > 0
+            ? stationData.MainGrids
+            : stationData.Grids;
+
         var query = AllEntityQuery<CryostorageComponent, TransformComponent>();
         while (query.MoveNext(out var cryoUid, out _, out var cryoTransform))
         {
-            if (stationGridTransform.MapUid != cryoTransform.MapUid)
+            if (cryoTransform.GridUid is not { } gridUid)
+                continue;
+
+            // skip any cryo storage that is not on the main station grids
+            if(!grids.Contains(gridUid))
                 continue;
 
             var container = _container.EnsureContainer<ContainerSlot>(cryoUid, "storage");
@@ -154,6 +178,7 @@ public sealed class CryoTeleportationSystem : EntitySystem
             return (cryoUid, container);
         }
 
+        // if we couldn't find a cryo storage unit, return null
         return null;
     }
 }
