@@ -32,14 +32,14 @@ public sealed partial class HologramBrainChipGhostRoleSystem : EntitySystem
 
         if (TryComp<MindContainerComponent>(uid, out var mindContainer) && mindContainer.Mind != null)
         {
-            _popup.PopupEntity("This hologram brain chip is already occupied.", uid, args.User);
+            _popup.PopupEntity(Loc.GetString("hologram-brainchip-already-occupied"), uid, args.User);
             args.Handled = true;
             return;
         }
 
         if (TryComp<GhostRoleComponent>(uid, out var existingRole) && !existingRole.Taken)
         {
-            _popup.PopupEntity("This hologram brain chip is already searching for a mind.", uid, args.User);
+            _popup.PopupEntity(Loc.GetString("hologram-brainchip-already-searching"), uid, args.User);
             args.Handled = true;
             return;
         }
@@ -53,7 +53,7 @@ public sealed partial class HologramBrainChipGhostRoleSystem : EntitySystem
 
         _ghostRole.RegisterGhostRole((uid, role));
 
-        _popup.PopupEntity("The hologram brain chip begins searching for a mind.", uid, args.User);
+        _popup.PopupEntity(Loc.GetString("hologram-brainchip-search-start"), uid, args.User);
         args.Handled = true;
     }
 
@@ -67,6 +67,6 @@ public sealed partial class HologramBrainChipGhostRoleSystem : EntitySystem
 
         RemCompDeferred<GhostTakeoverAvailableComponent>(uid);
 
-        _popup.PopupEntity("A mind flickers to life inside the hologram brain chip.", uid);
+        _popup.PopupEntity(Loc.GetString("hologram-brainchip-mind-found"), uid);
     }
 }

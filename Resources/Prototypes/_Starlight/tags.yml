@@ -303,7 +303,7 @@
   id: HologramBrainChip
 
 - type: Tag
-  id: HoloProjectorCamera
+  id: HoloProjector
 
 - type: Tag
   id: HoloProjectorServer

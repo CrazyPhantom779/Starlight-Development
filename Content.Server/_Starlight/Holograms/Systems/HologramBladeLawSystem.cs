@@ -192,7 +192,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         component.Emagged = true;
         SyncBladeLawsToOccupants(uid, component);
         NotifyActiveHologram(component);
-        _popup.PopupEntity("The hologram blade's law storage flickers red.", uid, args.UserUid);
+        _popup.PopupEntity(Loc.GetString("hologram-blade-law-storage-corrupted"), uid, args.UserUid);
         args.Handled = true;
     }
 
@@ -220,7 +220,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         if (!changed)
             return;
 
-        _popup.PopupEntity("The rack pushes a corrupted law update to its hologram blades.", uid, args.UserUid);
+        _popup.PopupEntity(Loc.GetString("hologram-blade-rack-law-corrupted"), uid, args.UserUid);
         args.Handled = true;
     }
 
@@ -255,7 +255,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
 
         if (!TryGetBladeForActionOwner(uid, out _))
         {
-            _popup.PopupEntity("This hologram brain is not installed in a blade server.", uid, uid);
+            _popup.PopupEntity(Loc.GetString("hologram-blade-brain-not-installed"), uid, uid);
             return;
         }
 
@@ -270,7 +270,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
 
         if (!TryGetBladeForActionOwner(uid, out var bladeUid))
         {
-            _popup.PopupEntity("This projection is not associated with a blade server.", uid, args.Performer);
+            _popup.PopupEntity(Loc.GetString("hologram-blade-projection-no-server"), uid, args.Performer);
             return;
         }
 
@@ -308,7 +308,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
 
         if (!_ui.HasUi(uiHost, HologramConsoleUiKey.Key))
         {
-            _popup.PopupEntity("No hologram console interface is available.", user, user);
+            _popup.PopupEntity(Loc.GetString("hologram-blade-no-console-interface"), user, user);
             return;
         }
 

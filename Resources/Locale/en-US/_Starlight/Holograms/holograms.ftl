@@ -29,6 +29,45 @@ hologram-console-disk-loaded = Hologram disk loaded
 hologram-console-projector-list = Available Projectors
 hologram-console-project = Project
 hologram-console-recall = Recall
+hologram-recall-no-chip-ghosted = No brain chip was installed to receive the hologram's mind - it was shut down and its mind released.
+hologram-recall-chip-rejected-ghosted = The brain chip could not accept the returning mind - the hologram was shut down and its mind released.
+hologram-projector-damaged-offline = Sparks fly from the projector as it shuts down!
+
+## Body scanner
+hologram-scanner-cooldown = The scanner is still processing the last scan!
+hologram-scanner-invalid-settings = The scanner's hologram scan settings are invalid.
+hologram-scanner-empty = The scanner is empty!
+hologram-scanner-need-chip = Use a hologram mind chip or body chip on the occupied scanner.
+hologram-scanner-chip-cant-store-mind = This chip cannot store a consciousness.
+hologram-scanner-chip-already-has-mind = This hologram mind chip already contains a consciousness.
+hologram-scanner-chip-occupied = This hologram mind chip is already occupied.
+hologram-scanner-target-not-dead = The scanner can only transfer consciousness from a dead body.
+hologram-scanner-no-mind-detected = The scanner cannot detect a consciousness to transfer!
+hologram-scanner-body-chip-occupied = This hologram body chip already contains body data.
+
+## Brain chip ghost role
+hologram-brainchip-already-occupied = This hologram brain chip is already occupied.
+hologram-brainchip-already-searching = This hologram brain chip is already searching for a mind.
+hologram-brainchip-search-start = The hologram brain chip begins searching for a mind.
+hologram-brainchip-mind-found = A mind flickers to life inside the hologram brain chip.
+
+## Blade laws
+hologram-blade-law-storage-corrupted = The hologram blade's law storage flickers red.
+hologram-blade-rack-law-corrupted = The rack pushes a corrupted law update to its hologram blades.
+hologram-blade-brain-not-installed = This hologram brain is not installed in a blade server.
+hologram-blade-projection-no-server = This projection is not associated with a blade server.
+hologram-blade-no-console-interface = No hologram console interface is available.
+
+## Console: projecting
+hologram-project-fail-blade-unavailable = Projection failed: that blade server is not available from this console.
+hologram-project-fail-blade-invalid = Projection failed: invalid, unpowered, or incomplete blade server.
+hologram-project-fail-no-body-chip = Projection failed: no body chip is installed.
+hologram-project-fail-no-mind-chip = Projection failed: no mind chip is installed.
+hologram-project-fail-limit = Projection failed: this console is already at its active hologram limit.
+hologram-project-fail-no-charge = Projection failed: the portable projector has no charge.
+hologram-project-fail-invalid-projector = Projection failed: select a valid same-grid projector.
+hologram-move-fail = Move failed: could not move the active hologram to that projector.
+hologram-project-fail-spawn = Projection failed: could not spawn the configured hologram body.
 hologram-console-select = Select
 hologram-console-integrity = Integrity:
 hologram-console-no-projectors = No projectors found on station

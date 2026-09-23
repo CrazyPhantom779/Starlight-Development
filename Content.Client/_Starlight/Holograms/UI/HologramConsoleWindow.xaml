@@ -9,8 +9,11 @@
         <BoxContainer Orientation="Vertical" Margin="14" SeparationOverride="12">
 
             <!-- Header -->
-            <PanelContainer HorizontalExpand="True">
-                <BoxContainer Orientation="Horizontal" Margin="12 10" SeparationOverride="12">
+            <PanelContainer>
+                <BoxContainer Orientation="Horizontal" Margin="14 11" SeparationOverride="14">
+                    <!-- Accent bar -->
+                    <PanelContainer Name="HeaderAccent" MinSize="4 0" VerticalExpand="True" />
+
                     <BoxContainer Orientation="Vertical" HorizontalExpand="True" SeparationOverride="2">
                         <Label Text="HOLOGRAM PROJECTION CONTROL"
                                FontColorOverride="#7dd3fc" />
@@ -19,13 +22,23 @@
                                FontColorOverride="#94a3b8" />
                     </BoxContainer>
 
-                    <BoxContainer Orientation="Horizontal" SeparationOverride="8" VerticalAlignment="Center">
-                        <Label Name="ModeLabel"
-                               Text="STATION MODE"
-                               FontColorOverride="#fbbf24" />
-                        <Label Name="ActiveIndicator"
-                               Text="● READY"
-                               FontColorOverride="#fbbf24" />
+                    <BoxContainer Orientation="Horizontal" SeparationOverride="14" VerticalAlignment="Center">
+                        <!-- Battery indicator: only visible when the console says so (see comp) -->
+                        <ui:BatteryIndicator Name="HeaderBattery" VerticalAlignment="Center" />
+
+                        <PanelContainer Name="ModeBadge">
+                            <Label Name="ModeLabel"
+                                   Text="STATION MODE"
+                                   Margin="8 3"
+                                   FontColorOverride="#fbbf24" />
+                        </PanelContainer>
+
+                        <PanelContainer Name="ActiveBadge">
+                            <Label Name="ActiveIndicator"
+                                   Text="● READY"
+                                   Margin="8 3"
+                                   FontColorOverride="#fbbf24" />
+                        </PanelContainer>
                     </BoxContainer>
                 </BoxContainer>
             </PanelContainer>
@@ -39,7 +52,7 @@
                 <!-- Left rail -->
                 <BoxContainer Name="LeftPanel"
                               Orientation="Vertical"
-                              SetWidth="410"
+                              MinSize="410 0"
                               VerticalExpand="True"
                               SeparationOverride="10">
 
@@ -87,28 +100,9 @@
                         </BoxContainer>
                     </PanelContainer>
 
-                    <PanelContainer Name="BatteryPanel">
-                        <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="8">
-                            <BoxContainer Orientation="Horizontal" SeparationOverride="8">
-                                <Label Text="BATTERY"
-                                       HorizontalExpand="True"
-                                       FontColorOverride="#e5e7eb" />
-                                <Label Name="BatteryLabel"
-                                       Text="--%"
-                                       FontColorOverride="#94a3b8" />
-                            </BoxContainer>
-                            <ProgressBar Name="BatteryBar"
-                                         MinValue="0"
-                                         MaxValue="1"
-                                         Value="0"
-                                         HorizontalExpand="True"
-                                         MinSize="0 18" />
-                        </BoxContainer>
-                    </PanelContainer>
-
                     <PanelContainer Name="SettingsPanel">
                         <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="8">
-                            <Label Text="PORTABLE SETTINGS"
+                            <Label Text="DEVICE SETTINGS"
                                    FontColorOverride="#e5e7eb" />
                             <CheckBox Name="AllowCarryCheckbox"
                                       Text="Allow hologram carry mode" />
@@ -145,7 +139,7 @@
                             <BoxContainer Orientation="Vertical" HorizontalExpand="True" SeparationOverride="2">
                                 <Label Text="PROJECTOR MAP"
                                        FontColorOverride="#e5e7eb" />
-                                <Label Text="Only active projectors on the same grid are shown."
+                                <Label Text="Only same-grid projectors are shown. Black markers exist but can't host a hologram right now."
                                        FontColorOverride="#94a3b8" />
                             </BoxContainer>
                             <Label Name="ProjectorCountLabel"

@@ -116,6 +116,7 @@
         location: Left
       right:
         location: Right
+  - type: ComplexInteraction
   - type: Inventory
   - type: InventorySlots
   - type: Body
@@ -227,6 +228,7 @@
     showProjectButton: true
     showRecallButton: true
     showBladeServerPanel: true
+    showSettingsPanel: false
 
 - type: entity
   name: Urist McLight
@@ -243,7 +245,7 @@
     validProjectorWhitelist:
       tags:
       - HoloProjectorServer
-      - HoloProjectorCamera
+      - HoloProjector
     effectPrototype: EffectHologramProjectionBeam
   - type: NpcFactionMember
     factions:
@@ -285,7 +287,7 @@
     validProjectorWhitelist:
       tags:
       - HoloProjectorServer
-      - HoloProjectorCamera
+      - HoloProjector
     effectPrototype: EffectHologramProjectionBeam
   - type: MovementIgnoreGravity
   - type: NoSlip
@@ -380,9 +382,13 @@
   components:
   # Visuals
   - Sprite
+  - Icon
   - DamageStateVisuals
   - RotationVisuals
   - ScaleVisuals
+  - FloatingVisuals
+  - GenericVisualizer
+  - PointLight
 
   # Body
   - MovementSpeedModifier
@@ -403,49 +409,3 @@
   - ExploitableInfo
   - MindSecrets
   - RoleplayInfo
-
-  blacklist:
-  - Transform
-  - MetaData
-  - Actor
-  - MindContainer
-  - UserInterface
-  - Actions
-  - Hologram
-  - HologramProjected
-  - HologramConsole
-  - HologramActionGrant
-  - HologramBrainChip
-  - HologramBodyChip
-  - HologramBladeServer
-  - HTN
-  - NpcFactionMember
-  - GhostRole
-  - GhostTakeoverAvailable
-  - RandomMetadata
-  - Respirator
-  - Bloodstream
-  - Temperature
-  - TemperatureDamage
-  - Perishable
-  - Hunger
-  - Thirst
-  - Metabolizer
-  - DiseaseCarrier
-  - SolutionContainerManager
-  - MeleeChemicalInjector
-  - Reactive
-  - Butcherable
-  - Damageable
-  - MobThresholds
-  - MeleeWeapon
-  - Gun
-  - RechargeBasicEntityAmmo
-  - Explosive
-  - Storage
-  - EntityStorage
-  - ItemSlots
-  - ContainerContainer
-  - SiliconLawBound
-  - SiliconLawProvider
-  - HologramBladeLawProvider

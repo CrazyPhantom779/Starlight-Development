@@ -46,6 +46,10 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
         NavMap.Visible = false;
         NoServerOverlay.Visible = true;
 
+        HeaderAccent.PanelOverride = new StyleBoxFlat { BackgroundColor = Color.FromHex(ReadyColor) };
+        ModeBadge.PanelOverride = BadgeStyle(WarningColor);
+        ActiveBadge.PanelOverride = BadgeStyle(WarningColor);
+
         ProjectButton.OnPressed += _ => TryProjectSelected();
         RecallButton.OnPressed += _ => TryRecallSelected();
         AllowCarryCheckbox.OnToggled += args =>
@@ -55,6 +59,13 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
         };
         NavMap.TrackedEntitySelectedAction += OnProjectorSelectedFromMap;
     }
+
+    private static StyleBoxFlat BadgeStyle(string hex) => new()
+    {
+        BackgroundColor = Color.FromHex("#111827"),
+        BorderColor = Color.FromHex(hex),
+        BorderThickness = new Thickness(1),
+    };
 
     public void UpdateState(HologramConsoleBoundUserInterfaceState state)
     {
@@ -98,33 +109,43 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
 
     private void UpdatePanels(HologramConsoleBoundUserInterfaceState state)
     {
-        BatteryPanel.Visible = state.IsPortable;
-        SettingsPanel.Visible = state.IsPortable;
+        // Every section below is driven by its own field on HologramConsoleComponent - nothing
+        // here branches on state.IsPortable. A device is whatever combination of these its
+        // prototype says it is; "portable" only changes *how* projection targets get picked
+        // (see TryProjectSelected/OnProjectHologram) and what the mode badge says.
+        HeaderBattery.Visible = state.ShowBattery;
+        HeaderBattery.SetCharge(state.BatteryPercent);
+
+        SettingsPanel.Visible = state.ShowSettingsPanel;
         ModeLabel.Visible = true;
         ModeLabel.Text = state.IsPortable ? "PORTABLE MODE" : "STATION MODE";
 
         LeftPanel.Visible = state.ShowBladeServerPanel;
-        MapPanel.Visible = state.ShowMap && !state.IsPortable;
+        MapPanel.Visible = state.ShowMap;
+        // The left rail has a min-width but isn't forced to a fixed width, so when there's no
+        // map to share the row with it can grow to fill the space instead of leaving a void.
+        LeftPanel.HorizontalExpand = !state.ShowMap;
+
         ProjectButton.Visible = state.ShowProjectButton;
         RecallButton.Visible = state.ShowRecallButton;
         ControlsPanel.Visible = state.ShowProjectButton || state.ShowRecallButton;
-        SelectedPanel.Visible = state.ShowBladeServerPanel;
+        SelectedPanel.Visible = state.ShowSelectionPanel;
 
-        if (state.IsPortable)
+        PortableInfoLabel.Visible = state.ShowActiveCount;
+        PortableInfoLabel.Text = state.MaxActive > 0
+            ? $"Active: {state.ActiveCount} / {state.MaxActive}"
+            : $"Active: {state.ActiveCount}";
+
+        UpdateCarryCheckbox(state.AllowCarry);
+
+        if (!state.ShowMap)
         {
             NavMap.Visible = false;
             NoServerOverlay.Visible = false;
-            UpdateBattery(state);
-            UpdateCarryCheckbox(state.AllowCarry);
-            PortableInfoLabel.Visible = true;
-            PortableInfoLabel.Text = state.MaxActive > 0
-                ? $"Active: {state.ActiveCount} / {state.MaxActive}"
-                : $"Active: {state.ActiveCount}";
-            return;
         }
 
-        PortableInfoLabel.Visible = false;
-        UpdateCarryCheckbox(state.AllowCarry);
+        if (state.IsPortable)
+            return;
 
         if (!state.HasServer)
         {
@@ -133,7 +154,9 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
         }
 
         NoBladeServersLabel.Visible = false;
-        SetupNavMap(state);
+
+        if (state.ShowMap)
+            SetupNavMap(state);
     }
 
     private void UpdateCarryCheckbox(bool allowCarry)
@@ -179,7 +202,8 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
         {
             var coords = _entManager.GetCoordinates(netCoords);
             var selected = netEntity == _selectedProjector;
-            NavMap.TrackedEntities[netEntity] = new NavMapBlip(coords, _blipTexture, NavMap.GetProjectorColor(selected), true, true);
+            var isFunctional = state.Projectors.FirstOrDefault(x => x.Uid == netEntity)?.IsFunctional ?? true;
+            NavMap.TrackedEntities[netEntity] = new NavMapBlip(coords, _blipTexture, NavMap.GetProjectorColor(selected, isFunctional), true, true);
         }
     }
 
@@ -217,7 +241,7 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
         }
 
         if (_selectedProjector == null && state.Projectors.Count > 0)
-            _selectedProjector = state.Projectors.First().Uid;
+            _selectedProjector = (state.Projectors.FirstOrDefault(x => x.IsFunctional) ?? state.Projectors.First()).Uid;
     }
 
     private static BladeServerInfo ChooseInitialBlade(HologramConsoleBoundUserInterfaceState state)
@@ -253,38 +277,13 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
         ProjectorCountLabel.Text = " No Same-Grid Projectors ";
 
         SetText(StatusLabel, "No same-grid hologram hardware", ErrorColor);
-        SetText(ActiveIndicator, "● OFFLINE", ErrorColor);
+        SetActiveIndicator("● OFFLINE", ErrorColor);
         SetText(SelectedBladeLabel, "Blade: none", MutedColor);
         SetText(SelectedProjectorLabel, "Projector: none", MutedColor);
         SetText(HintLabel, "Install or power a hologram rack/console on this grid.", ErrorColor);
 
         ProjectButton.Disabled = true;
         RecallButton.Disabled = true;
-    }
-
-    private void UpdateBattery(HologramConsoleBoundUserInterfaceState state)
-    {
-        if (state.BatteryPercent is not { } percent)
-        {
-            BatteryBar.Value = 0f;
-            BatteryLabel.Text = "--%";
-            BatteryLabel.FontColorOverride = Color.FromHex(MutedColor);
-            BatteryBar.ForegroundStyleBoxOverride = new StyleBoxFlat { BackgroundColor = Color.FromHex(MutedColor) };
-            return;
-        }
-
-        BatteryBar.Value = Math.Clamp(percent / 100f, 0f, 1f);
-        BatteryLabel.Text = $"{percent:F0}%";
-
-        var color = percent switch
-        {
-            > 50 => ActiveColor,
-            > 20 => WarningColor,
-            _ => ErrorColor,
-        };
-
-        BatteryLabel.FontColorOverride = Color.FromHex(color);
-        BatteryBar.ForegroundStyleBoxOverride = new StyleBoxFlat { BackgroundColor = Color.FromHex(color) };
     }
 
     private void UpdateBladeServerList(HologramConsoleBoundUserInterfaceState state)
@@ -320,7 +319,7 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
         if (state.BladeServers.Count == 0)
         {
             SetText(StatusLabel, "No blade servers available", ErrorColor);
-            SetText(ActiveIndicator, "● NO DATA", MutedColor);
+            SetActiveIndicator("● NO DATA", MutedColor);
             return;
         }
 
@@ -332,7 +331,20 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
             : $"{state.BladeServers.Count} hologram(s) available, {activeText}";
 
         SetText(StatusLabel, status, ReadyColor);
-        SetText(ActiveIndicator, state.ActiveCount > 0 ? "● ACTIVE" : "● READY", state.ActiveCount > 0 ? ActiveColor : WarningColor);
+        SetActiveIndicator(
+            state.ActiveCount > 0 ? "● ACTIVE" : "● READY",
+            state.ActiveCount > 0 ? ActiveColor : WarningColor);
+    }
+
+    /// <summary>
+    /// Updates the active-indicator label together with its badge border and the header accent
+    /// bar, so the whole header reads as one glance-able status at a distance.
+    /// </summary>
+    private void SetActiveIndicator(string text, string colorHex)
+    {
+        SetText(ActiveIndicator, text, colorHex);
+        ActiveBadge.PanelOverride = BadgeStyle(colorHex);
+        HeaderAccent.PanelOverride = new StyleBoxFlat { BackgroundColor = Color.FromHex(colorHex) };
     }
 
     private void UpdateSelectionState(HologramConsoleBoundUserInterfaceState state)

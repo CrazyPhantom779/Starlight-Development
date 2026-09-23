@@ -1,0 +1,53 @@
+# A standalone projector, separate from cameras (see wireless_surveillance_camera.yml /
+# surveillance_camera.yml for the removed hardcoded version). Cameras can still project once a
+# HologramProjectorUpgradeKit is used on them - see hologram_projector_upgrade.yml.
+#
+# Sprite is a placeholder (reusing the holopad's) until real art exists - swap the Sprite/Icon
+# state below for dedicated art when it's ready, nothing else needs to change.
+- type: entity
+  parent: [ SmallConstructibleMachine, BaseMachinePowered ]
+  id: HologramProjectorMachine
+  name: holographic projector
+  description: A dedicated hardlight emitter for projecting holograms. Doesn't watch or listen to anything, unlike a repurposed camera.
+  components:
+  - type: HologramProjector
+  - type: Tag
+    tags:
+    - HoloProjector
+  - type: Sprite
+    sprite: Structures/Machines/holopad.rsi
+    layers:
+    - state: base
+      map: ["enum.PowerDeviceVisualLayers.Powered"]
+  - type: Icon
+    sprite: Structures/Machines/holopad.rsi
+    state: base
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.PowerDeviceVisuals.Powered:
+        enum.PowerDeviceVisualLayers.Powered:
+          True: { state: base }
+          False: { state: unpowered }
+  placement:
+    mode: SnapgridCenter
+
+- type: entity
+  id: HologramProjectorMachineCircuitboard
+  parent: BaseMachineCircuitboard
+  name: holographic projector circuitboard
+  description: A machine printed circuit board for a standalone holographic projector.
+  components:
+  - type: Sprite
+    state: science
+  - type: MachineBoard
+    prototype: HologramProjectorMachine
+    stackRequirements:
+      Steel: 2
+      Glass: 2
+      CableHV: 1
+
+- type: latheRecipe
+  parent: [ BaseCircuitboardRecipe, BaseResearchMachineRecipeCategory ]
+  id: HologramProjectorMachineCircuitboard
+  result: HologramProjectorMachineCircuitboard

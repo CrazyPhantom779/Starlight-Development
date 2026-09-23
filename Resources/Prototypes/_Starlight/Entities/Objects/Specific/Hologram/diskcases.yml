@@ -13,7 +13,7 @@
         - state: screen
           visible: false
           map: ["screen"]
-        - sprite: _Starlight/Structures/Machines/blade_server.rsi
+        - sprite: _Moffstation/Structures/Machines/blade_server.rsi
           state: inhand
           visible: false
           map: ["blade"]
@@ -48,6 +48,8 @@
       allowHologramCarry: false
       powerDrawPerHologram: 50
       showMap: false
+      showSettingsPanel: true
+      isPortable: true
     - type: HologramProjector
       projectorRange: 5.0
     - type: ContainerContainer

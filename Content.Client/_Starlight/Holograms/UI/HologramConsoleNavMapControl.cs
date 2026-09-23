@@ -17,5 +17,10 @@ public sealed class HologramConsoleNavMapControl : NavMapControl
         BackgroundColor = Color.FromHex("#0a1612");
     }
 
-    public Color GetProjectorColor(bool selected) => selected ? _selectedColor : _unselectedColor;
+    /// <summary>
+    /// Black marks a projector that exists on the map but can't currently host a hologram -
+    /// unpowered, switched off, or shut down from damage.
+    /// </summary>
+    public Color GetProjectorColor(bool selected, bool isFunctional = true)
+        => !isFunctional ? Color.Black : selected ? _selectedColor : _unselectedColor;
 }

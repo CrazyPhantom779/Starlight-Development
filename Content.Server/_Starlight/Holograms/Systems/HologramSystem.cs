@@ -372,18 +372,23 @@ public sealed partial class HologramSystem : SharedHologramSystem
         return prefs.GetRandomEnabledProfile();
     }
 
+    /// <summary>
+    /// Picks the hologram's display name. Priority must match <see cref="HologramConsoleSystem.GetHologramName"/>
+    /// (mind name first) - the console's hologram list and the actual projected body previously disagreed
+    /// on priority, which let a stale name on the body chip "stick" and diverge from what the console showed.
+    /// </summary>
     private void ApplyProjectedName(
         EntityUid mob,
         MindComponent mind,
         HumanoidCharacterProfile? profile,
         HologramBodyChipComponent? bodyChip)
     {
-        var name = bodyChip?.HologramName;
-
-        if (string.IsNullOrWhiteSpace(name) || name == "hologram")
-            name = mind.CharacterName;
+        var name = mind.CharacterName;
 
         if (string.IsNullOrWhiteSpace(name))
+            name = bodyChip?.HologramName;
+
+        if (string.IsNullOrWhiteSpace(name) || name == "hologram")
             name = profile?.Name;
 
         if (string.IsNullOrWhiteSpace(name))
@@ -461,7 +466,7 @@ public sealed partial class HologramSystem : SharedHologramSystem
             Tags =
             [
                 "HoloProjectorServer",
-                "HoloProjectorCamera",
+                "HoloProjector",
             ],
         };
 

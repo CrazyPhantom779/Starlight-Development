@@ -807,6 +807,7 @@
   components:
     - type: HologramConsole
       maxActiveHolograms: 4
+      showSettingsPanel: false
     - type: ActivatableUI
       key: enum.HologramConsoleUiKey.Key
     - type: UserInterface

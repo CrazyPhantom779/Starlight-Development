@@ -23,6 +23,10 @@ public sealed class HologramConsoleBoundUserInterfaceState(
     bool showProjectButton = true,
     bool showRecallButton = true,
     bool showBladeServerPanel = true,
+    bool showSettingsPanel = true,
+    bool showBattery = false,
+    bool showActiveCount = true,
+    bool showSelectionPanel = true,
     bool hasServer = true) : BoundUserInterfaceState
 {
     public List<BladeServerInfo> BladeServers { get; init; } = bladeServers;
@@ -39,6 +43,31 @@ public sealed class HologramConsoleBoundUserInterfaceState(
     public bool ShowProjectButton { get; init; } = showProjectButton;
     public bool ShowRecallButton { get; init; } = showRecallButton;
     public bool ShowBladeServerPanel { get; init; } = showBladeServerPanel;
+
+    /// <summary>
+    /// Whether the settings panel (allow-carry toggle, etc) should be shown. Resolved server-side
+    /// from HologramConsoleComponent.ShowSettingsPanel - no longer implied by IsPortable.
+    /// </summary>
+    public bool ShowSettingsPanel { get; init; } = showSettingsPanel;
+
+    /// <summary>
+    /// Whether the header battery indicator should be shown. Resolved server-side from
+    /// HologramConsoleComponent.BatteryDisplay - no longer implied by IsPortable.
+    /// </summary>
+    public bool ShowBattery { get; init; } = showBattery;
+
+    /// <summary>
+    /// Whether the "N active / max" count readout should be shown. Resolved from
+    /// HologramConsoleComponent.ShowActiveCount.
+    /// </summary>
+    public bool ShowActiveCount { get; init; } = showActiveCount;
+
+    /// <summary>
+    /// Whether the blade server + projector selection summary should be shown. Resolved from
+    /// HologramConsoleComponent.ShowSelectionPanel.
+    /// </summary>
+    public bool ShowSelectionPanel { get; init; } = showSelectionPanel;
+
     public bool HasServer { get; init; } = hasServer;
 }
 
@@ -85,11 +114,18 @@ public sealed class ProjectorInfo
     public string Name { get; init; }
     public string Location { get; init; }
 
-    public ProjectorInfo(NetEntity uid, string name, string location)
+    /// <summary>
+    /// False while the projector is unpowered, switched off, or on a damage cooldown - it exists
+    /// and is shown on the map, but cannot currently host or accept a hologram.
+    /// </summary>
+    public bool IsFunctional { get; init; }
+
+    public ProjectorInfo(NetEntity uid, string name, string location, bool isFunctional = true)
     {
         Uid = uid;
         Name = string.IsNullOrWhiteSpace(name) ? "Hologram projector" : name;
         Location = string.IsNullOrWhiteSpace(location) ? "Unknown location" : location;
+        IsFunctional = isFunctional;
     }
 }
 

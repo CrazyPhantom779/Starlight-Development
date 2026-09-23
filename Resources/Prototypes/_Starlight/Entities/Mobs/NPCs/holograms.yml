@@ -56,31 +56,31 @@
   - type: MobState
 
 - type: entity
-  name: holo corgi
-  description: "A holographic projection of a corgi, computed by the SAI and materialized into hardlight via a nearby projector"
+  name: holographic corgi
+  description: "A holographic projection of a corgi, computed by the SAI and materialized into hardlight via a nearby projector. It's an upload of a real dog's scanned appearance, not a bespoke creation."
   parent: BaseHologramAnimal
-  id: MobCorgiHolo
+  id: MobHologramCorgi
   categories: [ HideSpawnMenu ]
   components:
   - type: LagCompensation
   - type: HTN
     rootTask:
-      task: SimpleHostileCompound
+      task: IdleCompound
   - type: Input
     context: "human"
   - type: NpcFactionMember
     factions:
-    - PetsNT
+    - SimpleNeutral
   - type: MovementSpeedModifier
     baseWalkSpeed: 4.5
     baseSprintSpeed: 3
   - type: Sprite
     noRot: true
     drawdepth: Mobs
-    sprite: _Starlight/Mobs/Pets/holo_corgi.rsi
+    sprite: Mobs/Pets/corgi.rsi
     layers:
     - map: ["enum.DamageStateVisualLayers.Base"]
-      state: holo-corgi
+      state: corgi
       netsync: false
   - type: ReplacementAccent
     accent: dog
@@ -96,5 +96,5 @@
     gracePeriod: 0.08
     validProjectorWhitelist:
       tags:
-      - HoloProjectorCamera
+      - HoloProjector
     effectPrototype: EffectHologramProjectionBeam

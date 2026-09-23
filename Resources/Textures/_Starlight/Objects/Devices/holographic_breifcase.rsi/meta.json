@@ -30,6 +30,10 @@
                     0.1
                 ]
             ]
+        },
+        {
+            "name": "inhand",
+            "copyright": "Placeholder: reuses the closed-briefcase icon as an in-hand sprite until dedicated in-hand art exists."
         }
     ]
 }

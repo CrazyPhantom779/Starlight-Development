@@ -315,7 +315,7 @@ public partial class SharedHologramSystem
 
     private bool CanUseProjector(EntityUid projector, HologramProjectorComponent projectorComp, EntityWhitelist? whitelist)
     {
-        if (!projectorComp.IsActive)
+        if (!projectorComp.IsFunctional)
             return false;
 
         return whitelist == null || _whitelist.IsValid(whitelist, projector);

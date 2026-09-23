@@ -15,7 +15,8 @@ namespace Content.Server._Starlight.Holograms.Systems;
 
 /// <summary>
 /// Writes scanned mind/body data onto hologram chips used on an occupied body scanner.
-/// Scanned bodies copy only YAML-allowlisted components into a safe runtime recipe.
+/// Scanned bodies only ever copy components named in the scan settings' allowlist -
+/// see HologramScanSettingsPrototype.Components. Nothing else can get through.
 /// </summary>
 public sealed partial class HologramBodyScannerSystem : EntitySystem
 {
@@ -46,19 +47,19 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
 
         if (_timing.CurTime < component.LastScanTime + component.ScanDelay)
         {
-            _popup.PopupEntity("The scanner is still processing the last scan!", uid, args.User);
+            _popup.PopupEntity(Loc.GetString("hologram-scanner-cooldown"), uid, args.User);
             return;
         }
 
         if (!_prototype.Resolve(component.Settings, out var scanSettings))
         {
-            _popup.PopupEntity("The scanner's hologram scan settings are invalid.", uid, args.User);
+            _popup.PopupEntity(Loc.GetString("hologram-scanner-invalid-settings"), uid, args.User);
             return;
         }
 
         if (!TryGetScannedEntity(uid, out var scannedEntity))
         {
-            _popup.PopupEntity("The scanner is empty!", uid, args.User);
+            _popup.PopupEntity(Loc.GetString("hologram-scanner-empty"), uid, args.User);
             return;
         }
 
@@ -67,7 +68,7 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
 
         if (!hasBrainChip && !hasBodyChip)
         {
-            _popup.PopupEntity("Use a hologram mind chip or body chip on the occupied scanner.", uid, args.User);
+            _popup.PopupEntity(Loc.GetString("hologram-scanner-need-chip"), uid, args.User);
             return;
         }
 
@@ -113,31 +114,31 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
 
         if (brainChip.PreventMindStorage)
         {
-            _popup.PopupEntity("This chip cannot store a consciousness.", scanner, user);
+            _popup.PopupEntity(Loc.GetString("hologram-scanner-chip-cant-store-mind"), scanner, user);
             return false;
         }
 
         if (brainChip.HoloMind is { } storedMind && Exists(storedMind))
         {
-            _popup.PopupEntity("This hologram mind chip already contains a consciousness.", scanner, user);
+            _popup.PopupEntity(Loc.GetString("hologram-scanner-chip-already-has-mind"), scanner, user);
             return false;
         }
 
         if (TryComp<MindContainerComponent>(chip, out var chipMind) && chipMind.Mind != null)
         {
-            _popup.PopupEntity("This hologram mind chip is already occupied.", scanner, user);
+            _popup.PopupEntity(Loc.GetString("hologram-scanner-chip-occupied"), scanner, user);
             return false;
         }
 
         if (!_mobState.IsDead(scannedEntity))
         {
-            _popup.PopupEntity("The scanner can only transfer consciousness from a dead body.", scanner, user);
+            _popup.PopupEntity(Loc.GetString("hologram-scanner-target-not-dead"), scanner, user);
             return false;
         }
 
         if (!TryComp<MindContainerComponent>(scannedEntity, out var mindContainer) || mindContainer.Mind is not { } scannedMind)
         {
-            _popup.PopupEntity("The scanner cannot detect a consciousness to transfer!", scanner, user);
+            _popup.PopupEntity(Loc.GetString("hologram-scanner-no-mind-detected"), scanner, user);
             return false;
         }
 
@@ -150,7 +151,7 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
         if (!bodyChip.HasStoredBodyData)
             return true;
 
-        _popup.PopupEntity("This hologram body chip already contains body data.", scanner, user);
+        _popup.PopupEntity(Loc.GetString("hologram-scanner-body-chip-occupied"), scanner, user);
         return false;
     }
 
@@ -202,9 +203,6 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
     {
         foreach (var componentName in scanSettings.Components)
         {
-            if (IsBlocked(componentName, scanSettings))
-                continue;
-
             if (!TryCopyComponentByName(scannedEntity, componentName, out var copy))
                 continue;
 
@@ -232,9 +230,6 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
             return false;
         }
     }
-
-    private static bool IsBlocked(string componentName, HologramScanSettingsPrototype scanSettings)
-        => scanSettings.Blacklist.Contains(componentName);
 
     private string GetSuccessMessage(bool wroteBrain, bool wroteBody)
     {

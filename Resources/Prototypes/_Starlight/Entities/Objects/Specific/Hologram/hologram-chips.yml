@@ -14,6 +14,7 @@
   - type: HologramBrainChip
   - type: MindContainer
   - type: Speech
+    speechSounds: Borg
   - type: TypingIndicator
     proto: robot
   - type: Physics
@@ -25,6 +26,7 @@
     showProjectButton: true
     showRecallButton: true
     showBladeServerPanel: true
+    showSettingsPanel: false
   - type: HologramActionGrant
     grantConsoleAction: true
     grantLawsAction: true
@@ -70,12 +72,12 @@
 - type: entity
   parent: HologramBodyChip
   id: HologramBodyChipCorgi
-  name: hologram body chip (holo corgi)
-  description: A chip pre-programmed with Holo Corgi appearance data.
+  name: hologram body chip (corgi)
+  description: A chip pre-programmed with a scanned corgi's appearance data.
   components:
   - type: HologramBodyChip
-    hologramPrototype: MobCorgiHolo
-    hologramName: "Holo Corgi"
+    hologramPrototype: MobHologramCorgi
+    hologramName: "Holographic Corgi"
 
 - type: entity
   parent: HologramBrainChip

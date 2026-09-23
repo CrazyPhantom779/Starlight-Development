@@ -1,0 +1,46 @@
+# Lets a built wireless camera be wired up into a hologram projector, and back again, using
+# only the engine's own construction system - no custom component/system/DoAfter needed.
+#
+# Currently only wired up for SurveillanceWirelessCameraAnchoredConstructed. The other camera
+# variants (Movable, Entertainment) would need the same treatment: a "...Projector" entity
+# below plus a matching pair of edges in the graph. Same pattern, just copy-paste.
+
+- type: entity
+  parent: SurveillanceWirelessCameraAnchoredConstructed
+  id: SurveillanceWirelessCameraAnchoredProjector
+  suffix: Constructed, Anchored, Projector
+  name: holographic surveillance camera
+  description: A surveillance camera rewired to double as a hologram projector.
+  components:
+  - type: HologramProjector
+  - type: Tag
+    tags:
+    - HoloProjector
+
+- type: constructionGraph
+  id: HologramProjectorCameraUpgrade
+  start: camera
+  graph:
+  - node: camera
+    entity: SurveillanceWirelessCameraAnchoredConstructed
+    edges:
+    - to: projector
+      steps:
+      - material: Cable
+        amount: 2
+        doAfter: 2
+      - material: Glass
+        amount: 2
+        doAfter: 2
+
+  - node: projector
+    entity: SurveillanceWirelessCameraAnchoredProjector
+    edges:
+    - to: camera
+      completed:
+      - !type:SpawnPrototype
+        prototype: CableApcStack1
+        amount: 1
+      steps:
+      - tool: Prying
+        doAfter: 2

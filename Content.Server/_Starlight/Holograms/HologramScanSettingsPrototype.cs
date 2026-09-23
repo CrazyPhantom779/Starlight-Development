@@ -3,9 +3,12 @@ using Robust.Shared.Prototypes;
 namespace Content.Server._Starlight.Holograms;
 
 /// <summary>
-/// Data-driven policy for hologram body scanners.
-/// Components listed here are copied from the scanned body onto the safe hologram base.
-/// A hard-coded safety denylist in HologramBodyScannerSystem still blocks dangerous components.
+/// Settings for a hologram body scanner. Says which prototype to project into, and which
+/// components are safe to copy from a scanned body onto that projection.
+///
+/// Components is an allowlist, not a denylist: only the names listed here are ever copied,
+/// so anything not listed is automatically excluded. There's no separate blacklist to keep
+/// in sync - if a component shouldn't be copied, just don't add it to the list.
 /// </summary>
 [Prototype]
 public sealed partial class HologramScanSettingsPrototype : IPrototype
@@ -14,29 +17,22 @@ public sealed partial class HologramScanSettingsPrototype : IPrototype
     public string ID { get; private set; } = default!;
 
     /// <summary>
-    /// Safe projection prototype for humanoid scans.
-    /// Humanoid scans also store a HumanoidCharacterProfile.
+    /// Projection prototype used for humanoid scans (these also carry a full HumanoidCharacterProfile,
+    /// so most of their look comes from that rather than from Components below).
     /// </summary>
     [DataField]
     public EntProtoId HumanoidProjectionPrototype = "MobHologramHardlight";
 
     /// <summary>
-    /// Safe projection prototype for non-humanoid/simple mob scans.
+    /// Projection prototype used for non-humanoid scans (animals, simple mobs, etc).
     /// </summary>
     [DataField]
     public EntProtoId ScannedProjectionPrototype = "MobHologramScannedBody";
 
     /// <summary>
-    /// Component names to copy from the source body.
-    /// Names are the same strings used in YAML component type fields.
+    /// Components copied from a scanned non-humanoid body onto its projection. Use the same
+    /// name you'd write after "type:" in YAML. Only used for the non-humanoid scan path.
     /// </summary>
     [DataField]
-    public List<string> Components = new();
-
-    /// <summary>
-    /// Extra denylist for a specific scanner policy.
-    /// This is applied in addition to the code safety denylist.
-    /// </summary>
-    [DataField]
-    public HashSet<string> Blacklist = new(StringComparer.OrdinalIgnoreCase);
+    public List<string> Components = [];
 }
