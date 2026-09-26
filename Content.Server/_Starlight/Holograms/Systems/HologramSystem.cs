@@ -211,13 +211,8 @@ public sealed partial class HologramSystem : SharedHologramSystem
         _grammar.SetGender((mob, grammar), Gender.Neuter);
     }
 
-    private EntProtoId ResolveProjectionPrototype(HologramBodyChipComponent? bodyChip)
-    {
-        if (bodyChip?.ScannedBody is { } scanned)
-            return scanned.ProjectionPrototype;
-
-        return bodyChip?.HologramPrototype ?? DefaultHologramPrototype;
-    }
+    private static EntProtoId ResolveProjectionPrototype(HologramBodyChipComponent? bodyChip)
+        => bodyChip?.ScannedBody is { } scanned ? scanned.ProjectionPrototype : bodyChip?.HologramPrototype ?? DefaultHologramPrototype;
 
     private void ApplyScannedBodyData(EntityUid mob, HologramBodyChipComponent? bodyChip)
     {
@@ -247,16 +242,7 @@ public sealed partial class HologramSystem : SharedHologramSystem
         mind = null;
         client = null;
 
-        if (!TryComp(mindId, out mind))
-            return false;
-
-        if (!CanProjectMind(mindId, mind))
-            return false;
-
-        if (mind.UserId == null || !_playerManager.TryGetSessionById(mind.UserId.Value, out client))
-            return false;
-
-        return true;
+        return TryComp(mindId, out mind) && CanProjectMind(mindId, mind) && mind.UserId != null && _playerManager.TryGetSessionById(mind.UserId.Value, out client);
     }
 
     private bool CanProjectMind(EntityUid mindId, MindComponent mind)
@@ -274,14 +260,9 @@ public sealed partial class HologramSystem : SharedHologramSystem
             HologramsWaitingForMind.Remove(mindId);
         }
 
-        if (mind.OwnedEntity is { } ownedEntity &&
-            !HasComp<HologramBrainChipComponent>(ownedEntity) &&
-            (_mobState.IsAlive(ownedEntity) || _mobState.IsCritical(ownedEntity)))
-        {
-            return false;
-        }
-
-        return true;
+        return !(mind.OwnedEntity is { } ownedEntity) ||
+            HasComp<HologramBrainChipComponent>(ownedEntity) ||
+            (!_mobState.IsAlive(ownedEntity) && !_mobState.IsCritical(ownedEntity));
     }
 
     private void FinishProjection(EntityUid mindId, EntityUid mob, EntityCoordinates coords, bool promptConsent, ICommonSession client)

@@ -38,16 +38,6 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         base.Initialize();
 
         _sawmill = _logManager.GetSawmill("hologram.blade");
-
-        SubscribeLocalEvent<HologramBladeServerComponent, GotEmaggedEvent>(OnBladeEmagged);
-        SubscribeLocalEvent<HologramBladeServerComponent, EntInsertedIntoContainerMessage>(OnBladeSlotChanged);
-        SubscribeLocalEvent<HologramBladeServerComponent, EntRemovedFromContainerMessage>(OnBladeSlotChanged);
-        SubscribeLocalEvent<BladeServerRackComponent, GotEmaggedEvent>(OnRackEmagged);
-        SubscribeLocalEvent<HologramBrainChipComponent, MindAddedMessage>(OnBrainMindAdded);
-        SubscribeLocalEvent<HologramBrainChipComponent, MindRemovedMessage>(OnBrainMindRemoved);
-        SubscribeLocalEvent<HologramBrainChipComponent, HologramOpenConsoleActionEvent>(OnOpenConsoleFromBrain);
-        SubscribeLocalEvent<HologramComponent, HologramOpenConsoleActionEvent>(OnOpenConsoleFromProjection);
-        SubscribeLocalEvent<HologramBladeLawProviderComponent, GetSiliconLawsEvent>(OnGetBladeLaws, before: [typeof(SiliconLawSystem)]);
     }
 
     public void SyncBladeLawsToOccupants(EntityUid bladeUid, HologramBladeServerComponent? blade = null)
@@ -112,6 +102,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         return true;
     }
 
+    [SubscribeLocalEvent]
     private void OnBladeSlotChanged(EntityUid uid, HologramBladeServerComponent component, EntInsertedIntoContainerMessage args)
     {
         if (args.Container.ID != component.BrainChipSlot && args.Container.ID != component.BodyChipSlot)
@@ -120,6 +111,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         SyncBladeLawsToOccupants(uid, component);
     }
 
+    [SubscribeLocalEvent]
     private void OnBladeSlotChanged(EntityUid uid, HologramBladeServerComponent component, EntRemovedFromContainerMessage args)
     {
         if (args.Container.ID != component.BrainChipSlot && args.Container.ID != component.BodyChipSlot)
@@ -164,6 +156,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         _meta.SetEntityName(bodyChip, mind.CharacterName);
     }
 
+    [SubscribeLocalEvent]
     private void OnBrainMindAdded(EntityUid uid, HologramBrainChipComponent component, MindAddedMessage args)
     {
         component.HoloMind = args.Mind;
@@ -178,12 +171,14 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         SyncBladeLawsToOccupants(bladeUid, blade);
     }
 
+    [SubscribeLocalEvent]
     private void OnBrainMindRemoved(EntityUid uid, HologramBrainChipComponent component, MindRemovedMessage args)
     {
         if (component.HoloMind == args.Mind)
             component.HoloMind = null;
     }
 
+    [SubscribeLocalEvent]
     private void OnBladeEmagged(EntityUid uid, HologramBladeServerComponent component, ref GotEmaggedEvent args)
     {
         if ((args.Type & EmagType.Interaction) == 0 || component.Emagged)
@@ -196,6 +191,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         args.Handled = true;
     }
 
+    [SubscribeLocalEvent]
     private void OnRackEmagged(EntityUid uid, BladeServerRackComponent component, ref GotEmaggedEvent args)
     {
         if ((args.Type & EmagType.Interaction) == 0)
@@ -232,6 +228,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         _laws.NotifyLawsChanged(hologram);
     }
 
+    [SubscribeLocalEvent(before: [typeof(SiliconLawSystem)])]
     private void OnGetBladeLaws(EntityUid uid, HologramBladeLawProviderComponent component, ref GetSiliconLawsEvent args)
     {
         if (args.Handled)
@@ -248,6 +245,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         args.Handled = true;
     }
 
+    [SubscribeLocalEvent]
     private void OnOpenConsoleFromBrain(EntityUid uid, HologramBrainChipComponent component, HologramOpenConsoleActionEvent args)
     {
         if (args.Handled)
@@ -263,6 +261,7 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
         args.Handled = true;
     }
 
+    [SubscribeLocalEvent]
     private void OnOpenConsoleFromProjection(EntityUid uid, HologramComponent component, HologramOpenConsoleActionEvent args)
     {
         if (args.Handled)
@@ -358,13 +357,13 @@ public sealed partial class HologramBladeLawSystem : EntitySystem
 [RegisterComponent]
 public sealed partial class HologramConsoleActionComponent : Component
 {
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField]
     public EntityUid? BladeServer;
 }
 
 [RegisterComponent]
 public sealed partial class HologramBladeLawProviderComponent : Component
 {
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField]
     public EntityUid? BladeServer;
 }

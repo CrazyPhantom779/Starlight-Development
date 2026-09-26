@@ -1,4 +1,6 @@
 using Content.Server._Starlight.Holograms.Components;
+using Content.Server.EUI;
+using Content.Shared._Starlight.Holograms;
 using Content.Server.Humanoid;
 using Content.Server.Mind;
 using Content.Shared.Humanoid;
@@ -6,10 +8,12 @@ using Content.Shared.Interaction;
 using Content.Shared.Mind.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
+using Robust.Server.Player;
 using Robust.Shared.Containers;
 using Robust.Shared.Prototypes;
 using Robust.Shared.Serialization.Manager;
 using Robust.Shared.Timing;
+using Content.Shared.Mind;
 
 namespace Content.Server._Starlight.Holograms.Systems;
 
@@ -17,6 +21,10 @@ namespace Content.Server._Starlight.Holograms.Systems;
 /// Writes scanned mind/body data onto hologram chips used on an occupied body scanner.
 /// Scanned bodies only ever copy components named in the scan settings' allowlist -
 /// see HologramScanSettingsPrototype.Components. Nothing else can get through.
+///
+/// Pulling in a mind needs the scanned player's consent - same deal as cloning. If they're
+/// online, the transfer waits on the AcceptHologramScanEui prompt instead of happening
+/// immediately. Body data isn't gated the same way; it's just an appearance snapshot.
 /// </summary>
 public sealed partial class HologramBodyScannerSystem : EntitySystem
 {
@@ -28,18 +36,12 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
     [Dependency] private IPrototypeManager _prototype = default!;
     [Dependency] private IComponentFactory _componentFactory = default!;
     [Dependency] private ISerializationManager _serialization = default!;
-    [Dependency] private ILogManager _logManager = default!;
+    [Dependency] private IPlayerManager _playerManager = default!;
+    [Dependency] private EuiManager _euiManager = default!;
 
-    private ISawmill _sawmill = default!;
+    private readonly ISawmill _sawmill = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        _sawmill = _logManager.GetSawmill("hologram.scanner");
-        SubscribeLocalEvent<HologramBodyScannerComponent, InteractUsingEvent>(OnInteractUsing);
-    }
-
+    [SubscribeLocalEvent]
     private void OnInteractUsing(EntityUid uid, HologramBodyScannerComponent component, InteractUsingEvent args)
     {
         if (args.Handled)
@@ -73,6 +75,7 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
         }
 
         EntityUid mindToTransfer = default;
+        MindComponent? mindComp = null;
         var transferMind = false;
 
         if (hasBrainChip && brainChip != null)
@@ -80,7 +83,7 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
             if (!CanWriteBrainChip(uid, scannedEntity, args.Used, brainChip, args.User, out mindToTransfer))
                 return;
 
-            transferMind = true;
+            transferMind = TryComp(mindToTransfer, out mindComp);
         }
 
         if (hasBodyChip && bodyChip != null &&
@@ -93,13 +96,50 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
         if (hasBodyChip && bodyChip != null)
             WriteBodyChip(scannedEntity, bodyChip, scanSettings);
 
-        if (transferMind && brainChip != null)
-            WriteBrainChip(args.Used, brainChip, mindToTransfer);
-
         component.LastScanTime = _timing.CurTime;
         args.Handled = true;
 
+        if (transferMind && mindComp != null &&
+            mindComp.UserId is { } userId && _playerManager.TryGetSessionById(userId, out var session))
+        {
+            _euiManager.OpenEui(new AcceptHologramScanEui(mindToTransfer, mindComp, uid, args.Used, this), session);
+            _popup.PopupEntity(Loc.GetString("hologram-scanner-waiting-consent"), uid, args.User);
+            return;
+        }
+
+        // No one to ask (offline/no player attached to that mind) - just take it, same as
+        // cloning falls back to when it can't track down a session either.
+        if (transferMind && brainChip != null)
+            WriteBrainChip(args.Used, brainChip, mindToTransfer);
+
         _popup.PopupEntity(GetSuccessMessage(hasBrainChip, hasBodyChip), uid, args.User);
+    }
+
+    /// <summary>
+    /// Called by AcceptHologramScanEui when the scanned person accepts. The chip and its owning
+    /// mind might not exist anymore by now (scanner moved, chip destroyed, player ghosted) -
+    /// everything here re-checks rather than trusting what was true when the prompt opened.
+    /// </summary>
+    public void OnScanConsentAccepted(EntityUid mindId, MindComponent _, EntityUid scanner, EntityUid chip)
+    {
+        if (!Exists(chip) || !TryComp<HologramBrainChipComponent>(chip, out var brainChip))
+            return;
+
+        WriteBrainChip(chip, brainChip, mindId);
+        _popup.PopupEntity(Loc.GetString("hologram-scanner-mind-captured-target"), chip, chip);
+
+        if (Exists(scanner))
+            _popup.PopupEntity(Loc.GetString("hologram-scanner-success-mind"), scanner, scanner);
+    }
+
+    /// <summary>
+    /// Called by AcceptHologramScanEui when the scanned person declines, or just closes the
+    /// prompt. Nothing was written yet, so there's nothing to undo - just let them know.
+    /// </summary>
+    public void OnScanConsentDenied(EntityUid scanner, EntityUid _)
+    {
+        if (Exists(scanner))
+            _popup.PopupEntity(Loc.GetString("hologram-scanner-consent-denied"), scanner, scanner);
     }
 
     private bool CanWriteBrainChip(
@@ -171,14 +211,14 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
         bodyChip.SourceBody = scannedEntity;
         bodyChip.HologramName = meta.EntityName;
         bodyChip.HologramProfile = null;
-        bodyChip.ScannedBody = null;
         bodyChip.ScanSettings = scanSettings.ID;
 
-        if (TryComp<HumanoidAppearanceComponent>(scannedEntity, out var appearance))
+        var isHumanoid = TryComp<HumanoidAppearanceComponent>(scannedEntity, out var appearance);
+
+        if (isHumanoid)
         {
-            bodyChip.HologramProfile = _humanoid.GetBaseProfile((scannedEntity, appearance));
+            bodyChip.HologramProfile = _humanoid.GetBaseProfile((scannedEntity, appearance!));
             bodyChip.HologramPrototype = scanSettings.HumanoidProjectionPrototype;
-            return;
         }
 
         var scannedData = new HologramScannedBodyData
@@ -187,13 +227,14 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
             SourcePrototype = meta.EntityPrototype is { } sourcePrototype
                 ? (EntProtoId?) new EntProtoId(sourcePrototype.ID)
                 : null,
-            ProjectionPrototype = scanSettings.ScannedProjectionPrototype,
+            ProjectionPrototype = isHumanoid ? scanSettings.HumanoidProjectionPrototype : scanSettings.ScannedProjectionPrototype,
         };
 
         CaptureConfiguredComponents(scannedEntity, scanSettings, scannedData);
-
-        bodyChip.HologramPrototype = scannedData.ProjectionPrototype;
         bodyChip.ScannedBody = scannedData;
+
+        if (!isHumanoid)
+            bodyChip.HologramPrototype = scannedData.ProjectionPrototype;
     }
 
     private void CaptureConfiguredComponents(
@@ -218,7 +259,7 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
         {
             var registration = _componentFactory.GetRegistration(componentName);
 
-            if (!EntityManager.TryGetComponent(source, registration.Type, out var sourceComponent))
+            if (!TryComp(source, registration.Type, out var sourceComponent))
                 return false;
 
             copy = (Component) _serialization.CreateCopy(sourceComponent, notNullableOverride: true);
@@ -232,14 +273,11 @@ public sealed partial class HologramBodyScannerSystem : EntitySystem
     }
 
     private string GetSuccessMessage(bool wroteBrain, bool wroteBody)
-    {
-        if (wroteBrain && wroteBody)
-            return "Mind and body data saved to the hologram chip.";
-
-        return wroteBrain
-            ? "Mind data saved to the hologram mind chip."
-            : "Body data saved to the hologram body chip.";
-    }
+        => wroteBrain && wroteBody
+            ? Loc.GetString("hologram-scanner-success-both")
+            : wroteBrain
+            ? Loc.GetString("hologram-scanner-success-mind")
+            : Loc.GetString("hologram-scanner-success-body");
 
     private bool TryGetScannedEntity(EntityUid uid, out EntityUid scannedEntity)
     {

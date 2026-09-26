@@ -38,30 +38,9 @@ public sealed partial class HologramJobSpawnSystem : EntitySystem
     [Dependency] private StationSystem _station = default!;
     [Dependency] private IServerPreferencesManager _prefs = default!;
     [Dependency] private SharedJobSystem _job = default!;
-    [Dependency] private ILogManager _logManager = default!;
+    private readonly ISawmill _sawmill = default!;
 
-    private ISawmill _sawmill = default!;
-
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        _sawmill = _logManager.GetSawmill("hologram.job");
-
-        // This is the only place where an unavailable Hologram job is converted
-        // into a ghost. It has the player session, so it can use the normal ghost
-        // flow and can consume the selected job slot without a station arrival
-        // announcement.
-        SubscribeLocalEvent<PlayerBeforeSpawnEvent>(OnPlayerBeforeSpawn);
-
-        // This must run before SpawnPointSystem. SpawnPointSystem treats a null
-        // SpawnResult as "nobody handled this" and will place the job mob at an
-        // arrivals/job spawn point.
-        SubscribeLocalEvent<PlayerSpawningEvent>(OnPlayerSpawning, before: [typeof(SpawnPointSystem)]);
-
-        SubscribeLocalEvent<HologramBladeServerComponent, PowerChangedEvent>(OnBladePowerChanged);
-    }
-
+    [SubscribeLocalEvent]
     private void OnPlayerBeforeSpawn(PlayerBeforeSpawnEvent args)
     {
         if (args.Handled || args.JobId != HologramJobId)
@@ -87,6 +66,7 @@ public sealed partial class HologramJobSpawnSystem : EntitySystem
         args.Handled = true;
     }
 
+    [SubscribeLocalEvent(before: [typeof(SpawnPointSystem)])]
     private void OnPlayerSpawning(PlayerSpawningEvent args)
     {
         if (args.SpawnResult != null || !IsHologramJob(args.Job))
@@ -128,19 +108,11 @@ public sealed partial class HologramJobSpawnSystem : EntitySystem
     /// This may create a HologramJobBladeServer inside a mapped HologramJobRack.
     /// </summary>
     private bool TryEnsureAvailableJobBlade(EntityUid? preferredStation)
-    {
-        if (HasFreeJobBladeInScope(preferredStation))
-            return true;
-
-        if (preferredStation != null && HasFreeJobBladeInScope(null))
-            return true;
-
-        if (TryCreateBladeInRackInScope(preferredStation, out _, out _, out _))
-            return true;
-
-        return preferredStation != null &&
-               TryCreateBladeInRackInScope(null, out _, out _, out _);
-    }
+        => HasFreeJobBladeInScope(preferredStation)
+        || (preferredStation != null && HasFreeJobBladeInScope(null))
+        || TryCreateBladeInRackInScope(preferredStation, out _, out _, out _)
+        || (preferredStation != null
+        && TryCreateBladeInRackInScope(null, out _, out _, out _));
 
     private bool TryFindOrCreateBlade(
         EntityUid? preferredStation,
@@ -471,10 +443,7 @@ public sealed partial class HologramJobSpawnSystem : EntitySystem
             return false;
         }
 
-        if (TryComp<ApcPowerReceiverComponent>(bladeServerUid, out var ownPower))
-            return ownPower.Powered;
-
-        return false;
+        return TryComp<ApcPowerReceiverComponent>(bladeServerUid, out var ownPower) && ownPower.Powered;
     }
 
     private void LogJobRackDebug(EntityUid? station)
@@ -505,6 +474,7 @@ public sealed partial class HologramJobSpawnSystem : EntitySystem
         _sawmill.Warning($"Hologram job rack scan complete: racks={count}, freeSlots={free}, requestedStation={requestedStation}.");
     }
 
+    [SubscribeLocalEvent]
     private void OnBladePowerChanged(EntityUid uid, HologramBladeServerComponent component, ref PowerChangedEvent args)
         => RefreshBladePower(uid, component);
 

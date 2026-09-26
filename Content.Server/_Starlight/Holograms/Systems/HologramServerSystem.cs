@@ -10,14 +10,7 @@ public sealed partial class HologramServerSystem : EntitySystem
     [Dependency] private HologramSystem _hologram = default!;
     [Dependency] private HologramConsoleSystem _console = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        SubscribeLocalEvent<HologramServerComponent, PowerChangedEvent>(ServerOnPowerChanged);
-        SubscribeLocalEvent<HologramServerComponent, ComponentShutdown>(OnServerShutdown);
-    }
-
+    [SubscribeLocalEvent]
     private void ServerOnPowerChanged(EntityUid _, HologramServerComponent component, ref PowerChangedEvent args)
     {
         if (args.Powered)
@@ -26,12 +19,12 @@ public sealed partial class HologramServerSystem : EntitySystem
         KillAllHolograms(component);
     }
 
+    [SubscribeLocalEvent]
     private void OnServerShutdown(EntityUid _, HologramServerComponent component, ComponentShutdown __)
         => KillAllHolograms(component);
 
     private void KillAllHolograms(HologramServerComponent component)
     {
-        // Starlight Edit Start - blade-backed projections must return their minds before deletion.
         foreach (var (blade, hologram) in component.ActiveHolograms.ToArray())
         {
             if (!Exists(hologram))
@@ -42,7 +35,6 @@ public sealed partial class HologramServerSystem : EntitySystem
             else
                 _hologram.DoKillHologram(hologram);
         }
-        // Starlight Edit End
 
         component.ActiveHolograms.Clear();
 

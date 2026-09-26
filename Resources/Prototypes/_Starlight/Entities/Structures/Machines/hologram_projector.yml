@@ -1,6 +1,7 @@
 # A standalone projector, separate from cameras (see wireless_surveillance_camera.yml /
-# surveillance_camera.yml for the removed hardcoded version). Cameras can still project once a
-# HologramProjectorUpgradeKit is used on them - see hologram_projector_upgrade.yml.
+# surveillance_camera.yml for the removed hardcoded version). Cameras can also become projectors
+# via the HologramProjectorCameraUpgrade construction graph - see
+# hologram_projector_camera_upgrade.yml.
 #
 # Sprite is a placeholder (reusing the holopad's) until real art exists - swap the Sprite/Icon
 # state below for dedicated art when it's ready, nothing else needs to change.

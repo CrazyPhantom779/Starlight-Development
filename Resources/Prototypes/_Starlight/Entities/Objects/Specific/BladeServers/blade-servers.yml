@@ -15,12 +15,12 @@
   - type: ItemSlots
     slots:
       hologram_brain_chip:
-        name: Brain Chip
+        name: hologram-slot-brain-chip
         whitelist:
           tags:
             - HologramBrainChip
       hologram_body_chip:
-        name: Body Chip
+        name: hologram-slot-body-chip
         whitelist:
           tags:
             - HologramBodyChip
@@ -48,13 +48,13 @@
   - type: ItemSlots
     slots:
       hologram_brain_chip:
-        name: Brain Chip
+        name: hologram-slot-brain-chip
         whitelist:
           tags:
           - HologramBrainChip
         startingItem: HologramStuntedBrainChip
       hologram_body_chip:
-        name: Body Chip
+        name: hologram-slot-body-chip
         whitelist:
           tags:
           - HologramBodyChip

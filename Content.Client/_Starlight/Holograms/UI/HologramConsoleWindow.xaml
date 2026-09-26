@@ -1,6 +1,6 @@
 <DefaultWindow xmlns="https://spacestation14.io"
                xmlns:ui="clr-namespace:Content.Client._Starlight.Holograms.UI"
-               Title="Hologram Console"
+               Title="{Loc 'hologram-console-window-title'}"
                MinSize="1040 700"
                SetSize="1160 780"
                Resizable="True">
@@ -15,10 +15,10 @@
                     <PanelContainer Name="HeaderAccent" MinSize="4 0" VerticalExpand="True" />
 
                     <BoxContainer Orientation="Vertical" HorizontalExpand="True" SeparationOverride="2">
-                        <Label Text="HOLOGRAM PROJECTION CONTROL"
+                        <Label Text="{Loc 'hologram-console-title'}"
                                FontColorOverride="#7dd3fc" />
                         <Label Name="StatusLabel"
-                               Text="No blade servers available"
+                               Text="{Loc 'hologram-console-status-no-blade-servers'}"
                                FontColorOverride="#94a3b8" />
                     </BoxContainer>
 
@@ -28,7 +28,7 @@
 
                         <PanelContainer Name="ModeBadge">
                             <Label Name="ModeLabel"
-                                   Text="STATION MODE"
+                                   Text="{Loc 'hologram-console-mode-station'}"
                                    Margin="8 3"
                                    FontColorOverride="#fbbf24" />
                         </PanelContainer>
@@ -59,15 +59,15 @@
                     <PanelContainer>
                         <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="6">
                             <BoxContainer Orientation="Horizontal">
-                                <Label Text="BLADE SERVERS"
+                                <Label Text="{Loc 'hologram-console-section-blade-servers'}"
                                        HorizontalExpand="True"
                                        FontColorOverride="#e5e7eb" />
                                 <Label Name="NoBladeServersLabel"
-                                       Text="NONE DETECTED"
+                                       Text="{Loc 'hologram-console-none-detected'}"
                                        FontColorOverride="#ef4444" />
                             </BoxContainer>
 
-                            <Label Text="Select a blade server, verify its body data, then choose a projector."
+                            <Label Text="{Loc 'hologram-console-hint-select-blade'}"
                                    FontColorOverride="#94a3b8" />
                         </BoxContainer>
                     </PanelContainer>
@@ -84,30 +84,30 @@
 
                     <PanelContainer Name="SelectedPanel">
                         <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="6">
-                            <Label Text="SELECTION"
+                            <Label Text="{Loc 'hologram-console-section-selection'}"
                                    FontColorOverride="#e5e7eb" />
                             <Label Name="SelectedBladeLabel"
-                                   Text="Blade: none"
+                                   Text="{Loc 'hologram-console-blade-none'}"
                                    ClipText="True"
                                    FontColorOverride="#94a3b8" />
                             <Label Name="SelectedProjectorLabel"
-                                   Text="Projector: none"
+                                   Text="{Loc 'hologram-console-projector-none'}"
                                    ClipText="True"
                                    FontColorOverride="#94a3b8" />
                             <Label Name="HintLabel"
-                                   Text="Select a blade server and projector."
+                                   Text="{Loc 'hologram-console-hint-select-both'}"
                                    FontColorOverride="#7dd3fc" />
                         </BoxContainer>
                     </PanelContainer>
 
                     <PanelContainer Name="SettingsPanel">
                         <BoxContainer Orientation="Vertical" Margin="12" SeparationOverride="8">
-                            <Label Text="DEVICE SETTINGS"
+                            <Label Text="{Loc 'hologram-console-section-settings'}"
                                    FontColorOverride="#e5e7eb" />
                             <CheckBox Name="AllowCarryCheckbox"
-                                      Text="Allow hologram carry mode" />
+                                      Text="{Loc 'hologram-console-allow-carry'}" />
                             <Label Name="PortableInfoLabel"
-                                   Text="Active: 0 / 0"
+                                   Text="{Loc 'hologram-console-active-placeholder'}"
                                    FontColorOverride="#7dd3fc" />
                         </BoxContainer>
                     </PanelContainer>
@@ -137,13 +137,13 @@
                     <PanelContainer HorizontalExpand="True">
                         <BoxContainer Orientation="Horizontal" Margin="12 10" SeparationOverride="8">
                             <BoxContainer Orientation="Vertical" HorizontalExpand="True" SeparationOverride="2">
-                                <Label Text="PROJECTOR MAP"
+                                <Label Text="{Loc 'hologram-console-section-map'}"
                                        FontColorOverride="#e5e7eb" />
-                                <Label Text="Only same-grid projectors are shown. Black markers exist but can't host a hologram right now."
+                                <Label Text="{Loc 'hologram-console-map-hint'}"
                                        FontColorOverride="#94a3b8" />
                             </BoxContainer>
                             <Label Name="ProjectorCountLabel"
-                                   Text=" No Same-Grid Projectors "
+                                   Text="{Loc 'hologram-console-projector-count-placeholder'}"
                                    FontColorOverride="#7dd3fc"
                                    VerticalAlignment="Center" />
                         </BoxContainer>
@@ -165,10 +165,10 @@
                                           VerticalAlignment="Center"
                                           SeparationOverride="10">
                                 <Label Name="NoServerMapLabel"
-                                       Text="NO SAME-GRID PROJECTORS"
+                                       Text="{Loc 'hologram-console-no-projectors-title'}"
                                        HorizontalAlignment="Center"
                                        FontColorOverride="#ef4444" />
-                                <Label Text="Power a projector on this grid, then reopen or refresh the console."
+                                <Label Text="{Loc 'hologram-console-no-projectors-hint'}"
                                        HorizontalAlignment="Center"
                                        FontColorOverride="#94a3b8" />
                             </BoxContainer>

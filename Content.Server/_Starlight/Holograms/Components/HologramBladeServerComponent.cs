@@ -19,7 +19,7 @@ public sealed partial class HologramBladeServerComponent : Component
     [ViewVariables]
     public EntityUid? ActiveHologram;
 
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField]
     public bool Emagged;
 
     [DataField]

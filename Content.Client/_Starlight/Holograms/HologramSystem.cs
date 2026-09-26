@@ -15,19 +15,15 @@ public sealed partial class HologramSystem : SharedHologramSystem
     [Dependency] private EyeSystem _eye = default!;
     [Dependency] private SpriteSystem _sprite = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        SubscribeLocalEvent<HologramProjectedComponent, ComponentShutdown>(OnProjectedShutdown);
-    }
-
     public override void Update(float frameTime)
     {
+        base.Update(frameTime);
+
         UpdateLocalEyeTarget();
         UpdateProjectedEffects();
     }
 
+    [SubscribeLocalEvent]
     private void OnProjectedShutdown(EntityUid uid, HologramProjectedComponent component, ComponentShutdown args)
     {
         DeleteEffect(component);

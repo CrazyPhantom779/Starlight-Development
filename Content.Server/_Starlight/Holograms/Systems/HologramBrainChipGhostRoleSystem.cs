@@ -15,14 +15,7 @@ public sealed partial class HologramBrainChipGhostRoleSystem : EntitySystem
     [Dependency] private GhostRoleSystem _ghostRole = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        SubscribeLocalEvent<HologramBrainChipGhostRoleComponent, ActivateInWorldEvent>(OnActivate);
-        SubscribeLocalEvent<HologramBrainChipGhostRoleComponent, MindAddedMessage>(OnMindAdded);
-    }
-
+    [SubscribeLocalEvent]
     private void OnActivate(EntityUid uid, HologramBrainChipGhostRoleComponent component, ActivateInWorldEvent args)
     {
         if (args.Handled)
@@ -57,6 +50,7 @@ public sealed partial class HologramBrainChipGhostRoleSystem : EntitySystem
         args.Handled = true;
     }
 
+    [SubscribeLocalEvent]
     private void OnMindAdded(EntityUid uid, HologramBrainChipGhostRoleComponent component, MindAddedMessage args)
     {
         if (TryComp<HologramBrainChipComponent>(uid, out var brainChip))

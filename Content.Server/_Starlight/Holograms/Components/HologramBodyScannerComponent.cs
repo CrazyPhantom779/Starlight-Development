@@ -1,3 +1,4 @@
+using Content.Shared._Starlight.Holograms;
 using Robust.Shared.Prototypes;
 
 namespace Content.Server._Starlight.Holograms.Components;

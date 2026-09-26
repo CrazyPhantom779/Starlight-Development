@@ -26,9 +26,6 @@ public sealed partial class HologramActionGrantSystem : EntitySystem
     public override void Initialize()
     {
         base.Initialize();
-
-        SubscribeLocalEvent<HologramActionGrantComponent, ComponentStartup>(OnStartup);
-        SubscribeLocalEvent<HologramActionGrantComponent, ComponentShutdown>(OnShutdown);
         SubscribeLocalEvent<HologramActionGrantComponent, MindAddedMessage>(OnMindChanged);
         SubscribeLocalEvent<HologramActionGrantComponent, MindRemovedMessage>(OnMindChanged);
 
@@ -54,9 +51,11 @@ public sealed partial class HologramActionGrantSystem : EntitySystem
         }
     }
 
+    [SubscribeLocalEvent]
     private void OnStartup(EntityUid uid, HologramActionGrantComponent component, ComponentStartup args)
         => RefreshActions(uid, component);
 
+    [SubscribeLocalEvent]
     private void OnShutdown(EntityUid uid, HologramActionGrantComponent component, ComponentShutdown args)
         => RemoveAllActions(uid, component);
 

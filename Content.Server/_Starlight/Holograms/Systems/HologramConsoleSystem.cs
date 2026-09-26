@@ -31,28 +31,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
     [Dependency] private BatterySystem _battery = default!;
     [Dependency] private SharedAppearanceSystem _appearance = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
-    [Dependency] private ILogManager _logManager = default!;
-
-    private ISawmill _sawmill = default!;
-
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        _sawmill = _logManager.GetSawmill("hologram.console");
-
-        SubscribeLocalEvent<HologramConsoleComponent, BoundUIOpenedEvent>(OnUIOpened);
-        SubscribeLocalEvent<HologramConsoleComponent, BoundUIClosedEvent>(OnUIClosed);
-        SubscribeLocalEvent<HologramConsoleComponent, HologramConsoleProjectHologramMessage>(OnProjectHologram);
-        SubscribeLocalEvent<HologramConsoleComponent, HologramConsoleRecallMessage>(OnRecallHologram);
-        SubscribeLocalEvent<HologramConsoleComponent, HologramConsoleEjectBladeServerMessage>(OnEjectBladeServer);
-        SubscribeLocalEvent<HologramConsoleComponent, HologramConsoleToggleCarryMessage>(OnToggleCarry);
-        SubscribeLocalEvent<HologramConsoleComponent, PowerCellSlotEmptyEvent>(OnBatteryEmpty);
-        SubscribeLocalEvent<HologramConsoleComponent, EntInsertedIntoContainerMessage>(OnBladeInserted);
-        SubscribeLocalEvent<HologramConsoleComponent, EntRemovedFromContainerMessage>(OnBladeRemoved);
-        SubscribeLocalEvent<HologramBladeServerComponent, ComponentShutdown>(OnBladeShutdown);
-        SubscribeLocalEvent<HologramComponent, MobStateChangedEvent>(OnHologramMobStateChanged);
-    }
+    private readonly ISawmill _sawmill = default!;
 
     /// <summary>
     /// Whether this console is a portable device (briefcase-style) rather than a fixed station
@@ -71,6 +50,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
 
     public bool IsBatteryPowered(EntityUid uid) => HasComp<PowerCellSlotComponent>(uid);
 
+    [SubscribeLocalEvent]
     private void OnHologramMobStateChanged(EntityUid uid, HologramComponent component, MobStateChangedEvent args)
     {
         if (args.NewMobState is not (MobState.Critical or MobState.Dead))
@@ -90,6 +70,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
             _hologram.DoKillHologram(uid, component);
     }
 
+    [SubscribeLocalEvent]
     private void OnBatteryEmpty(EntityUid uid, HologramConsoleComponent component, ref PowerCellSlotEmptyEvent args)
     {
         if (!IsPortable(uid))
@@ -100,18 +81,31 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         UpdateBriefcaseAppearance(uid, component);
     }
 
+    [SubscribeLocalEvent]
     private void OnBladeShutdown(EntityUid uid, HologramBladeServerComponent component, ComponentShutdown args)
         => KillBladeHologram(uid, component);
 
+    /// <summary>
+    /// Fires for a blade server leaving ANY container - a rack slot, the briefcase's own slot,
+    /// a hand, wherever. OnBladeRemoved below only ever saw removal from the briefcase's slot,
+    /// so pulling a blade server out of a rack while its hologram was live never disconnected it.
+    /// </summary>
+    // [SubscribeLocalEvent]
+    // private void OnBladeServerRemovedFromAnyContainer(EntityUid uid, HologramBladeServerComponent component, EntRemovedFromContainerMessage args)
+    //     => KillBladeHologram(uid, component);
+
+    [SubscribeLocalEvent]
     private void OnUIOpened(EntityUid uid, HologramConsoleComponent component, BoundUIOpenedEvent args)
     {
         UpdateUserInterface(uid, component);
         UpdateBriefcaseAppearance(uid, component);
     }
 
+    [SubscribeLocalEvent]
     private void OnUIClosed(EntityUid uid, HologramConsoleComponent component, BoundUIClosedEvent args)
         => UpdateBriefcaseAppearance(uid, component);
 
+    [SubscribeLocalEvent]
     private void OnBladeInserted(EntityUid uid, HologramConsoleComponent component, EntInsertedIntoContainerMessage args)
     {
         if (args.Container.ID != GetPortableSlotId(uid, component))
@@ -121,6 +115,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         UpdateUserInterface(uid, component);
     }
 
+    [SubscribeLocalEvent]
     private void OnBladeRemoved(EntityUid uid, HologramConsoleComponent component, EntRemovedFromContainerMessage args)
     {
         if (args.Container.ID != GetPortableSlotId(uid, component))
@@ -135,6 +130,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         UpdateUserInterface(uid, component);
     }
 
+    [SubscribeLocalEvent]
     private void OnEjectBladeServer(EntityUid console, HologramConsoleComponent component, HologramConsoleEjectBladeServerMessage args)
     {
         if (!IsPortable(console))
@@ -560,6 +556,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         return $"({coords.X:F0}, {coords.Y:F0})";
     }
 
+    [SubscribeLocalEvent]
     private void OnProjectHologram(EntityUid console, HologramConsoleComponent component, HologramConsoleProjectHologramMessage args)
     {
         var bladeServer = GetEntity(args.BladeServerUid);
@@ -730,8 +727,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
             mind = oldMindUid;
 
         var autonomousProjection = mind == null && brainChipComp?.AllowAutonomousProjection == true;
-
-        if (mind is { } mindUid && brainChip is { } chip && Exists(chip))
+        if (mind is { } && brainChip is { } chip && Exists(chip))
             _hologram.TryReturnMindToBrainChip(oldHologram, chip);
         else if (mind == null && !autonomousProjection)
         {
@@ -792,6 +788,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         Dirty(hologram, projectedComp);
     }
 
+    [SubscribeLocalEvent]
     private void OnRecallHologram(EntityUid console, HologramConsoleComponent component, HologramConsoleRecallMessage args)
     {
         var actor = args.Actor;
@@ -821,6 +818,7 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         UpdateConsoleIfAlive(console, component);
     }
 
+    [SubscribeLocalEvent]
     private void OnToggleCarry(EntityUid uid, HologramConsoleComponent component, HologramConsoleToggleCarryMessage args)
     {
         if (!IsPortable(uid))
@@ -835,9 +833,13 @@ public sealed partial class HologramConsoleSystem : EntitySystem
         base.Update(frameTime);
 
         var bladeQuery = EntityQueryEnumerator<HologramBladeServerComponent>();
-        while (bladeQuery.MoveNext(out _, out var bladeComp))
+        while (bladeQuery.MoveNext(out var bladeUid, out var bladeComp))
         {
             CleanupBladeHologram(bladeComp);
+
+            var isGridPowered = TryGetContainingRack(bladeUid, out _, out _) || HasComp<ApcPowerReceiverComponent>(bladeUid);
+            if (isGridPowered && bladeComp.ActiveHologram is { } && !IsBladeServerPowered(bladeUid))
+                KillBladeHologram(bladeUid, bladeComp);
         }
 
         var query = EntityQueryEnumerator<HologramConsoleComponent>();

@@ -133,8 +133,8 @@
   - type: MobThresholds
     thresholds:
       0: Alive
-      100: Critical
-      200: Dead
+      15: Critical
+      30: Dead
   - type: Stamina
   - type: StunVisuals
   - type: HealthExaminable
@@ -329,8 +329,8 @@
   - type: MobThresholds
     thresholds:
       0: Alive
-      100: Critical
-      200: Dead
+      15: Critical
+      30: Dead
   - type: Stamina
   - type: Damageable
     damageContainer: Biological
@@ -395,13 +395,13 @@
   - Fixtures
   - Hands
 
-  # Speech / language / RP flavor
+  # Ect
   - Speech
   - Vocal
   - TypingIndicator
   - Grammar
   - BodyEmotes
-  - LanguageSpeaker
+  - LanguageKnowledge
   - ForeignerTrait
   - TextToSpeech
   - CharacterDescription

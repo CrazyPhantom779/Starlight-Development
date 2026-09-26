@@ -19,17 +19,9 @@ public sealed partial class HologramProjectorSystem : EntitySystem
     [Dependency] private IGameTiming _timing = default!;
     [Dependency] private SharedAudioSystem _audio = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
-
     private float _accumulator;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        SubscribeLocalEvent<HologramProjectorComponent, PowerChangedEvent>(OnPowerChanged);
-        SubscribeLocalEvent<HologramProjectorComponent, DamageChangedEvent>(OnDamageChanged);
-    }
-
+    [SubscribeLocalEvent]
     private void OnPowerChanged(EntityUid uid, HologramProjectorComponent component, ref PowerChangedEvent args)
         => CheckState(uid, component);
 
@@ -37,6 +29,7 @@ public sealed partial class HologramProjectorSystem : EntitySystem
     /// Damage starts (or extends) the cooldown, weighted by damage type - see
     /// CooldownDamageTypeMultipliers on the component. Ignores healing.
     /// </summary>
+    [SubscribeLocalEvent]
     private void OnDamageChanged(EntityUid uid, HologramProjectorComponent component, DamageChangedEvent args)
     {
         if (!args.DamageIncreased || args.DamageDelta is null)

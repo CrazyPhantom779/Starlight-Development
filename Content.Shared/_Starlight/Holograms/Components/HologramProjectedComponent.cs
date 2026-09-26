@@ -1,7 +1,6 @@
 using Content.Shared.Whitelist;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype;
 
 namespace Content.Shared._Starlight.Holograms.Components;
 
@@ -20,18 +19,15 @@ public sealed partial class HologramProjectedComponent : Component
 
     /// <summary>
     /// Grace time after leaving projector range or line of sight before the hologram is returned.
-    /// Kept short so portals/teleports/walls snap the projection back quickly, but not instantly enough
-    /// to punish brief door movement.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField]
     [AutoNetworkedField]
     public TimeSpan GracePeriod = TimeSpan.FromSeconds(0.75);
 
     /// <summary>
     /// Short grace used when the current projector is still in range but line-of-sight is blocked.
-    /// This makes walls and closed doors cut projections quickly without making range-edge movement harsh.
     /// </summary>
-    [DataField, ViewVariables(VVAccess.ReadWrite)]
+    [DataField]
     [AutoNetworkedField]
     public TimeSpan OcclusionGracePeriod = TimeSpan.FromSeconds(0.15);
 
@@ -50,13 +46,12 @@ public sealed partial class HologramProjectedComponent : Component
     /// <summary>
     /// Prototype of the client-side projection beam/effect entity.
     /// </summary>
-    [DataField(customTypeSerializer: typeof(PrototypeIdSerializer<EntityPrototype>))]
+    [DataField(customTypeSerializer: typeof(ProtoId<EntityPrototype>))]
     [AutoNetworkedField]
     public string? EffectPrototype;
 
     /// <summary>
     /// Whether the hologram's eye should snap to the projector it is emitted from.
-    /// Walking hardlight bodies should leave this false.
     /// </summary>
     [DataField]
     [AutoNetworkedField]

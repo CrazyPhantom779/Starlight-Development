@@ -118,7 +118,7 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
 
         SettingsPanel.Visible = state.ShowSettingsPanel;
         ModeLabel.Visible = true;
-        ModeLabel.Text = state.IsPortable ? "PORTABLE MODE" : "STATION MODE";
+        ModeLabel.Text = state.IsPortable ? Loc.GetString("hologram-console-mode-portable") : Loc.GetString("hologram-console-mode-station");
 
         LeftPanel.Visible = state.ShowBladeServerPanel;
         MapPanel.Visible = state.ShowMap;
@@ -133,8 +133,8 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
 
         PortableInfoLabel.Visible = state.ShowActiveCount;
         PortableInfoLabel.Text = state.MaxActive > 0
-            ? $"Active: {state.ActiveCount} / {state.MaxActive}"
-            : $"Active: {state.ActiveCount}";
+            ? Loc.GetString("hologram-console-active-of-max", ("count", state.ActiveCount), ("max", state.MaxActive))
+            : Loc.GetString("hologram-console-active-readout", ("count", state.ActiveCount));
 
         UpdateCarryCheckbox(state.AllowCarry);
 
@@ -169,14 +169,14 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
     private void SetupNavMap(HologramConsoleBoundUserInterfaceState state)
     {
         ProjectorCountLabel.Text = state.Projectors.Count > 0
-            ? $" {state.Projectors.Count} Same-Grid Projectors "
-            : " No Same-Grid Projectors ";
+            ? Loc.GetString("hologram-console-projector-count", ("count", state.Projectors.Count))
+            : Loc.GetString("hologram-console-projector-count-placeholder");
 
         if (_blipTexture == null || state.ProjectorCoordinates.Count == 0)
         {
             NavMap.Visible = false;
             NoServerOverlay.Visible = true;
-            NoServerMapLabel.Text = "NO SAME-GRID PROJECTORS";
+            NoServerMapLabel.Text = Loc.GetString("hologram-console-no-projectors-title");
             return;
         }
 
@@ -274,13 +274,13 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
         NoServerOverlay.Visible = true;
         NavMap.Visible = false;
         BladeServersList.RemoveAllChildren();
-        ProjectorCountLabel.Text = " No Same-Grid Projectors ";
+        ProjectorCountLabel.Text = Loc.GetString("hologram-console-projector-count-placeholder");
 
-        SetText(StatusLabel, "No same-grid hologram hardware", ErrorColor);
-        SetActiveIndicator("● OFFLINE", ErrorColor);
-        SetText(SelectedBladeLabel, "Blade: none", MutedColor);
-        SetText(SelectedProjectorLabel, "Projector: none", MutedColor);
-        SetText(HintLabel, "Install or power a hologram rack/console on this grid.", ErrorColor);
+        SetText(StatusLabel, Loc.GetString("hologram-console-status-no-same-grid"), ErrorColor);
+        SetActiveIndicator(Loc.GetString("hologram-console-active-offline"), ErrorColor);
+        SetText(SelectedBladeLabel, Loc.GetString("hologram-console-blade-none"), MutedColor);
+        SetText(SelectedProjectorLabel, Loc.GetString("hologram-console-projector-none"), MutedColor);
+        SetText(HintLabel, Loc.GetString("hologram-console-hint-install-rack"), ErrorColor);
 
         ProjectButton.Disabled = true;
         RecallButton.Disabled = true;
@@ -318,21 +318,21 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
     {
         if (state.BladeServers.Count == 0)
         {
-            SetText(StatusLabel, "No blade servers available", ErrorColor);
-            SetActiveIndicator("● NO DATA", MutedColor);
+            SetText(StatusLabel, Loc.GetString("hologram-console-status-no-blade-servers"), ErrorColor);
+            SetActiveIndicator(Loc.GetString("hologram-console-active-no-data"), MutedColor);
             return;
         }
 
         var missingBodies = state.BladeServers.Count(x => !x.HasBody);
-        var activeText = state.ActiveCount == 1 ? "1 active" : $"{state.ActiveCount} active";
+        var activeText = Loc.GetString("hologram-console-active-count", ("count", state.ActiveCount));
 
         var status = missingBodies > 0
-            ? $"{state.BladeServers.Count} hologram(s), {activeText}, {missingBodies} missing body"
-            : $"{state.BladeServers.Count} hologram(s) available, {activeText}";
+            ? Loc.GetString("hologram-console-status-missing", ("count", state.BladeServers.Count), ("active", activeText), ("missing", missingBodies))
+            : Loc.GetString("hologram-console-status-available", ("count", state.BladeServers.Count), ("active", activeText));
 
         SetText(StatusLabel, status, ReadyColor);
         SetActiveIndicator(
-            state.ActiveCount > 0 ? "● ACTIVE" : "● READY",
+            state.ActiveCount > 0 ? Loc.GetString("hologram-console-active-active") : Loc.GetString("hologram-console-active-ready"),
             state.ActiveCount > 0 ? ActiveColor : WarningColor);
     }
 
@@ -365,29 +365,29 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
         var selected = GetSelectedBladeInfo(state);
         var projector = GetSelectedProjectorInfo(state);
 
-        SetText(SelectedBladeLabel, selected == null ? "Blade: none" : $"Blade: {selected.HologramName}", selected == null ? MutedColor : ReadyColor);
+        SetText(SelectedBladeLabel, selected == null ? Loc.GetString("hologram-console-blade-none") : Loc.GetString("hologram-console-blade-selected", ("name", selected.HologramName)), selected == null ? MutedColor : ReadyColor);
 
         if (state.IsPortable)
         {
-            SetText(SelectedProjectorLabel, "Projector: portable emitter", ReadyColor);
+            SetText(SelectedProjectorLabel, Loc.GetString("hologram-console-projector-portable"), ReadyColor);
         }
         else
         {
             SetText(SelectedProjectorLabel,
-                projector == null ? "Projector: none" : $"Projector: {projector.Name} — {projector.Location}",
+                projector == null ? Loc.GetString("hologram-console-projector-none") : Loc.GetString("hologram-console-projector-selected", ("name", projector.Name), ("location", projector.Location)),
                 projector == null ? MutedColor : ReadyColor);
         }
 
         if (selected == null)
-            SetText(HintLabel, "Select a blade server.", MutedColor);
+            SetText(HintLabel, Loc.GetString("hologram-console-hint-pick-blade"), MutedColor);
         else if (!selected.HasBody)
-            SetText(HintLabel, "Install or scan a body chip before projecting.", ErrorColor);
+            SetText(HintLabel, Loc.GetString("hologram-console-hint-need-body"), ErrorColor);
         else if (selected.IsActive && !state.IsPortable)
-            SetText(HintLabel, "Select a projector to move this active hologram.", ActiveColor);
+            SetText(HintLabel, Loc.GetString("hologram-console-hint-move-active"), ActiveColor);
         else if (!state.IsPortable && projector == null)
-            SetText(HintLabel, "Select a same-grid projector on the map.", WarningColor);
+            SetText(HintLabel, Loc.GetString("hologram-console-hint-pick-projector"), WarningColor);
         else
-            SetText(HintLabel, "Ready to project.", ActiveColor);
+            SetText(HintLabel, Loc.GetString("hologram-console-hint-ready"), ActiveColor);
     }
 
     private void UpdateButtons(HologramConsoleBoundUserInterfaceState state)
@@ -401,20 +401,26 @@ public sealed partial class HologramConsoleWindow : DefaultWindow
         if (selectedMissingBody)
         {
             ProjectButton.Disabled = true;
-            ProjectButton.Text = "▶ MISSING BODY";
+            ProjectButton.Text = Loc.GetString("hologram-console-project-missing-body");
         }
         else if (state.IsPortable)
         {
             ProjectButton.Disabled = !canProject || selectedActive || (!selectedActive && maxed);
-            ProjectButton.Text = selectedActive ? "▶ ALREADY PROJECTED" : state.ActiveCount > 0 ? "▶ PROJECT ANOTHER" : "▶ PROJECT";
+            ProjectButton.Text = selectedActive
+                ? Loc.GetString("hologram-console-project-already")
+                : state.ActiveCount > 0 ? Loc.GetString("hologram-console-project-another") : Loc.GetString("hologram-console-project-default");
         }
         else
         {
             ProjectButton.Disabled = !canProject || (!selectedActive && maxed);
-            ProjectButton.Text = selectedActive ? "▶ MOVE TO PROJECTOR" : state.ActiveCount > 0 ? "▶ PROJECT ANOTHER" : "▶ PROJECT";
+            ProjectButton.Text = selectedActive
+                ? Loc.GetString("hologram-console-project-move")
+                : state.ActiveCount > 0 ? Loc.GetString("hologram-console-project-another") : Loc.GetString("hologram-console-project-default");
         }
 
-        RecallButton.Text = selectedActive ? "◾ RECALL SELECTED" : state.ActiveCount > 1 ? "◾ RECALL ALL" : "◾ RECALL";
+        RecallButton.Text = selectedActive
+            ? Loc.GetString("hologram-console-recall-selected")
+            : state.ActiveCount > 1 ? Loc.GetString("hologram-console-recall-all") : Loc.GetString("hologram-console-recall-default");
         RecallButton.Disabled = state.ActiveCount <= 0;
     }
 
@@ -483,7 +489,9 @@ public sealed class BladeServerListEntry : PanelContainer
         var ejectButton = new Button
         {
             Text = "⏏",
-            ToolTip = isPortable ? "Eject blade server" : "Only portable consoles can eject blade servers",
+            ToolTip = isPortable
+                ? Loc.GetString("hologram-console-eject-tooltip")
+                : Loc.GetString("hologram-console-eject-tooltip-disabled"),
             MinWidth = 34,
             MinHeight = 30,
             Disabled = !isPortable || _isActive,
@@ -493,7 +501,7 @@ public sealed class BladeServerListEntry : PanelContainer
 
         var selectButton = new Button
         {
-            Text = "SELECT",
+            Text = Loc.GetString("hologram-console-select-button"),
             MinWidth = 70,
             MinHeight = 30,
         };
@@ -510,15 +518,15 @@ public sealed class BladeServerListEntry : PanelContainer
     private static string GetStatusMarkup(BladeServerInfo info)
     {
         if (!info.HasBody)
-            return $"[color={ErrorColor}]MISSING BODY[/color]";
+            return $"[color={ErrorColor}]{Loc.GetString("hologram-console-entry-missing-body")}[/color]";
 
         if (info.IsEmagged)
-            return $"[color={ErrorColor}]SUBVERTED[/color]";
+            return $"[color={ErrorColor}]{Loc.GetString("hologram-console-entry-subverted")}[/color]";
 
         if (info.IsActive)
-            return $"[color={ActiveColor}]ACTIVE PROJECTION[/color]";
+            return $"[color={ActiveColor}]{Loc.GetString("hologram-console-entry-active")}[/color]";
 
-        return $"[color={ReadyColor}]READY[/color]";
+        return $"[color={ReadyColor}]{Loc.GetString("hologram-console-entry-ready")}[/color]";
     }
 
     private StyleBoxFlat GetPanelStyle(bool selected)
