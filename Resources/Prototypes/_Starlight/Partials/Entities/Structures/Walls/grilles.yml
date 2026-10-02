@@ -1,0 +1,22 @@
+- type: !PartialOnly entity
+  id: Grille
+  components:
+  - type: Tag
+    tags:
+    - Grille
+
+- type: !PartialOnly entity
+  id: GrilleBroken
+  components:
+  - type: Tag
+    tags:
+    - ForceNoFixRotations
+    - Grille
+
+- type: !PartialOnly entity
+  id: ClockworkGrilleDiagonal
+  components:
+  - type: Tag
+    tags:
+    - Diagonal
+    - Grille # Starlight

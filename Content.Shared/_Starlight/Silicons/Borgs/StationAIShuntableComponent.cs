@@ -21,4 +21,9 @@ public sealed partial class StationAIShuntableComponent : Component
     /// </summary>
     [ViewVariables]
     public EntityUid? Inhabited = null;
+
+    // Flock edit: lets non-AI shunters (flockmind/flocktrace) shunt without being inside a camera's view.
+    /// <summary>If true, shunting skips the camera-view check (used for the alt-click verb).</summary>
+    [DataField]
+    public bool IgnoreCameraView;
 }

@@ -1,0 +1,50 @@
+# What the flock turns station things into. Highest priority first match wins.
+# Computers become compute nodes (the compute node is *not* a copy of the computer), the rest are re-skins.
+
+- type: flockConversion
+  id: FlockConvertComputer
+  priority: 30
+  whitelist:
+    components:
+    - Computer
+  replacement: FlockComputeNode
+
+- type: flockConversion
+  id: FlockConvertAirlock
+  priority: 20
+  whitelist:
+    tags:
+    - Airlock
+  replacement: FlockDoor
+
+- type: flockConversion
+  id: FlockConvertWindow
+  priority: 10
+  whitelist:
+    tags:
+    - Window
+  replacement: FlockWindow
+
+- type: flockConversion
+  id: FlockConvertGrille
+  priority: 10
+  whitelist:
+    tags:
+    - Grille
+  replacement: FlockGrille
+
+- type: flockConversion
+  id: FlockConvertTable
+  priority: 10
+  whitelist:
+    tags:
+    - Table
+  replacement: FlockTable
+
+- type: flockConversion
+  id: FlockConvertWall
+  priority: 5
+  whitelist:
+    tags:
+    - Wall
+  replacement: WallFlock

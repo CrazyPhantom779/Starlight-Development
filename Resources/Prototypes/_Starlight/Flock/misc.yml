@@ -1,0 +1,81 @@
+# Projectiles, reagents and recipes.
+
+- type: entity
+  id: BulletFlockStun
+  parent: BulletDisabler
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: stunbolt
+      shader: unshaded
+  - type: StaminaDamageOnCollide
+    damage: 55
+  - type: StunOnCollide
+    stunAmount: 0
+    knockdownAmount: 3
+    slowdownAmount: 2
+    walkSpeedModifier: 0.5
+    sprintSpeedModifier: 0.5
+
+- type: entity
+  id: BulletFlockGnesis
+  parent: BulletDisabler
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: stunbolt
+      shader: unshaded
+    color: "#4d736d"
+  - type: StaminaDamageOnCollide
+    damage: 15
+  - type: Solution
+    solution:
+      maxVol: 20
+      reagents:
+      - ReagentId: FlockGnesis
+        Quantity: 20
+  - type: SolutionInjectOnProjectileHit
+    transferAmount: 20
+    solution: ammo
+
+- type: entity
+  id: FlockLightning
+  parent: Lightning
+  categories: [ HideSpawnMenu ]
+  name: flock arc
+  components:
+  - type: Sprite
+    color: "#3cb5a4"
+
+- type: reagent
+  id: FlockGnesis
+  name: reagent-name-flock-gnesis
+  group: Toxins
+  desc: reagent-desc-flock-gnesis
+  physicalDesc: reagent-physical-desc-viscous
+  flavor: metallic
+  color: "#4d736d"
+  recognizable: false
+
+- type: reagent
+  id: Tealquila
+  name: reagent-name-tealquila
+  parent: BaseAlcohol
+  desc: reagent-desc-tealquila
+  physicalDesc: reagent-physical-desc-fizzy
+  flavor: tequilasunrise
+  color: "#26ffe6"
+
+- type: reaction
+  id: Tealquila
+  reactants:
+    TequilaSunrise:
+      amount: 1
+    FlockGnesis:
+      amount: 1
+  products:
+    Tealquila: 2

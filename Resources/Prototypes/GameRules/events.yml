@@ -72,7 +72,8 @@
     #- id: BrighteyeSpawn
     #- id: TerrorSpidersSpawn
     - id: RailroadingTerminator
-    - id: ColossusSpawn # Starlight end
+    - id: ColossusSpawn
+    - id: FlockmindSpawn # Starlight end
     - id: EeepEvent # imp
     - !type:NestedSelector
       tableId: DerelictBorgEventTable

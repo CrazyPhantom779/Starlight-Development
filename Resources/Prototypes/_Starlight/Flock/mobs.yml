@@ -1,0 +1,270 @@
+# Flock mobs: flockmind, flocktrace, flockdrone, flockbit.
+
+- type: damageModifierSet
+  id: FlockDrone
+  coefficients:
+    Blunt: 1.0
+    Slash: 0.9
+    Piercing: 0.8
+    Heat: 0.7
+    Cold: 1.0
+    Shock: 0.0
+    Radiation: 0.0
+    Poison: 0.0
+
+# ---------------------------------------------------------------- flockmind
+
+- type: entity
+  abstract: true
+  parent: [ Incorporeal, BaseMob ]
+  id: BaseFlockIntangible
+  components:
+  - type: Input
+    context: "ghost"
+  - type: MovementSpeedModifier
+    baseWalkSpeed: 7
+    baseSprintSpeed: 7
+  - type: Eye
+    drawFov: false
+    visMask:
+    - Normal
+    - Ghost
+  - type: ContentEye
+    maxZoom: 1.5, 1.5
+  - type: Visibility
+    layer: 32 # ghost visibility layer
+  - type: MindContainer
+  - type: Examiner
+  - type: SSDIndicator
+  - type: StatusIcon
+    bounds: -0.5,-0.5,0.5,0.5
+  - type: MobState
+    allowedStates:
+    - Alive
+  - type: Speech
+    speechVerb: Robotic
+  - type: LanguageKnowledge
+    speaks:
+    - Flock
+    understands:
+    - Flock
+  - type: UniversalLanguageSpeaker
+  - type: FlockMember
+  - type: UserInterface
+    interfaces:
+      enum.FlockUiKey.Panel:
+        type: FlockPanelBoundUserInterface
+  - type: PointLight
+    color: "#3cb5a4"
+    radius: 3
+    energy: 2.5
+    softness: 1
+    castShadows: false
+  # Reuses Starlight's shunting: alt-click a drone to take it over, "UnShunt" to return.
+  - type: StationAIShuntable
+    ignoreCameraView: true
+    unshuntAction: ActionAIUnShunt
+
+- type: entity
+  parent: BaseFlockIntangible
+  id: MobFlockmind
+  name: flockmind
+  description: A vast, cold intelligence wearing a body of light. It is thinking about you.
+  components:
+  - type: Sprite
+    drawdepth: Ghosts
+    noRot: true
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: flockmind
+      shader: unshaded
+  - type: Flockmind
+
+- type: entity
+  abstract: true
+  parent: BaseFlockIntangible
+  id: BaseFlocktrace
+  name: flocktrace
+  description: A fragment of the flockmind, given a purpose. It is thinking about you too.
+  components:
+  - type: Sprite
+    drawdepth: Ghosts
+    noRot: true
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: flocktrace
+      shader: unshaded
+  - type: Flocktrace
+
+- type: entity
+  parent: BaseFlocktrace
+  id: MobFlocktrace
+
+- type: entity
+  parent: BaseFlocktrace
+  id: MobFlocktraceGhostRole
+  suffix: Ghost role
+  components:
+  - type: GhostRole
+    name: ghost-role-information-flocktrace-name
+    description: ghost-role-information-flocktrace-description
+    rules: ghost-role-information-flocktrace-rules
+    raffle:
+      settings: short
+    mindRoles:
+    - MindRoleFlocktrace
+  - type: GhostTakeoverAvailable
+
+# ---------------------------------------------------------------- flockdrone
+
+- type: entity
+  parent: BaseSimpleMob
+  id: MobFlockDrone
+  name: flockdrone
+  description: A mechanical bird-thing, made of teal glass and bad intentions.
+  components:
+  - type: Sprite
+    drawdepth: Mobs
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - map: [ "enum.FlockVisuals.State" ]
+      state: drone
+    - map: [ "hibernate" ]
+      state: drone-dormant
+      visible: false
+  - type: Appearance
+  - type: GenericVisualizer
+    visuals:
+      enum.FlockVisuals.Hibernating:
+        hibernate:
+          True: { visible: true }
+          False: { visible: false }
+  - type: Damageable
+    damageContainer: Inorganic
+    damageModifierSet: FlockDrone
+  - type: MobState
+    allowedStates:
+    - Alive
+    - Dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      60: Dead
+  - type: MovementSpeedModifier
+    baseWalkSpeed: 3.2
+    baseSprintSpeed: 4.4
+  - type: FlockMember
+  - type: FlockDrone
+  - type: StationAIShunt
+  - type: Speech
+    speechVerb: Robotic
+  - type: LanguageKnowledge
+    speaks:
+    - Flock
+    understands:
+    - Flock
+  - type: UniversalLanguageSpeaker
+  - type: MindContainer
+  - type: Examiner
+  - type: Tag
+    tags:
+    - DoorBumpOpener
+    - StunImmune
+  - type: HTN
+    rootTask:
+      task: FlockDroneCompound
+    blackboard:
+      NavClimb: !type:Bool
+        true
+      NavInteract: !type:Bool
+        true
+      NavPry: !type:Bool
+        true
+  - type: PointLight
+    color: "#3cb5a4"
+    radius: 2
+    energy: 1.2
+    softness: 1
+    castShadows: false
+
+# ---------------------------------------------------------------- flockbit
+
+- type: entity
+  parent: BaseSimpleMob
+  id: MobFlockBit
+  name: flockbit
+  description: A tiny chittering thing. Many of them, in fact.
+  components:
+  - type: Sprite
+    drawdepth: SmallMobs
+    sprite: _Starlight/Flock/featherzone.rsi
+    scale: 0.8, 0.8
+    layers:
+    - state: flockbit
+  - type: Damageable
+    damageContainer: Inorganic
+    damageModifierSet: FlockDrone
+  - type: MobState
+    allowedStates:
+    - Alive
+    - Dead
+  - type: MobThresholds
+    thresholds:
+      0: Alive
+      12: Dead
+  - type: MovementSpeedModifier
+    baseWalkSpeed: 3.5
+    baseSprintSpeed: 4.5
+  - type: FlockMember
+  - type: FlockBit
+  - type: Speech
+    enabled: false
+  - type: MindContainer
+  - type: Examiner
+  - type: Fixtures
+    fixtures:
+      fix1:
+        shape:
+          !type:PhysShapeCircle
+          radius: 0.2
+        density: 5
+        mask:
+        - SmallMobMask
+        layer:
+        - SmallMobLayer
+  - type: HTN
+    rootTask:
+      task: FlockBitCompound
+    blackboard:
+      NavClimb: !type:Bool
+        true
+      NavInteract: !type:Bool
+        true
+  - type: Tag
+    tags:
+    - StunImmune
+  - type: PointLight
+    color: "#3cb5a4"
+    radius: 1
+    energy: 1
+    softness: 1
+    castShadows: false
+
+# Remains of a drone. Anyone with a drone's nanites (Scrap mode) can reclaim the resources.
+- type: entity
+  parent: BaseStructureDynamic
+  id: FlockDroneDebris
+  name: drone debris
+  description: What's left of a flockdrone. There's still some salvageable gnesis in there.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: drone-long-dead
+  - type: Physics
+    bodyType: Dynamic
+    canCollide: false
+  - type: FlockCache
+    resources: 20
+  - type: TimedDespawn
+    lifetime: 600

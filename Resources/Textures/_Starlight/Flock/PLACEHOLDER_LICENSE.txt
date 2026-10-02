@@ -1,0 +1,3 @@
+All files in Resources/Textures/_Starlight/Flock and Resources/Audio/_Starlight/Flock are PLACEHOLDERS
+taken from Goonstation (https://github.com/goonstation/goonstation), licensed CC BY-NC-SA 3.0.
+They MUST be replaced with original or compatibly-licensed art/audio before any release.

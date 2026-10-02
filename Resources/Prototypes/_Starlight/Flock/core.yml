@@ -1,0 +1,93 @@
+# Flockmind core: nullspace flock holder, tiles, soundcollections, language, radio, damage.
+
+- type: entity
+  id: FlockRoot
+  name: flock
+  categories: [ HideSpawnMenu ]
+  components: []
+
+- type: tile
+  id: FloorFlock
+  parent: BaseStationTile
+  name: tiles-flock-floor
+  sprite: /Textures/_Starlight/Flock/Tiles/flock_floor.png
+  itemDrop: NothingEntity # Why cant this just be nullable ;-;
+  canCrowbar: false
+  canAxe: false
+  isSubfloor: false
+
+- type: tile
+  id: FloorFlockBroken
+  parent: BaseStationTile
+  name: tiles-flock-floor-broken
+  sprite: /Textures/_Starlight/Flock/Tiles/flock_floor_broken.png
+  itemDrop: NothingEntity # Why cant this just be nullable ;-;
+  canCrowbar: false
+  canAxe: false
+  isSubfloor: false
+
+- type: flockTileSettings
+  id: FlockDefault
+  floorTile: FloorFlock
+  brokenTile: FloorFlockBroken
+
+- type: soundCollection
+  id: FlockDroneBeeps
+  files:
+  - /Audio/_Starlight/Flock/flockdrone_beep1.ogg
+  - /Audio/_Starlight/Flock/flockdrone_beep2.ogg
+  - /Audio/_Starlight/Flock/flockdrone_beep3.ogg
+  - /Audio/_Starlight/Flock/flockdrone_beep4.ogg
+
+- type: soundCollection
+  id: FlockDroneGrumps
+  files:
+  - /Audio/_Starlight/Flock/flockdrone_grump1.ogg
+  - /Audio/_Starlight/Flock/flockdrone_grump2.ogg
+  - /Audio/_Starlight/Flock/flockdrone_grump3.ogg
+
+- type: soundCollection
+  id: FlockBitWisps
+  files:
+  - /Audio/_Starlight/Flock/flockbit_wisp1.ogg
+  - /Audio/_Starlight/Flock/flockbit_wisp2.ogg
+  - /Audio/_Starlight/Flock/flockbit_wisp3.ogg
+  - /Audio/_Starlight/Flock/flockbit_wisp4.ogg
+  - /Audio/_Starlight/Flock/flockbit_wisp5.ogg
+  - /Audio/_Starlight/Flock/flockbit_wisp6.ogg
+
+- type: soundCollection
+  id: FlockRadioSweep
+  files:
+  - /Audio/_Starlight/Flock/Flock_Static.ogg
+
+# ---- Language / radio: flocktalk is a hivemind channel, modelled on Cosmic. ----
+
+- type: radioChannel
+  id: FlockRadio
+  name: language-Flock-name
+  keycode: 'ф'
+  frequency: 1599
+  color: "#3cb5a4"
+  longRange: true
+  autoTranslate: Flock
+
+- type: jobIcon
+  parent: JobIcon
+  id: LanguageIconFlock
+  icon:
+    sprite: /Textures/_Starlight/Flock/flock-ui.rsi
+    state: talk
+  allowSelection: false
+
+- type: language
+  id: Flock
+  icon: LanguageIconFlock
+  chatPrefix: ф
+  iconNotUnderstood: false
+  speech:
+    color: "#3cb5a4"
+    radioChannel: FlockRadio
+    blockSpeech: true
+  obfuscation:
+    !type:RandomObfuscation

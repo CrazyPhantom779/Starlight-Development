@@ -1,0 +1,137 @@
+# Flockmind antagonist: mid-round ghost role event, modelled on the Dragon.
+
+- type: antag
+  id: Flockmind
+  name: roles-antag-flockmind-name
+  antagonist: true
+  objective: roles-antag-flockmind-objective
+
+- type: antagSpecifier
+  parent: RestrictedAntag
+  id: Flockmind
+  spawnerPrototype: SpawnPointGhostFlockmind
+  pickPlayer: false
+  mindRoles:
+  - MindRoleFlockmind
+
+- type: entity
+  parent: BaseMindRoleAntag
+  id: MindRoleFlockmind
+  name: Flockmind Role
+  components:
+  - type: MindRole
+    antagPrototype: Flockmind
+    roleType: TeamAntagonist
+    subtype: role-subtype-flockmind
+    exclusiveAntag: true
+  - type: FlockmindRole
+
+- type: entity
+  parent: BaseMindRoleAntag
+  id: MindRoleFlocktrace
+  name: Flocktrace Role
+  components:
+  - type: MindRole
+    antagPrototype: Flockmind
+    roleType: TeamAntagonist
+    subtype: role-subtype-flocktrace
+    exclusiveAntag: false
+  - type: FlocktraceRole
+
+- type: entity
+  categories: [ HideSpawnMenu, Spawner ]
+  parent: BaseAntagSpawner
+  id: SpawnPointGhostFlockmind
+  components:
+  - type: GhostRole
+    name: ghost-role-information-flockmind-name
+    description: ghost-role-information-flockmind-description
+    rules: ghost-role-information-flockmind-rules
+    important: true
+    mindRoles:
+    - MindRoleFlockmind
+  - type: Sprite
+    layers:
+    - state: green
+    - sprite: _Starlight/Flock/featherzone.rsi
+      state: flockmind
+
+- type: entity
+  parent: BaseAntagGhostRoleRule
+  id: FlockmindSpawn
+  components:
+  - type: StationEvent
+    globalAnnouncement: false
+    weight: 3
+    earliestStart: 40
+    reoccurrenceDelay: 45
+    minimumPlayers: 30
+    duration: null
+  - type: FlockRule
+  - type: AntagSpawner
+    prototype: MobFlockmind
+  - type: AntagObjectives
+    objectives:
+    - FlockRelayObjective
+    - FlockTilesObjective
+    - FlockSurviveObjective
+  - type: AntagSelection
+    agentName: flock-round-end-agent-name
+    antags:
+    - !type:FixedAntagCount
+      proto: Flockmind
+  - type: DynamicRuleCost
+    cost: 75
+
+# ---------------------------------------------------------------- objectives
+
+- type: entity
+  abstract: true
+  parent: BaseObjective
+  id: BaseFlockObjective
+  components:
+  - type: Objective
+    difficulty: 1.5
+    issuer: objective-issuer-flock
+  - type: RoleRequirement
+    roles:
+    - FlockmindRole
+
+- type: entity
+  parent: BaseFlockObjective
+  id: FlockRelayObjective
+  name: Transmit the Signal
+  description: Build the Relay and defend it until it finishes transmitting. If it falls, so do you.
+  components:
+  - type: Objective
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: structure-relay
+  - type: FlockRelayCondition
+
+- type: entity
+  parent: BaseFlockObjective
+  id: FlockTilesObjective
+  components:
+  - type: Objective
+    icon:
+      sprite: _Starlight/Flock/featherzone.rsi
+      state: floor
+  - type: NumberObjective
+    min: 120
+    max: 200
+    title: objective-flock-tiles-title
+    description: objective-flock-tiles-description
+  - type: FlockTilesCondition
+
+- type: entity
+  parent: BaseFlockObjective
+  id: FlockSurviveObjective
+  name: Stay online
+  description: The flock only exists while its flockmind does.
+  components:
+  - type: Objective
+    icon:
+      sprite: _Starlight/Flock/featherzone.rsi
+      state: flockmind_face
+  - type: FlockSurviveCondition

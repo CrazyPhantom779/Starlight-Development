@@ -1,0 +1,364 @@
+# Flockmind, Flocktrace and Flockdrone abilities.
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockSpawnRift
+  name: Spawn Rift
+  description: Tear open a rift into the station. Choose carefully, you only get one attempt.
+  components:
+  - type: Action
+    useDelay: 0
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: spawn_egg
+  - type: TargetAction
+    range: 1000
+    repeat: false
+  - type: WorldTargetAction
+    event: !type:FlockSpawnRiftEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockPing
+  name: Ping
+  description: Draw your flock's attention to a location.
+  components:
+  - type: Action
+    useDelay: 0.3
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: ping
+  - type: TargetAction
+    range: 1000
+    repeat: false
+  - type: WorldTargetAction
+    event: !type:FlockPingEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockPanel
+  name: Flock Panel
+  description: Open the flock overview - drones, compute, structures and enemies.
+  components:
+  - type: Action
+    useDelay: 0
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: question_mark
+  - type: InstantAction
+    event: !type:FlockOpenPanelEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockDesignateTile
+  name: Designate Priority Tile
+  description: Mark a tile as a conversion priority for your flock.
+  components:
+  - type: Action
+    useDelay: 0.5
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: designate_tile
+  - type: TargetAction
+    range: 1000
+    repeat: false
+  - type: WorldTargetAction
+    event: !type:FlockDesignateTileEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockDesignateEnemy
+  name: Designate Enemy
+  description: Mark a creature as an enemy of the flock. Marked enemies are attacked on sight.
+  components:
+  - type: Action
+    useDelay: 0.5
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: designate_enemy
+  - type: TargetAction
+    range: 1000
+    repeat: false
+  - type: EntityTargetAction
+    event: !type:FlockDesignateEnemyEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockDesignateIgnore
+  name: Designate Ignore
+  description: Mark a creature or thing the flock should leave alone.
+  components:
+  - type: Action
+    useDelay: 0.5
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: designate_ignore
+  - type: TargetAction
+    range: 1000
+    repeat: false
+  - type: EntityTargetAction
+    event: !type:FlockDesignateIgnoreEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockPartitionMind
+  name: Partition Mind
+  description: Split off a flocktrace to control more of the flock. Costs 100 compute while it exists.
+  components:
+  - type: Action
+    useDelay: 60
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: partition_mind
+  - type: InstantAction
+    event: !type:FlockPartitionMindEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockDiffract
+  name: Diffract Drone
+  description: Break one of your drones apart into flockbits.
+  components:
+  - type: Action
+    useDelay: 15
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: diffract
+  - type: TargetAction
+    range: 1000
+    repeat: false
+  - type: EntityTargetAction
+    event: !type:FlockDiffractEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockGatecrash
+  name: Gatecrash
+  description: Force open every airlock around you.
+  components:
+  - type: Action
+    useDelay: 10
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: open_door
+  - type: InstantAction
+    event: !type:FlockGatecrashEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockRepairBurst
+  name: Concentrated Repair Burst
+  description: Repair up to four flock units in a small area.
+  components:
+  - type: Action
+    useDelay: 30
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: heal_drone
+  - type: TargetAction
+    range: 1000
+    repeat: false
+  - type: WorldTargetAction
+    event: !type:FlockRepairBurstEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockRadioStun
+  name: Radio Stun
+  description: Blast a screech down the headsets of everyone nearby.
+  components:
+  - type: Action
+    useDelay: 20
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: radio_stun
+  - type: TargetAction
+    range: 1000
+    repeat: false
+  - type: WorldTargetAction
+    event: !type:FlockRadioStunEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockNarrowbeam
+  name: Narrowbeam Transmission
+  description: Send a message directly into one person's headset.
+  components:
+  - type: Action
+    useDelay: 20
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: talk
+  - type: TargetAction
+    range: 1000
+    repeat: false
+  - type: EntityTargetAction
+    event: !type:FlockNarrowbeamEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockTealprint
+  name: Tealprint
+  description: Lay down a structure blueprint for your drones to build.
+  components:
+  - type: Action
+    useDelay: 1
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: fabstructure
+  - type: TargetAction
+    range: 1000
+    repeat: false
+  - type: WorldTargetAction
+    event: !type:FlockTealprintEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockMarkDeconstruct
+  name: Mark For Deconstruction
+  description: Mark a flock structure so your drones tear it down.
+  components:
+  - type: Action
+    useDelay: 0.5
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: destroystructure
+  - type: TargetAction
+    range: 1000
+    repeat: false
+  - type: EntityTargetAction
+    event: !type:FlockMarkDeconstructEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockSpray
+  name: Nanite Spray
+  description: Use your nanites on a target. What it does depends on your spray mode.
+  components:
+  - type: Action
+    useDelay: 0.5
+    itemIconStyle: NoItem
+    checkCanInteract: true
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: converter0
+  - type: TargetAction
+    range: 2.6
+    repeat: false
+  - type: WorldTargetAction
+    event: !type:FlockSprayEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockSprayMode
+  name: Cycle Spray Mode
+  description: Cycle between convert, repair, barricade and reclaim.
+  components:
+  - type: Action
+    useDelay: 0.3
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: converter1
+  - type: InstantAction
+    event: !type:FlockSprayModeEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockIncapacitor
+  name: Incapacitor
+  description: Fire a bolt that drops non-flock targets. Uses charge, which recharges faster on flock floors.
+  components:
+  - type: Action
+    useDelay: 1.2
+    itemIconStyle: NoItem
+    checkCanInteract: true
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: incapacitor0
+  - type: TargetAction
+    range: 12
+    repeat: false
+  - type: WorldTargetAction
+    event: !type:FlockIncapacitorEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockCage
+  name: Imprison
+  description: Lock a downed creature in a flock cage. Needs them to be stunned, down or in crit.
+  components:
+  - type: Action
+    useDelay: 5
+    itemIconStyle: NoItem
+    checkCanInteract: true
+    icon:
+      sprite: _Starlight/Flock/featherzone.rsi
+      state: cage
+  - type: TargetAction
+    range: 2.6
+    repeat: false
+  - type: WorldTargetAction
+    event: !type:FlockCageEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockLayEgg
+  name: Lay Egg
+  description: Spend resources to lay an egg that hatches into a new drone.
+  components:
+  - type: Action
+    useDelay: 8
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: spawn_egg
+  - type: InstantAction
+    event: !type:FlockLayEggEvent {}
+
+- type: entity
+  parent: BaseMentalAction
+  id: ActionFlockFloorRun
+  name: Floor Run
+  description: Run along flock floor at high speed. Leaving flock floor ends it.
+  components:
+  - type: Action
+    useDelay: 1
+    itemIconStyle: NoItem
+    checkCanInteract: false
+    icon:
+      sprite: _Starlight/Flock/flock-ui.rsi
+      state: move-run
+  - type: InstantAction
+    event: !type:FlockFloorRunEvent {}
+

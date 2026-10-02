@@ -1,0 +1,167 @@
+# Flockdrone and flockbit AI. Branches are tried in order: fight, cage, egg, feed, repair, tear down, convert, wander.
+
+- type: htnCompound
+  id: FlockDroneCompound
+  branches:
+  # 1. Shoot enemies in sight
+  - preconditions:
+    - !type:FlockHasChargePrecondition {}
+    tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:FlockPickTargetOperator
+            kind: Enemy
+            range: 8
+            path: false
+        - !type:HTNPrimitiveTask
+          operator: !type:RaiseEventForOwnerOperator
+            args: !type:FlockDroneAiActEvent
+              act: Shoot
+            targetKey: Target
+
+  # 2. Cage downed enemies
+  - tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:FlockPickTargetOperator
+            kind: DownedEnemy
+            range: 12
+            path: true
+        - !type:HTNPrimitiveTask
+          operator: !type:MoveToOperator
+            pathfindInPlanning: true
+            removeKeyOnFinish: false
+            targetKey: TargetCoordinates
+            pathfindKey: TargetPathfind
+        - !type:HTNPrimitiveTask
+          operator: !type:RaiseEventForOwnerOperator
+            args: !type:FlockDroneAiActEvent
+              act: Cage
+            targetKey: Target
+
+  # 3. Lay an egg when rich enough
+  - preconditions:
+    - !type:FlockCanLayEggPrecondition {}
+    tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:RaiseEventForOwnerOperator
+            args: !type:FlockDroneAiActEvent
+              act: LayEgg
+
+  # 4. Get resources when we can't afford a conversion
+  - preconditions:
+    - !type:FlockHasResourcesPrecondition
+      amount: 20
+      invert: true
+    tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:FlockPickTargetOperator
+            kind: Harvest
+            range: 14
+            path: true
+        - !type:HTNPrimitiveTask
+          operator: !type:MoveToOperator
+            pathfindInPlanning: true
+            removeKeyOnFinish: false
+            targetKey: TargetCoordinates
+            pathfindKey: TargetPathfind
+        - !type:HTNPrimitiveTask
+          operator: !type:RaiseEventForOwnerOperator
+            args: !type:FlockDroneAiActEvent
+              act: Harvest
+            targetKey: Target
+
+  # 5. Repair hurt flock units
+  - preconditions:
+    - !type:FlockHasResourcesPrecondition
+      amount: 10
+    tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:FlockPickTargetOperator
+            kind: Repair
+            range: 8
+            path: true
+        - !type:HTNPrimitiveTask
+          operator: !type:MoveToOperator
+            pathfindInPlanning: true
+            removeKeyOnFinish: false
+            targetKey: TargetCoordinates
+            pathfindKey: TargetPathfind
+        - !type:HTNPrimitiveTask
+          operator: !type:RaiseEventForOwnerOperator
+            args: !type:FlockDroneAiActEvent
+              act: Repair
+            targetKey: Target
+
+  # 6. Tear down things the flockmind marked
+  - tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:FlockPickTargetOperator
+            kind: Deconstruct
+            range: 16
+            path: true
+        - !type:HTNPrimitiveTask
+          operator: !type:MoveToOperator
+            pathfindInPlanning: true
+            removeKeyOnFinish: false
+            targetKey: TargetCoordinates
+            pathfindKey: TargetPathfind
+        - !type:HTNPrimitiveTask
+          operator: !type:RaiseEventForOwnerOperator
+            args: !type:FlockDroneAiActEvent
+              act: Harvest
+            targetKey: Target
+
+  # 7. Convert
+  - preconditions:
+    - !type:FlockHasResourcesPrecondition
+      amount: 20
+    tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:FlockPickTargetOperator
+            kind: ConvertTile
+            range: 10
+            path: true
+        - !type:HTNPrimitiveTask
+          operator: !type:MoveToOperator
+            pathfindInPlanning: true
+            removeKeyOnFinish: false
+            targetKey: TargetCoordinates
+            pathfindKey: TargetPathfind
+        - !type:HTNPrimitiveTask
+          operator: !type:RaiseEventForOwnerOperator
+            args: !type:FlockDroneAiActEvent
+              act: Convert
+            targetKey: Target
+
+  # 8. Wander (and eventually hibernate)
+  - tasks:
+        - !type:HTNCompoundTask
+          task: IdleCompound
+        - !type:HTNPrimitiveTask
+          operator: !type:RaiseEventForOwnerOperator
+            args: !type:FlockDroneAiActEvent
+              act: Wander
+
+- type: htnCompound
+  id: FlockBitCompound
+  branches:
+  - tasks:
+        - !type:HTNPrimitiveTask
+          operator: !type:FlockPickTargetOperator
+            kind: ConvertTile
+            range: 8
+            path: true
+        - !type:HTNPrimitiveTask
+          operator: !type:MoveToOperator
+            pathfindInPlanning: true
+            removeKeyOnFinish: false
+            targetKey: TargetCoordinates
+            pathfindKey: TargetPathfind
+        - !type:HTNPrimitiveTask
+          operator: !type:RaiseEventForOwnerOperator
+            args: !type:FlockDroneAiActEvent
+              act: Convert
+            targetKey: Target
+
+  - tasks:
+    - !type:HTNCompoundTask
+      task: IdleCompound

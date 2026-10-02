@@ -1,0 +1,634 @@
+# Flock structures. Health/cost/compute values are goonstation's where known, see PORT_NOTES.md.
+
+- type: entity
+  abstract: true
+  parent: BaseStructure
+  id: FlockStructureBase
+  components:
+  - type: Damageable
+    damageContainer: Inorganic
+  - type: Appearance
+  - type: PointLight
+    color: "#3cb5a4"
+    radius: 2.2
+    energy: 1.1
+    softness: 1
+    castShadows: false
+
+- type: entity
+  parent: FlockStructureBase
+  id: FlockEgg
+  name: flock egg
+  description: A pulsing teal egg. Something is waiting to hatch.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: egg
+
+  - type: FlockStructure
+    flockId: egg
+    flockDesc: "Hatches into a new drone."
+    resourceCost: 0
+    compute: 0
+    onlineComputeCost: 0
+    buildTime: 0
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 20
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          FlockDroneDebris:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: FlockEgg
+    hatch: MobFlockDrone
+    count: 1
+    hatchTime: 6
+  - type: FlockDeconImmune
+
+- type: entity
+  parent: FlockStructureBase
+  id: FlockBitEgg
+  name: flockbit egg
+  description: A cluster of tiny teal eggs.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: egg
+
+  - type: FlockStructure
+    flockId: bit egg
+    flockDesc: "Hatches into several flockbits."
+    resourceCost: 0
+    compute: 0
+    onlineComputeCost: 0
+    buildTime: 0
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 12
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          FlockDroneDebris:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: FlockEgg
+    hatch: MobFlockBit
+    count: 4
+    hatchTime: 4
+  - type: FlockDeconImmune
+
+- type: entity
+  parent: FlockStructureBase
+  id: FlockRift
+  name: flock rift
+  description: A tear in the world, leaking teal light. It's getting wider.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: rift
+      shader: unshaded
+
+  - type: FlockStructure
+    flockId: rift
+    flockDesc: "The flock's entry point."
+    resourceCost: 0
+    compute: 0
+    onlineComputeCost: 0
+    buildTime: 0
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 400
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          FlockDroneDebris:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: FlockRift
+  - type: FlockDeconImmune
+
+- type: entity
+  parent: BaseStructureDynamic
+  id: FlockResourceCache
+  name: gnesis cache
+  description: A heap of glittering teal shards.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: minicache
+      shader: unshaded
+
+  - type: FlockStructure
+    flockId: cache
+    flockDesc: "Gnesis for drones to absorb."
+    resourceCost: 0
+    compute: 0
+    onlineComputeCost: 0
+    buildTime: 0
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 20
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          FlockDroneDebris:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: FlockCache
+    resources: 40
+
+- type: entity
+  parent: FlockStructureBase
+  id: FlockCollector
+  name: flock collector
+  description: A crystalline spire wired into the flock floor.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: collectoron
+      shader: unshaded
+    - state: collector
+      shader: unshaded
+
+  - type: FlockStructure
+    flockId: collector
+    flockDesc: "Provides compute from connected flock floor tiles."
+    resourceCost: 200
+    compute: 0
+    onlineComputeCost: 0
+    buildTime: 0
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 80
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          FlockDroneDebris:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: FlockCollector
+
+- type: entity
+  parent: FlockStructureBase
+  id: FlockComputeNode
+  name: flock compute node
+  description: A flickering teal terminal that is definitely thinking.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: compute
+      shader: unshaded
+    - state: compute_screen
+      shader: unshaded
+
+  - type: FlockStructure
+    flockId: compute node
+    flockDesc: "Provides 30 compute."
+    resourceCost: 0
+    compute: 30
+    onlineComputeCost: 0
+    buildTime: 0
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 60
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          FlockDroneDebris:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: FlockComputeNode
+
+- type: entity
+  parent: FlockStructureBase
+  id: FlockMajorComputeNode
+  name: major compute node
+  description: A huge, corrupted-looking mainframe.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: compute_mainframe
+      shader: unshaded
+
+  - type: FlockStructure
+    flockId: major compute node
+    flockDesc: "Provides 180 compute."
+    resourceCost: 0
+    compute: 180
+    onlineComputeCost: 0
+    buildTime: 0
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          FlockDroneDebris:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: FlockComputeNode
+
+- type: entity
+  parent: FlockStructureBase
+  id: FlockSentinel
+  name: flock sentinel
+  description: A charged pylon. It watches. It crackles.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: sentinelon
+      shader: unshaded
+
+  - type: FlockStructure
+    flockId: sentinel
+    flockDesc: "Zaps enemies with disorienting arcs. Uses 20 compute."
+    resourceCost: 150
+    compute: 0
+    onlineComputeCost: 20
+    buildTime: 0
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 80
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          FlockDroneDebris:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: FlockSentinel
+
+- type: entity
+  parent: FlockStructureBase
+  id: FlockInterceptor
+  name: flock interceptor
+  description: A glassy dish that tracks fast-moving objects.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: interceptor-ready
+      shader: unshaded
+
+  - type: FlockStructure
+    flockId: interceptor
+    flockDesc: "Shoots down incoming projectiles."
+    resourceCost: 100
+    compute: 0
+    onlineComputeCost: 0
+    buildTime: 0
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 50
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          FlockDroneDebris:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: FlockInterceptor
+
+- type: entity
+  parent: FlockStructureBase
+  id: FlockSapper
+  name: flock sapper
+  description: A small humming node that tugs at nearby energy.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: sapper-on
+      shader: unshaded
+
+  - type: FlockStructure
+    flockId: sapper
+    flockDesc: "Supports nearby flock units."
+    resourceCost: 100
+    compute: 0
+    onlineComputeCost: 0
+    buildTime: 0
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 30
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          FlockDroneDebris:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: FlockSapper
+
+- type: entity
+  parent: FlockStructureBase
+  id: FlockGnesisTurret
+  name: gnesis turret
+  description: A thing that wants to spit at you.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: totem
+      shader: unshaded
+
+  - type: FlockStructure
+    flockId: gnesis turret
+    flockDesc: "Fires coagulated gnesis at enemies."
+    resourceCost: 150
+    compute: 0
+    onlineComputeCost: 0
+    buildTime: 0
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 60
+      behaviors:
+      - !type:SpawnEntitiesBehavior
+        spawn:
+          FlockDroneDebris:
+            min: 1
+            max: 1
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: FlockGnesisTurret
+
+- type: entity
+  parent: FlockStructureBase
+  id: FlockRelay
+  name: flock relay
+  description: A towering teal antenna aimed at the sky. Whatever it is sending, you do not want it to finish.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone-160x160.rsi
+    offset: 0,1
+    layers:
+    - state: structure-relay
+    - state: structure-relay-glow
+      shader: unshaded
+  - type: FlockStructure
+    flockId: relay
+    flockDesc: "Transmits the Signal. If it is destroyed, the flockmind dies."
+    buildTime: 30
+  - type: FlockRelay
+  - type: FlockDeconImmune
+  - type: PointLight
+    color: "#3cb5a4"
+    radius: 6
+    energy: 3
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 1500
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  parent: BaseStructureDynamic
+  id: FlockTealprint
+  name: tealprint
+  description: A shimmering outline of a structure. Drones can deposit resources here to build it.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: telemarker
+      shader: unshaded
+    color: "#3cb5a4cc"
+  - type: Physics
+    canCollide: false
+  - type: FlockTealprint
+    structure: FlockCollector
+  - type: Damageable
+    damageContainer: Inorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 10
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  parent: BaseStructureDynamic
+  id: FlockCage
+  name: flock cage
+  description: A cage of teal energy. Something inside is being taken apart, politely.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: cage
+      shader: unshaded
+  - type: Transform
+    anchored: false
+  - type: EntityStorage
+    capacity: 1
+    openOnMove: false
+    isCollidableWhenOpen: true
+    showContents: true
+  - type: ContainerContainer
+    containers:
+      entity_storage: !type:Container
+  - type: FlockCage
+  - type: Damageable
+    damageContainer: Inorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 100
+      behaviors:
+      - !type:EmptyAllContainersBehaviour
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+
+- type: entity
+  parent: BaseStructure
+  id: FlockBarricade
+  name: flock barricade
+  description: A hastily extruded wall of teal glass. Drones will happily climb all over it.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: barricade-0
+  - type: Damageable
+    damageContainer: Inorganic
+  - type: Destructible
+    thresholds:
+    - trigger:
+        !type:DamageTrigger
+        damage: 80
+      behaviors:
+      - !type:DoActsBehavior
+        acts: [ "Destruction" ]
+  - type: FlockStructure
+    flockId: barricade
+    flockDesc: "A cheap barricade."
+
+- type: entity
+  id: FlockPriorityMarker
+  name: priority tile
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: frontier
+      shader: unshaded
+  - type: Visibility
+    layer: 32
+
+- type: entity
+  id: FlockPing
+  name: ping
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/flock-ui.rsi
+    layers:
+    - state: ping
+      shader: unshaded
+  - type: TimedDespawn
+    lifetime: 6
+  - type: Visibility
+    layer: 32
+
+- type: entity
+  id: FlockHealEffect
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: reclaimer
+      shader: unshaded
+  - type: TimedDespawn
+    lifetime: 1
+
+- type: entity
+  id: FlockInterceptEffect
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/featherzone.rsi
+    layers:
+    - state: stunbolt
+      shader: unshaded
+  - type: TimedDespawn
+    lifetime: 0.4
+
+# ---------------------------------------------------------------- converted station things (placeholders)
+
+- type: entity
+  parent: WallBrick
+  id: WallFlock
+  name: flock wall
+  description: A wall of teal glass and wire. It hums when you get close.
+  components:
+  - type: Sprite
+    sprite: _Starlight/Flock/Placeholders/wall.rsi
+    color: "#7fd6c8"
+  - type: Icon
+    sprite: _Starlight/Flock/Placeholders/wall.rsi
+  - type: IconSmooth
+    key: walls
+    base: brick
+  - type: FlockConverted
+    scrapValue: 20
+
+- type: entity
+  parent: Airlock
+  id: FlockDoor
+  name: flock door
+  description: A door that has opinions about who may pass.
+  components:
+  - type: Sprite
+    color: "#7fd6c8"
+  - type: FlockConverted
+    scrapValue: 20
+
+- type: entity
+  parent: Window
+  id: FlockWindow
+  name: flock window
+  description: Teal glass. It is looking back.
+  components:
+  - type: Sprite
+    color: "#7fd6c8"
+  - type: FlockConverted
+    scrapValue: 20
+
+- type: entity
+  parent: Grille
+  id: FlockGrille
+  name: flock fibrenet
+  description: A mesh of fine teal wire.
+  components:
+  - type: Sprite
+    color: "#7fd6c8"
+  - type: FlockConverted
+    scrapValue: 10
+
+- type: entity
+  parent: Table
+  id: FlockTable
+  name: flock table
+  description: A table of teal glass.
+  components:
+  - type: Sprite
+    color: "#7fd6c8"
+  - type: FlockConverted
+    scrapValue: 10

@@ -333,6 +333,9 @@
   id: Grenade120mm # Ammo: Magazine120mmGrenadeBlast, ShuttleGunNTSFCyerxa120mm
 
 - type: Tag
+  id: Grille
+
+- type: Tag
   id: GrenadeLessLethal #Ammo for the peacekeeper
 
 - type: Tag
