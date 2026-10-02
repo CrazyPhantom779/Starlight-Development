@@ -110,6 +110,7 @@ public sealed partial class DamageableComponent : Component
     [DataField]
     public Dictionary<(EntityUid Source, string ModifierKey), float> AdditiveCoefficients = [];
 
+
     /// <summary>
     ///     Additive changes to damage modifiers. See also: <see cref="DamageModifierSet"/>
     /// </summary>
