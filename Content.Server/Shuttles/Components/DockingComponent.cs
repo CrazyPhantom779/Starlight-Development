@@ -8,6 +8,7 @@ namespace Content.Server.Shuttles.Components
     {
         [DataField("dockedWith")]
         public EntityUid? DockedWith;
+
         [ViewVariables]
         public Joint? DockJoint;
 
