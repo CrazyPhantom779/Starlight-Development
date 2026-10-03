@@ -34,6 +34,8 @@ using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Mobs;
 using Content.Shared.Movement.Systems;
+using Content.Shared.NPC.Systems;
+using Content.Shared.NPC.Prototypes;
 using Content.Shared.Popups;
 using Content.Shared.Roles;
 using Content.Shared.Roles.Components;
@@ -62,6 +64,7 @@ using Content.Shared.Shuttles.Components;
 using Content.Shared.Radio.Components;
 using Content.Shared.Mind.Components;
 using Content.Shared._Starlight.Shadekin.Components;
+using Content.Server._Starlight.Statistics;
 
 namespace Content.Server._Starlight.CosmicCult;
 
@@ -103,6 +106,8 @@ public sealed partial class CosmicCultRuleSystem : GameRuleSystem<CosmicCultRule
     [Dependency] private VisibilitySystem _visibility = default!;
     [Dependency] private LanguageSystem _languageSystem = default!;
     [Dependency] private WeatherSystem _weather = default!;
+    [Dependency] private NpcFactionSystem _faction = default!;
+    [Dependency] private RoundStatisticsSystem _roundStatistics = default!;
 
     private ISawmill _sawmill = default!;
     private TimeSpan _t3RevealDelay = default!;
@@ -116,6 +121,11 @@ public sealed partial class CosmicCultRuleSystem : GameRuleSystem<CosmicCultRule
     private readonly SoundSpecifier _tier3Sound = new SoundPathSpecifier("/Audio/_Starlight/CosmicCult/tier3.ogg");
     private readonly SoundSpecifier _tier2Sound = new SoundPathSpecifier("/Audio/_Starlight/CosmicCult/tier2.ogg");
     private readonly SoundSpecifier _monumentAlert = new SoundPathSpecifier("/Audio/_Starlight/CosmicCult/tier_up.ogg");
+    private static readonly ProtoId<NpcFactionPrototype> NanoTrasenFaction = "NanoTrasen";
+    private static readonly ProtoId<NpcFactionPrototype> CosmicCultFaction = "CosmicCult";
+
+    private readonly SoundSpecifier _victoryMusic =
+        new SoundPathSpecifier("/Audio/_Starlight/CosmicCult/caustic_shift.ogg");
 
     private readonly ProtoId<LanguagePrototype> _cultLanguage = "Cosmic";
 
@@ -139,6 +149,7 @@ public sealed partial class CosmicCultRuleSystem : GameRuleSystem<CosmicCultRule
         SubscribeLocalEvent<CosmicGodComponent, ComponentInit>(OnGodSpawn);
         SubscribeLocalEvent<CosmicCultComponent, MobStateChangedEvent>(OnMobStateChanged);
         SubscribeLocalEvent<CosmicCultLeadComponent, MindRemovedMessage>(HandleMindRemoved);
+        SubscribeLocalEvent<CosmicStarMarkComponent, ComponentInit>(OnStarMarkAdded);
 
         Subs.CVar(_config,
             StarlightCCVars.CosmicCultT2RevealDelaySeconds,
@@ -331,8 +342,8 @@ public sealed partial class CosmicCultRuleSystem : GameRuleSystem<CosmicCultRule
                 return;
 
             var picked = args.Winner == null
-                ? (EntityUid) _rand.Pick(args.Winners)
-                : (EntityUid) args.Winner;
+                ? (EntityUid)_rand.Pick(args.Winners)
+                : (EntityUid)args.Winner;
 
             if (!IsValidStewardCandidate(picked))
             {
@@ -371,6 +382,8 @@ public sealed partial class CosmicCultRuleSystem : GameRuleSystem<CosmicCultRule
 
     private void OnGodSpawn(Entity<CosmicGodComponent> uid, ref ComponentInit args)
     {
+        if (!uid.Comp.TriggerRoundEnd) return;
+        _sound.DispatchStationEventMusic(uid, _victoryMusic, StationEventMusicType.CosmicCult );
         var query = QueryActiveRules();
         while (query.MoveNext(out var ruleUid, out _, out var cultRule, out _))
         {
@@ -541,6 +554,7 @@ public sealed partial class CosmicCultRuleSystem : GameRuleSystem<CosmicCultRule
         GameRuleComponent gameRule,
         ref RoundEndTextAppendEvent args)
     {
+
         var ftlKey = component.WinType.ToString().ToLower();
         var winType = Loc.GetString($"cosmiccult-roundend-{ftlKey}");
         var summaryText = Loc.GetString($"cosmiccult-summary-{ftlKey}");
@@ -550,6 +564,13 @@ public sealed partial class CosmicCultRuleSystem : GameRuleSystem<CosmicCultRule
         args.AddLine(Loc.GetString("cosmiccult-roundend-cultpop-count", ("count", component.PercentConverted)));
         args.AddLine(Loc.GetString("cosmiccult-roundend-entropy-count", ("count", component.EntropySiphoned)));
         args.AddLine(Loc.GetString("cosmiccult-roundend-monument-stage", ("stage", component.CurrentTier)));
+
+        _roundStatistics.RecordCosmicCultOutcome(
+            component.WinType.ToString(),
+            component.TotalCult,
+            component.PercentConverted,
+            component.EntropySiphoned,
+            component.CurrentTier);
     }
 
     public void IncrementCultObjectiveEntropy(Entity<CosmicCultComponent> ent)
@@ -581,6 +602,12 @@ public sealed partial class CosmicCultRuleSystem : GameRuleSystem<CosmicCultRule
             chaplainConditionComp.Converted += value;
     }
     #endregion
+
+    private void OnStarMarkAdded(Entity<CosmicStarMarkComponent> ent, ref ComponentInit args)
+    {
+        _faction.RemoveFaction(ent.Owner, NanoTrasenFaction);
+        _faction.AddFaction(ent.Owner, CosmicCultFaction);
+    }
 
     public void OnStartMonument(Entity<MonumentComponent> ent)
     {
@@ -776,6 +803,7 @@ public sealed partial class CosmicCultRuleSystem : GameRuleSystem<CosmicCultRule
         _antag.SendBriefing(uid, Loc.GetString("cosmiccult-role-short-briefing"), Color.FromHex("#cae8e8"), null);
 
         var cultComp = EnsureComp<CosmicCultComponent>(uid);
+
         cultComp.EntropyBudget = 10; // pity balance
         EnsureComp<IntrinsicRadioReceiverComponent>(uid);
         TransferCultAssociation(converter, uid);
@@ -939,6 +967,9 @@ public sealed partial class CosmicCultRuleSystem : GameRuleSystem<CosmicCultRule
             UpdateCultData(cosmicGamerule.MonumentInGame);
             return;
         }
+
+        _faction.RemoveFaction(uid.Owner, CosmicCultFaction);
+        _faction.AddFaction(uid.Owner, NanoTrasenFaction);
 
         if (wasSteward)
         {

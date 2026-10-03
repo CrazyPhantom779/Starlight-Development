@@ -609,6 +609,7 @@
     event: !type:ActionFleshmendEvent {}
   - type: ChangelingAction
     chemicalCost: 35
+    requireAbsorbed: 2 # easily one of the strongest combat abilities. Shouldn't be available round start
     useInLesserForm: true
 
 - type: entity
@@ -647,9 +648,9 @@
     chemicalCost: 20
 
 - type: entity
-  id: ActionToggleProtogenDisguise
-  name: Toggle Protogen Disguise
-  description: Form a fake protogen cybernetic frame. Costs 0 chemicals.
+  id: ActionToggleNeocyteDisguise
+  name: Toggle Neocyte Disguise
+  description: Form a fake neocyte cybernetic frame. Costs 0 chemicals.
   categories: [ HideSpawnMenu ]
   components:
   - type: Action
@@ -659,7 +660,7 @@
       sprite: _Starlight/Actions/changeling.rsi
       state: protogen_armor
   - type: InstantAction
-    event: !type:ActionProtogenDisguiseEvent {}
+    event: !type:ActionNeocyteDisguiseEvent {}
   - type: ChangelingAction
     chemicalCost: 0
 

@@ -110,6 +110,8 @@
       - PosterContrabandWantedPunPun
       - PosterContrabandWantedStirStir
       - PosterContrabandWantedTraitor
+      - PosterContrabandWantedDavid
+      - PosterContrabandWantedLex
       - PosterContrabandSELF
       - PosterContrabandInterdyneSyndicate
       - PosterContrabandComitas
@@ -122,6 +124,7 @@
       - PosterPrisonEspionage
       - PosterPrisonPinup
       - PosterPrisonObscene
+      - PosterContrabandNaN
       #endregion Starlight
     chance: 1
 
@@ -226,5 +229,8 @@
       - PosterLegitQuirks
       - PosterLegitSlogan
       - PosterLegitTipperCreamSoda
+      - PosterEndymion1
+      - PosterEndymion2
+      - PosterEndymion3
       #endregion Starlight
     chance: 1
