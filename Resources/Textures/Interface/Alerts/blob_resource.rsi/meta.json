@@ -1,0 +1,79 @@
+{
+  "version": 1,
+  "license": "CC-BY-SA-3.0",
+  "copyright": "Created by VigersRay",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "point0",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point1",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point2",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point3",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point4",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point5",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point6",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point7",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point8",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point9",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point10",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point11",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point12",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point13",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point14",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point15",
+      "copyright": "Created by VigersRay"
+    },
+    {
+      "name": "point16",
+      "copyright": "Created by VigersRay"
+    }
+  ]
+}
