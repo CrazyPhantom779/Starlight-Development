@@ -53,3 +53,6 @@ roles-antag-mothership-core-objective = Use your xenoborgs to create even more x
 
 roles-antag-xenoborg-name = Xenoborg
 roles-antag-xenoborg-objective = Help the mothership create more xenoborgs.
+
+roles-antag-blob-name = Blob
+roles-antag-blob-objective = Take over the station.

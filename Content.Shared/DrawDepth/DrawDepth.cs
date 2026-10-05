@@ -95,26 +95,32 @@ namespace Content.Shared.DrawDepth
         ///     Generic items. Things that should be above crates & tables, but underneath mobs.
         /// </summary>
         Items = DrawDepthTag.Default + 4,
+
+        /// <summary>
+        ///    Blob tiles. They need to be above items, but below mobs.
+        /// </summary>
+        BlobTiles = DrawDepthTag.Default - 5,
+
         /// <summary>
         /// Stuff that should be drawn below mobs, but on top of items. Like muzzle flash.
         /// </summary>
-        BelowMobs = DrawDepthTag.Default + 5,
+        BelowMobs = DrawDepthTag.Default + 6,
 
-        Mobs = DrawDepthTag.Default + 6,
+        Mobs = DrawDepthTag.Default + 7,
 
-        OverMobs = DrawDepthTag.Default + 7,
+        OverMobs = DrawDepthTag.Default + 8,
 
-        Doors = DrawDepthTag.Default + 8,
+        Doors = DrawDepthTag.Default + 9,
 
         /// <summary>
         /// Blast doors and shutters which go over the usual doors.
         /// </summary>
-        BlastDoors = DrawDepthTag.Default + 9,
+        BlastDoors = DrawDepthTag.Default + 10,
 
         /// <summary>
         /// Stuff that needs to draw over most things, but not effects, like Kudzu.
         /// </summary>
-        Overdoors = DrawDepthTag.Default + 10,
+        Overdoors = DrawDepthTag.Default + 11,
 
         /// <summary>
         ///     Visible atmos gas.

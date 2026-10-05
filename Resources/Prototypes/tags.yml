@@ -77,6 +77,9 @@
   id: BikeHorn # ConstructionGraph: HonkBot, BananiumHorn
 
 - type: Tag
+  id: BlobMob
+
+- type: Tag
   id: Bloodpack # Storage whitelist: ClothingBeltMedical
 
 - type: Tag

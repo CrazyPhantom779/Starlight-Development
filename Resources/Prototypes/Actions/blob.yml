@@ -1,0 +1,163 @@
+﻿# Actions
+
+- type: entity
+  parent: BaseAction
+  id: CreateBlobFactory
+  name: blob-create-factory-action-name
+  description: blob-create-factory-action-desc
+  components:
+  - type: Action
+    icon:
+      sprite: _Starlight/Interface/Actions/actions_blob.rsi
+      state: blobFactory
+  - type: WorldTargetAction
+    event: !type:BlobCreateFactoryActionEvent
+    range: 200
+    checkCanAccess: false
+
+- type: entity
+  parent: BaseAction
+  id: CreateBlobResource
+  name: blob-create-resource-action-name
+  description: blob-create-resource-action-desc
+  components:
+  - type: Action
+    icon:
+      sprite: _Starlight/Interface/Actions/actions_blob.rsi
+      state: blobResource
+  - type: WorldTargetAction
+    event: !type:BlobCreateResourceActionEvent
+    range: 200
+    checkCanAccess: false
+
+- type: entity
+  parent: BaseAction
+  id: CreateBlobNode
+  name: blob-create-node-action-name
+  description: blob-create-node-action-desc
+  components:
+  - type: Action
+    icon:
+      sprite: _Starlight/Interface/Actions/actions_blob.rsi
+      state: blobNode
+  - type: WorldTargetAction
+    event: !type:BlobCreateNodeActionEvent
+    range: 200
+    checkCanAccess: false
+
+- type: entity
+  parent: BaseAction
+  id: CreateBlobbernaut
+  name: blob-produce-blobbernaut-action-name
+  description: blob-produce-blobbernaut-action-desc
+  components:
+  - type: Action
+    icon:
+      sprite: _Starlight/Interface/Actions/actions_blob.rsi
+      state: blobBlobbernaut
+  - type: WorldTargetAction
+    event: !type:BlobCreateBlobbernautActionEvent
+    range: 200
+    checkCanAccess: false
+
+- type: entity
+  parent: BaseAction
+  id: SplitBlobCore
+  name: blob-split-core-action-name
+  description: blob-split-core-action-desc
+  components:
+  - type: Action
+    icon:
+      sprite: _Starlight/Interface/Actions/actions_blob.rsi
+      state: blobSplit
+  - type: WorldTargetAction
+    event: !type:BlobSplitCoreActionEvent
+    range: 200
+    checkCanAccess: false
+
+- type: entity
+  parent: BaseAction
+  id: SwapBlobCore
+  name: blob-swap-core-action-name
+  description: blob-swap-core-action-desc
+  components:
+  - type: Action
+    icon:
+      sprite: _Starlight/Interface/Actions/actions_blob.rsi
+      state: blobSwap
+  - type: WorldTargetAction
+    event: !type:BlobSwapCoreActionEvent
+    range: 200
+    checkCanAccess: false
+
+# Instant actions
+
+- type: entity
+  parent: BaseAction
+  id: TeleportBlobToCore
+  name: blob-teleport-to-core-action-name
+  description: blob-teleport-to-core-action-desc
+  components:
+  - type: Action
+    icon:
+      sprite: _Starlight/Interface/Actions/actions_blob.rsi
+      state: blobToCore
+  - type: InstantAction
+    event: !type:BlobToCoreActionEvent
+    checkCanAccess: false
+
+- type: entity
+  parent: BaseAction
+  id: TeleportBlobToNode
+  name: blob-teleport-to-node-action-name
+  description: blob-teleport-to-node-action-desc
+  components:
+  - type: Action
+    icon:
+      sprite: _Starlight/Interface/Actions/actions_blob.rsi
+      state: blobToNode
+  - type: InstantAction
+    event: !type:BlobToNodeActionEvent
+    checkCanAccess: false
+
+- type: entity
+  parent: BaseAction
+  id: HelpBlob
+  name: blob-help-action-name
+  description: blob-help-action-desc
+  components:
+  - type: Action
+    icon:
+      sprite: _Starlight/Interface/Actions/actions_blob.rsi
+      state: blobHelp
+  - type: InstantAction
+    event: !type:BlobHelpActionEvent
+    checkCanAccess: false
+
+- type: entity
+  parent: BaseAction
+  id: SwapBlobChem
+  name: blob-swap-chem-action-name
+  description: blob-swap-chem-action-desc
+  components:
+  - type: Action
+    icon:
+      sprite: _Starlight/Interface/Actions/actions_blob.rsi
+      state: blobChemSwap
+  - type: InstantAction
+    event: !type:BlobSwapChemActionEvent
+    checkCanAccess: false
+
+- type: entity
+  parent: BaseAction
+  id: TransformToBlob
+  name: blob-carrier-transform-to-blob-action-name
+  description: blob-carrier-transform-to-blob-action-desc
+  components:
+  - type: Action
+    icon:
+      sprite: _Starlight/Interface/Actions/actions_blob.rsi
+      state: createNormalBlob
+  - type: InstantAction
+    event: !type:TransformToBlobActionEvent
+    checkCanAccess: false

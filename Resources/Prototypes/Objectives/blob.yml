@@ -1,0 +1,11 @@
+- type: entity
+  parent: BaseObjective
+  id: BlobCaptureObjective
+  components:
+  - type: Objective
+    difficulty: 1.0
+    issuer: blob
+  - type: RoleRequirement
+    roles:
+    - BlobRole
+  # - type: BlobCaptureCondition

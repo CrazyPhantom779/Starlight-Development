@@ -213,6 +213,13 @@
 # Starlight end
 
 - type: entity
+  id: Blob
+  parent: BaseGameRule
+  noSpawn: true
+  components:
+    - type: BlobRule
+
+- type: entity
   abstract: true
   parent: BaseGameRule
   id: BaseTraitorRule
