@@ -1,0 +1,76 @@
+spellcraft-action-description = A spell woven from glyphs. Costs {$cost} Wind.
+
+spellcraft-error-empty = A spell needs glyphs.
+spellcraft-error-too-complex = That spell is more complex than you can hold in your mind.
+spellcraft-error-duplicate-node = The weave is tangled.
+spellcraft-error-unknown-glyph = One of those glyphs does not exist.
+spellcraft-error-not-known = You have not learned one of those glyphs.
+spellcraft-error-one-form = A spell needs exactly one Form.
+spellcraft-error-form-first = The Form must come first.
+spellcraft-error-bad-link = The weave does not connect that way.
+spellcraft-error-orphan = A glyph is not connected to the spell.
+spellcraft-error-no-effect = A spell needs at least one Effect.
+spellcraft-error-too-many-effects = Too many Effects for one spell.
+spellcraft-error-incompatible = That Effect cannot be used with this Form.
+spellcraft-error-too-many-repeats = Too many echoes on one Effect.
+spellcraft-error-too-slow = That delay is too long to hold.
+spellcraft-error-too-many-spells = You cannot hold any more woven spells.
+spellcraft-error-no-actions = Something stopped the spell from taking shape.
+
+glyph-form-aimed-name = Aimed
+glyph-form-aimed-desc = Cast toward a point you choose.
+glyph-form-self-name = Self
+glyph-form-self-desc = Cast on yourself, without aiming.
+
+glyph-effect-firebolt-name = Firebolt
+glyph-effect-firebolt-desc = A fast bolt of fire.
+glyph-effect-fireball-name = Fireball
+glyph-effect-fireball-desc = An explosive ball of fire.
+glyph-effect-blink-name = Blink
+glyph-effect-blink-desc = Step instantly to the target point.
+glyph-effect-carp-name = Magicarp
+glyph-effect-carp-desc = Summons hostile magical carp at the target point.
+glyph-effect-knock-name = Knock
+glyph-effect-knock-desc = Opens nearby doors and lockers.
+glyph-effect-forcewall-name = Forcewall
+glyph-effect-forcewall-desc = Raises a wall of force in front of you.
+glyph-effect-smoke-name = Smoke
+glyph-effect-smoke-desc = A cloud of smoke in front of you.
+glyph-effect-flashrune-name = Flash Rune
+glyph-effect-flashrune-desc = A rune that bursts with light when stepped on.
+glyph-effect-stunrune-name = Stun Rune
+glyph-effect-stunrune-desc = A rune that stuns whoever steps on it.
+glyph-effect-igniterune-name = Ignite Rune
+glyph-effect-igniterune-desc = A rune that sets fire to whoever steps on it.
+glyph-effect-explosionrune-name = Explosion Rune
+glyph-effect-explosionrune-desc = A rune that explodes when stepped on.
+glyph-effect-repulse-name = Repulse
+glyph-effect-repulse-desc = Pushes everything nearby away from you.
+
+glyph-augment-echo-name = Echo
+glyph-augment-echo-desc = Repeats the Effect it follows once more.
+glyph-augment-delay-name = Delay
+glyph-augment-delay-desc = The Effect it follows happens 1.5 seconds later.
+glyph-augment-frugal-name = Frugal
+glyph-augment-frugal-desc = Reduces the whole spell's cost by a fifth.
+
+spellcraft-ui-title = Spellweaving
+spellcraft-ui-palette = Glyphs
+spellcraft-ui-chain = Your weave (click a glyph here to remove it)
+spellcraft-ui-spells = Woven spells
+spellcraft-ui-weave = Weave
+spellcraft-ui-clear = Clear
+spellcraft-ui-forget = Forget
+spellcraft-ui-remove-tip = Click to remove
+spellcraft-ui-wind = Wind: {$wind} / {$max}
+spellcraft-ui-preview = {$name} - costs {$cost} Wind
+spellcraft-ui-category-form = Form (pick one first)
+spellcraft-ui-category-effect = Effects
+spellcraft-ui-category-augment = Augments (apply to the glyph before them)
+
+glyph-effect-foldswap-name = Fold
+glyph-effect-foldswap-desc = Folds space so you trade places with the creature nearest the target point.
+glyph-effect-firearrows-name = Fire Arrows
+glyph-effect-firearrows-desc = A short spread of burning arrows.
+glyph-effect-arcticglare-name = Arctic Glare
+glyph-effect-arcticglare-desc = A wide fan of ice shards.

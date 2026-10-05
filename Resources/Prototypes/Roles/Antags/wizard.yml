@@ -54,6 +54,32 @@
     - NamesWizardFirst
     - NamesWizardLast
     nameFormat: name-format-wizard
+  # Starlight-start: wizards look different to different people (uses the standalone Perception module)
+  - type: PerceptionVariant
+    mode: StablePerObserver
+    salt: 41
+    variants:
+    - whitelist:
+        tags:
+        - Wizard
+      append:
+      - perception-wizard-to-wizard
+    - blacklist:
+        tags:
+        - Wizard
+      append:
+      - perception-wizard-seen-a
+    - blacklist:
+        tags:
+        - Wizard
+      append:
+      - perception-wizard-seen-b
+    - blacklist:
+        tags:
+        - Wizard
+      append:
+      - perception-wizard-seen-c
+  # Starlight-end
   mindRoles:
   - MindRoleWizard
 

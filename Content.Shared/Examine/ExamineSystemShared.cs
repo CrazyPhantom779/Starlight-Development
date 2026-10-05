@@ -1,4 +1,5 @@
 using System.Linq;
+using Content.Shared._Starlight.Perception;
 using Content.Shared.Eye.Blinding.Components;
 using Content.Shared.Ghost;
 using Content.Shared.Interaction;
@@ -355,7 +356,7 @@ namespace Content.Shared.Examine
             ev = null; // Starlight
             var message = new FormattedMessage();
 
-            if (examiner == null)
+            if (examiner is not { } examinerUid)
             {
                 return message;
             }
@@ -363,19 +364,28 @@ namespace Content.Shared.Examine
             var hasDescription = false;
             var metadata = MetaData(entity);
 
+            // Starlight-start: allow per-examiner description overrides (see _Starlight/Perception)
+            string? perceivedDescription = null;
+            var perceived = new GetPerceivedDescriptionEvent(examinerUid);
+            RaiseLocalEvent(entity, ref perceived);
+            perceivedDescription = perceived.Description;
+
+            var description = perceivedDescription ?? metadata.EntityDescription;
+            // Starlight-end
+
             //Add an entity description if one is declared
-            if (!string.IsNullOrEmpty(metadata.EntityDescription))
+            if (!string.IsNullOrEmpty(description)) // Starlight Edit: was metadata.EntityDescription
             {
-                message.AddText(metadata.EntityDescription);
+                message.AddText(description); // Starlight Edit: was metadata.EntityDescription
                 hasDescription = true;
             }
 
             message.PushColor(Color.DarkGray);
 
             // Raise the event and let things that subscribe to it change the message...
-            var isInDetailsRange = IsInDetailsRange(examiner.Value, entity);
+            var isInDetailsRange = IsInDetailsRange(examinerUid, entity);
             // Starlight begin
-            ev = new ExaminedEvent(message, entity, examiner.Value, isInDetailsRange, hasDescription, name);
+            ev = new ExaminedEvent(message, entity, examinerUid, isInDetailsRange, hasDescription, name);
             RaiseLocalEvent(entity, ev);
 
             var newMessage = ev.GetTotalMessage();

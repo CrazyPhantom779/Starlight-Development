@@ -1,0 +1,26 @@
+- type: spellGlyph
+  id: AugmentEcho
+  category: Augment
+  name: glyph-augment-echo-name
+  description: glyph-augment-echo-desc
+  cost: 3
+  augment: Repeat
+  value: 1
+
+- type: spellGlyph
+  id: AugmentDelay
+  category: Augment
+  name: glyph-augment-delay-name
+  description: glyph-augment-delay-desc
+  cost: 0
+  augment: Delay
+  value: 1.5
+
+- type: spellGlyph
+  id: AugmentFrugal
+  category: Augment
+  name: glyph-augment-frugal-name
+  description: glyph-augment-frugal-desc
+  cost: 2
+  augment: Cheaper
+  value: 0.8

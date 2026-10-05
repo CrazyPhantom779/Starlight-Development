@@ -1,0 +1,66 @@
+# Aspects: a boon and usually a bane. Rolled two at a time. Weight controls how common they are.
+- type: aspect
+  id: AspectFragileMind
+  name: aspect-fragile-mind-name
+  description: aspect-fragile-mind-desc
+  costMultiplier: 0.75
+  gustChanceMultiplier: 1.6
+  instability: 1
+
+- type: aspect
+  id: AspectDeepWell
+  name: aspect-deep-well-name
+  description: aspect-deep-well-desc
+  maxWindMultiplier: 1.6
+  regenMultiplier: 0.6
+  conflicts: [ AspectTrickle ]
+
+- type: aspect
+  id: AspectTrickle
+  name: aspect-trickle-name
+  description: aspect-trickle-desc
+  maxWindMultiplier: 0.6
+  regenMultiplier: 1.9
+  conflicts: [ AspectDeepWell ]
+
+- type: aspect
+  id: AspectTangled
+  name: aspect-tangled-name
+  description: aspect-tangled-desc
+  extraNodes: 3
+  gustChanceMultiplier: 1.4
+  instability: 1
+
+- type: aspect
+  id: AspectPlain
+  name: aspect-plain-name
+  description: aspect-plain-desc
+  extraNodes: -1
+  extraSpells: 2
+  costMultiplier: 0.85
+  weight: 1.5
+  instability: -1
+
+- type: aspect
+  id: AspectProfligate
+  name: aspect-profligate-name
+  description: aspect-profligate-desc
+  costMultiplier: 1.35
+  regenMultiplier: 1.5
+  conflicts: [ AspectFragileMind ]
+
+- type: aspect
+  id: AspectCollector
+  name: aspect-collector-name
+  description: aspect-collector-desc
+  extraSpells: 4
+  maxWindMultiplier: 0.8
+
+- type: aspect
+  id: AspectUnmoored
+  name: aspect-unmoored-name
+  description: aspect-unmoored-desc
+  gustChanceMultiplier: 2.2
+  regenMultiplier: 1.4
+  instability: 2
+  weight: 0.6

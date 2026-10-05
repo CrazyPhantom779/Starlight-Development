@@ -11,7 +11,8 @@
     ears: ClothingHeadsetAltWizard #Starlight
     belt: ClothingBeltWand
     pocket1: WizardTeleportScroll
-    pocket2: WizardsGrimoire
+    # Starlight: players no longer start with the spell store. Admins can still spawn WizardsGrimoireDebug.
+    # Wizards get a Spellweaver's Tome and a starter kit from their Fate instead (see FateSystem).
   storage: #Starlight
     back:
     - WizardWarTablet

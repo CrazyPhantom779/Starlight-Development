@@ -1,0 +1,100 @@
+# The Primordial Wind anomaly. Spawn it as an admin (AnomalyPrimordialWind); research it like any anomaly.
+- type: entity
+  id: AnomalyPrimordialWind
+  parent: BaseAnomaly
+  name: primordial wind
+  suffix: Primordial
+  description: The air here folds in on itself. Looking at it for too long is unwise, and looking away feels worse.
+  components:
+  - type: Sprite
+    sprite: Structures/Specific/anomaly.rsi
+    layers:
+    - state: anom4
+      color: "#b07cff"
+      map: ["enum.AnomalyVisualLayers.Base"]
+    - state: anom4-pulse
+      color: "#b07cff"
+      map: ["enum.AnomalyVisualLayers.Animated"]
+      visible: false
+  - type: PointLight
+    radius: 2.5
+    energy: 6
+    color: "#b07cff"
+    castShadows: false
+  - type: Anomaly
+    corePrototype: AnomalyCorePrimordialWind
+    coreInertPrototype: AnomalyCorePrimordialWindInert
+    supercriticalSoundAtAnimationStart:
+      collection: AnomalyBluespaceSupercritical
+  - type: PrimordialWindAnomaly
+
+- type: entity
+  parent: BaseAnomalyCore
+  id: AnomalyCorePrimordialWind
+  suffix: Primordial
+  description: The core of a destroyed primordial wind. It feels like holding a thought that is not yours.
+  components:
+  - type: Sprite
+    sprite: Structures/Specific/Anomalies/Cores/bluespace_core.rsi
+    color: "#b07cff"
+  - type: PointLight
+    radius: 1.5
+    energy: 3.5
+    color: "#b07cff"
+    castShadows: false
+
+- type: entity
+  parent: BaseAnomalyInertCore
+  id: AnomalyCorePrimordialWindInert
+  suffix: Primordial, Inert
+  components:
+  - type: Sprite
+    sprite: Structures/Specific/Anomalies/Cores/bluespace_core.rsi
+    color: "#b07cff"
+  - type: PointLight
+    radius: 1.5
+    energy: 3.5
+    color: "#b07cff"
+    castShadows: false
+
+# Awakening: picks a station crew member who has Wizard enabled for their character, like Sleeper Agents do for traitors.
+- type: antagSpecifier
+  parent: RestrictedAntag
+  id: WizardAwakened
+  prefRoles:
+  - Wizard
+  allowNonHumans: false
+  blacklist:
+    components:
+    - AntagImmune
+  tags:
+  - Wizard
+  - CantBecomeRevolutionary
+  briefing:
+    text: wizard-awakened-greeting
+    color: Turquoise
+  components:
+  - type: NpcFactionMember
+    factions:
+    - Wizard
+  mindRoles:
+  - MindRoleWizard
+
+- type: entity
+  parent: BaseGameRule
+  id: PrimordialAwakening
+  components:
+  - type: AntagObjectives
+    objectives:
+    - WizardSurviveObjective
+  - type: AntagRandomObjectives
+    sets:
+    - groups: WizardObjectiveGroups
+      maxPicks: 2
+    maxDifficulty: 4
+  - type: AntagSelection
+    agentName: wizard-round-end-name
+    antags:
+    - !type:FixedAntagCount
+      proto: WizardAwakened
+      count: 1

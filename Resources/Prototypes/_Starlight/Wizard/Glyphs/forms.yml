@@ -1,0 +1,21 @@
+- type: spellGlyph
+  id: FormAimed
+  category: Form
+  name: glyph-form-aimed-name
+  description: glyph-form-aimed-desc
+  cost: 4
+  targetMode: World
+  icon:
+    sprite: Objects/Magic/magicactions.rsi
+    state: spell_default
+
+- type: spellGlyph
+  id: FormSelf
+  category: Form
+  name: glyph-form-self-name
+  description: glyph-form-self-desc
+  cost: 2
+  targetMode: Self
+  icon:
+    sprite: Objects/Magic/magicactions.rsi
+    state: shield

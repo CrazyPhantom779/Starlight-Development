@@ -1,0 +1,37 @@
+# Admin-spawnable demo entities for the Perception module. Not used by gameplay.
+- type: entity
+  id: PerceptionTestOrb
+  name: strange orb
+  description: It looks like an ordinary orb.
+  parent: BaseItem
+  components:
+  - type: Sprite
+    sprite: Objects/Magic/magicactions.rsi
+    state: fireball
+  - type: PerceptionVariant
+    variants:
+    # Anyone tagged Wizard sees something different from everyone else.
+    - whitelist:
+        tags:
+        - Wizard
+      description: perception-test-orb-wizard
+      append:
+      - perception-test-orb-wizard-extra
+    - description: perception-test-orb-default
+
+- type: entity
+  id: PerceptionTestRandomOrb
+  name: shifting orb
+  description: You can't tell what it is.
+  parent: BaseItem
+  components:
+  - type: Sprite
+    sprite: Objects/Magic/magicactions.rsi
+    state: fireball
+  - type: PerceptionVariant
+    mode: StablePerObserver
+    salt: 17
+    variants:
+    - description: perception-test-shifting-a
+    - description: perception-test-shifting-b
+    - description: perception-test-shifting-c

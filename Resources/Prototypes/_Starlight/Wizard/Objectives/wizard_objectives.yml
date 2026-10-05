@@ -1,0 +1,118 @@
+# Random wizard objectives. All are stated plainly. What is unknown is which ones you roll.
+# Counters are tracked by WizardCounterCondition (cast / woven / distinct / overcast).
+
+- type: entity
+  parent: BaseWizardObjective
+  id: WizardCastObjective
+  components:
+  - type: Objective
+    icon: { sprite: Objects/Magic/magicactions.rsi, state: fireball }
+  - type: NumberObjective
+    min: 8
+    max: 14
+    title: objective-wizard-cast-title
+    description: objective-wizard-cast-desc
+  - type: WizardCounterCondition
+    kind: Cast
+
+- type: entity
+  parent: BaseWizardObjective
+  id: WizardWeaveObjective
+  components:
+  - type: Objective
+    icon: { sprite: Objects/Magic/magicactions.rsi, state: spell_default }
+  - type: NumberObjective
+    min: 4
+    max: 8
+    title: objective-wizard-weave-title
+    description: objective-wizard-weave-desc
+  - type: WizardCounterCondition
+    kind: CastWoven
+
+- type: entity
+  parent: BaseWizardObjective
+  id: WizardVarietyObjective
+  components:
+  - type: Objective
+    icon: { sprite: Objects/Magic/magicactions.rsi, state: magicmissile }
+  - type: NumberObjective
+    min: 3
+    max: 5
+    title: objective-wizard-variety-title
+    description: objective-wizard-variety-desc
+  - type: WizardCounterCondition
+    kind: CastDistinct
+
+- type: entity
+  parent: BaseWizardObjective
+  id: WizardOvercastObjective
+  components:
+  - type: Objective
+    icon: { sprite: Objects/Magic/magicactions.rsi, state: gib }
+  - type: NumberObjective
+    min: 2
+    max: 4
+    title: objective-wizard-overcast-title
+    description: objective-wizard-overcast-desc
+  - type: WizardCounterCondition
+    kind: Overcast
+
+# Thefts: things worth having a wizard take.
+- type: entity
+  abstract: true
+  parent: [ BaseWizardObjective, BaseStealObjective ]
+  id: BaseWizardStealObjective
+  components:
+  - type: Objective
+    difficulty: 1.5
+  - type: StealCondition
+    verifyMapExistence: false
+
+- type: entity
+  parent: BaseWizardStealObjective
+  id: WizardStealIdObjective
+  components:
+  - type: StealCondition
+    stealGroup: CaptainIDCard
+
+- type: entity
+  parent: BaseWizardStealObjective
+  id: WizardStealTeleporterObjective
+  components:
+  - type: StealCondition
+    stealGroup: HandTeleporter
+
+- type: entity
+  parent: BaseWizardStealObjective
+  id: WizardStealClipboardObjective
+  components:
+  - type: StealCondition
+    stealGroup: BoxFolderQmClipboard
+
+# Group weights
+- type: weightedRandom
+  id: WizardObjectiveGroups
+  weights:
+    WizardObjectiveGroupSpells: 1
+    WizardObjectiveGroupThefts: 0.7
+    WizardObjectiveGroupShowOff: 0.5
+
+- type: weightedRandom
+  id: WizardObjectiveGroupSpells
+  weights:
+    WizardCastObjective: 1
+    WizardWeaveObjective: 1
+    WizardVarietyObjective: 1
+    WizardOvercastObjective: 0.5
+
+- type: weightedRandom
+  id: WizardObjectiveGroupThefts
+  weights:
+    WizardStealIdObjective: 1
+    WizardStealTeleporterObjective: 1
+    WizardStealClipboardObjective: 0.6
+
+- type: weightedRandom
+  id: WizardObjectiveGroupShowOff
+  weights:
+    WizardDemonstrateObjective: 1

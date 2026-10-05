@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "license": "CC0-1.0",
+  "copyright": "Generated for Starlight wizard rework (Wind alert icon).",
+  "size": {
+    "x": 32,
+    "y": 32
+  },
+  "states": [
+    {
+      "name": "wind0"
+    },
+    {
+      "name": "wind1"
+    },
+    {
+      "name": "wind2"
+    },
+    {
+      "name": "wind3"
+    },
+    {
+      "name": "wind4"
+    },
+    {
+      "name": "wind5"
+    }
+  ]
+}

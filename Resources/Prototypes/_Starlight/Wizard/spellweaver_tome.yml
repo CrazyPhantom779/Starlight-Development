@@ -1,0 +1,42 @@
+# Opens the Spellweaving window. This one is the admin/debug tome: it teaches every glyph.
+# Later PRs hand out restricted glyph sets through Fate; this prototype is the parent they build on.
+- type: entity
+  abstract: true
+  parent: BaseItem
+  id: BaseSpellweaverTome
+  name: spellweaver's tome
+  description: Its pages rearrange themselves while you aren't looking. Glyphs, and room to combine them.
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/books.rsi
+    layers:
+    - state: paper
+    - state: cover_strong
+      color: "#3b2a7a"
+    - state: decor_wingette_circle
+      color: "#b69cff"
+    - state: icon_pentagramm
+      color: "#e6dcff"
+  - type: SpellweaverTome
+  - type: ActivatableUI
+    key: enum.SpellcraftUiKey.Key
+    inHandsOnly: true
+    singleUser: true
+  - type: UserInterface
+    interfaces:
+      enum.SpellcraftUiKey.Key:
+        type: SpellcraftBoundUserInterface
+
+- type: entity
+  parent: BaseSpellweaverTome
+  id: SpellweaverTomeDebug
+  suffix: Admin, all glyphs
+  components:
+  - type: SpellweaverTome
+    grantAll: true
+    maxNodes: 8
+
+# The tome wizards receive. Glyphs come from their Fate, not from the book.
+- type: entity
+  parent: BaseSpellweaverTome
+  id: SpellweaverTome

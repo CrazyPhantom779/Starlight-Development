@@ -1,0 +1,19 @@
+- type: alert
+  id: Wind
+  name: alerts-wind-name
+  description: alerts-wind-desc
+  minSeverity: 0
+  maxSeverity: 5
+  icons:
+  - sprite: /Textures/_Starlight/Interface/Alerts/wind.rsi
+    state: wind0
+  - sprite: /Textures/_Starlight/Interface/Alerts/wind.rsi
+    state: wind1
+  - sprite: /Textures/_Starlight/Interface/Alerts/wind.rsi
+    state: wind2
+  - sprite: /Textures/_Starlight/Interface/Alerts/wind.rsi
+    state: wind3
+  - sprite: /Textures/_Starlight/Interface/Alerts/wind.rsi
+    state: wind4
+  - sprite: /Textures/_Starlight/Interface/Alerts/wind.rsi
+    state: wind5

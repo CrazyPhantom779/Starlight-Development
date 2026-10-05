@@ -1,0 +1,20 @@
+# Gusts: small misfortunes when a caster overcasts. Add more freely; they are picked by weight.
+- type: windGust
+  id: GustWhisper
+  weight: 3
+  message: wind-gust-whisper
+
+- type: windGust
+  id: GustFlash
+  weight: 2
+  message: wind-gust-flash
+  spawnAtCaster:
+  - EffectFlashBluespaceSimple
+
+- type: windGust
+  id: GustSwap
+  weight: 2
+  message: wind-gust-swap
+  swapWithNearby: true
+  spawnAtCaster:
+  - EffectFlashBluespaceSimple

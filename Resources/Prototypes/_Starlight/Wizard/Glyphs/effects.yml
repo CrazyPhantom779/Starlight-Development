@@ -1,0 +1,175 @@
+# Effect glyphs wrap the events of existing spells. To make a new glyph from any spell, copy that spell's event here.
+
+# --- aimed (World) ---
+- type: spellGlyph
+  id: EffectFirebolt
+  category: Effect
+  name: glyph-effect-firebolt-name
+  description: glyph-effect-firebolt-desc
+  cost: 8
+  schools: [ Fire ]
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: fireball }
+  worldEvent: !type:ProjectileSpellEvent
+    prototype: ProjectileFirebolt
+
+- type: spellGlyph
+  id: EffectFireball
+  category: Effect
+  name: glyph-effect-fireball-name
+  description: glyph-effect-fireball-desc
+  cost: 30
+  schools: [ Fire ]
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: fireball }
+  worldEvent: !type:ProjectileSpellEvent
+    prototype: ProjectileFireball
+
+- type: spellGlyph
+  id: EffectBlink
+  category: Effect
+  name: glyph-effect-blink-name
+  description: glyph-effect-blink-desc
+  cost: 12
+  schools: [ Ender ]
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: blink }
+  worldEvent: !type:TeleportSpellEvent {}
+
+- type: spellGlyph
+  id: EffectCarp
+  category: Effect
+  name: glyph-effect-carp-name
+  description: glyph-effect-carp-desc
+  cost: 22
+  schools: [ Nature ]
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: spell_default }
+  worldEvent: !type:WorldSpawnSpellEvent
+    prototypes:
+    - id: MobCarpMagic
+      amount: 2
+    offset: 0, 1
+
+# --- self-centred (Self) ---
+- type: spellGlyph
+  id: EffectKnock
+  category: Effect
+  name: glyph-effect-knock-name
+  description: glyph-effect-knock-desc
+  cost: 6
+  schools: [ Evocation ]
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: knock }
+  instantEvent: !type:KnockSpellEvent {}
+
+- type: spellGlyph
+  id: EffectForceWall
+  category: Effect
+  name: glyph-effect-forcewall-name
+  description: glyph-effect-forcewall-desc
+  cost: 10
+  schools: [ Evocation ]
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: shield }
+  instantEvent: !type:InstantSpawnSpellEvent
+    prototype: WallForce
+    posData: !type:TargetInFront
+
+- type: spellGlyph
+  id: EffectSmoke
+  category: Effect
+  name: glyph-effect-smoke-name
+  description: glyph-effect-smoke-desc
+  cost: 8
+  schools: [ Nature ]
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: spell_default }
+  instantEvent: !type:InstantSpawnSpellEvent
+    prototype: WizardSmoke
+    posData: !type:TargetInFront
+
+- type: spellGlyph
+  id: EffectFlashRune
+  category: Effect
+  name: glyph-effect-flashrune-name
+  description: glyph-effect-flashrune-desc
+  cost: 7
+  schools: [ Holy ]
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: spell_default }
+  instantEvent: !type:InstantSpawnSpellEvent
+    prototype: FlashRune
+
+- type: spellGlyph
+  id: EffectStunRune
+  category: Effect
+  name: glyph-effect-stunrune-name
+  description: glyph-effect-stunrune-desc
+  cost: 10
+  schools: [ Lightning ]
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: spell_default }
+  instantEvent: !type:InstantSpawnSpellEvent
+    prototype: StunRune
+
+- type: spellGlyph
+  id: EffectIgniteRune
+  category: Effect
+  name: glyph-effect-igniterune-name
+  description: glyph-effect-igniterune-desc
+  cost: 12
+  schools: [ Fire ]
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: spell_default }
+  instantEvent: !type:InstantSpawnSpellEvent
+    prototype: IgniteRune
+
+- type: spellGlyph
+  id: EffectExplosionRune
+  category: Effect
+  name: glyph-effect-explosionrune-name
+  description: glyph-effect-explosionrune-desc
+  cost: 24
+  schools: [ Fire ]
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: spell_default }
+  instantEvent: !type:InstantSpawnSpellEvent
+    prototype: ExplosionRune
+
+- type: spellGlyph
+  id: EffectRepulse
+  category: Effect
+  name: glyph-effect-repulse-name
+  description: glyph-effect-repulse-desc
+  cost: 14
+  schools: [ Evocation ]
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: repulse }
+  instantEvent: !type:RepulseAttractActionEvent {}
+
+# --- Fold / non-euclidean ---
+- type: spellGlyph
+  id: EffectFoldSwap
+  category: Effect
+  name: glyph-effect-foldswap-name
+  description: glyph-effect-foldswap-desc
+  cost: 14
+  schools: [ Ender ]
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: jaunt }
+  worldEvent: !type:FoldSwapSpellEvent {}
+
+# --- Starlight multi-shot spells ---
+- type: spellGlyph
+  id: EffectFireArrows
+  category: Effect
+  name: glyph-effect-firearrows-name
+  description: glyph-effect-firearrows-desc
+  cost: 14
+  schools: [ Fire ]
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: fireball }
+  worldEvent: !type:MultiProjectileSpellEvent
+    prototype: ProjectileFireArrow
+    projectileCount: 3
+    spreadDegrees: 16
+
+- type: spellGlyph
+  id: EffectArcticGlare
+  category: Effect
+  name: glyph-effect-arcticglare-name
+  description: glyph-effect-arcticglare-desc
+  cost: 28
+  schools: [ Ice ]
+  icon: { sprite: Objects/Magic/magicactions.rsi, state: magicmissile }
+  worldEvent: !type:MultiProjectileSpellEvent
+    prototype: ProjectileIceGlare
+    projectileCount: 15
+    spreadDegrees: 120

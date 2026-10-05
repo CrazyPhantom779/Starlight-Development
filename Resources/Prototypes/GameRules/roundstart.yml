@@ -331,7 +331,13 @@
   - type: AntagObjectives
     objectives:
     - WizardSurviveObjective
-    - WizardDemonstrateObjective
+  # Starlight-start: wizards roll random plain-language objectives instead of a fixed pair
+  - type: AntagRandomObjectives
+    sets:
+    - groups: WizardObjectiveGroups
+      maxPicks: 2
+    maxDifficulty: 4
+  # Starlight-end
   - type: LoadMapRule
     mapPath: /Maps/_Starlight/WizardShuttle.yml #Starlight. wizard deserves their shuttle. and it had to be re-saved as a map to get it to work.
   - type: RuleGrids
