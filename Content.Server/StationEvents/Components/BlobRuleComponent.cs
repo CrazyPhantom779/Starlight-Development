@@ -1,23 +1,22 @@
 ﻿using Content.Server.StationEvents.Events;
 using Robust.Shared.Prototypes;
-using Robust.Shared.Serialization.TypeSerializers.Implementations.Custom.Prototype.List;
 
 namespace Content.Server.StationEvents.Components;
 
 [RegisterComponent, Access(typeof(BlobSpawnRule))]
 public sealed partial class BlobSpawnRuleComponent : Component
 {
-    [DataField(required: true, customTypeSerializer: typeof(PrototypeIdListSerializer<EntityPrototype>))]
-    public List<string> CarrierBlobProtos = new()
-    {
+    [DataField(required: true, customTypeSerializer: typeof(ProtoId<EntityPrototype>))]
+    public List<string> CarrierBlobProtos =
+    [
         "MobMouse",
         "MobMouse1",
         "MobMouse2"
-    };
+    ];
 
-    [ViewVariables(VVAccess.ReadOnly), DataField("playersPerCarrierBlob")]
+    [ViewVariables(VVAccess.ReadOnly), DataField]
     public int PlayersPerCarrierBlob = 30;
 
-    [ViewVariables(VVAccess.ReadOnly), DataField("maxCarrierBlob")]
+    [ViewVariables(VVAccess.ReadOnly), DataField]
     public int MaxCarrierBlob = 3;
 }

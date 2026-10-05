@@ -1,6 +1,8 @@
 using Content.Shared.Blob;
 using Content.Shared.Damage;
+using Content.Shared.Damage.Prototypes;
 using Content.Shared.FixedPoint;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server.Blob;
 
@@ -19,7 +21,7 @@ public sealed partial class BlobTileComponent : SharedBlobTileComponent
     [ViewVariables(VVAccess.ReadOnly), DataField("healthOfPulse")]
     public DamageSpecifier HealthOfPulse = new()
     {
-        DamageDict = new Dictionary<string, FixedPoint2>
+        DamageDict = new Dictionary<ProtoId<DamageTypePrototype>, FixedPoint2>
         {
             { "Blunt", -4 },
             { "Slash", -4 },
@@ -33,7 +35,7 @@ public sealed partial class BlobTileComponent : SharedBlobTileComponent
     [ViewVariables(VVAccess.ReadOnly), DataField]
     public DamageSpecifier FlashDamage = new()
     {
-        DamageDict = new Dictionary<string, FixedPoint2>
+        DamageDict = new Dictionary<ProtoId<DamageTypePrototype>, FixedPoint2>
         {
             { "Heat", 100 },
         }

@@ -7,12 +7,7 @@ public sealed partial class BlobSpawnerSystem : EntitySystem
 {
     [Dependency] private BlobCoreSystem _blobCoreSystem = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-        SubscribeLocalEvent<BlobSpawnerComponent, PlayerAttachedEvent>(OnPlayerAttached);
-    }
-
+    [SubscribeLocalEvent]
     private void OnPlayerAttached(EntityUid uid, BlobSpawnerComponent component, PlayerAttachedEvent args)
     {
         var xform = Transform(uid);

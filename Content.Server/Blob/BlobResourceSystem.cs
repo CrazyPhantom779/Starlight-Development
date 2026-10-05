@@ -9,13 +9,7 @@ public sealed partial class BlobResourceSystem : EntitySystem
     [Dependency] private BlobCoreSystem _blobCoreSystem = default!;
     [Dependency] private SharedPopupSystem _popup = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        SubscribeLocalEvent<BlobResourceComponent, BlobTileGetPulseEvent>(OnPulsed);
-    }
-
+    [SubscribeLocalEvent]
     private void OnPulsed(EntityUid uid, BlobResourceComponent component, BlobTileGetPulseEvent args)
     {
         if (!TryComp<BlobTileComponent>(uid, out var blobTileComponent) || blobTileComponent.Core == null)

@@ -9,12 +9,7 @@ public sealed partial class BlobbernautSystem : EntitySystem
 {
     [Dependency] private SpriteSystem _sprite = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-        SubscribeLocalEvent<BlobbernautComponent, ComponentHandleState>(OnBlobTileHandleState);
-    }
-
+    [SubscribeLocalEvent]
     private void OnBlobTileHandleState(EntityUid uid, BlobbernautComponent component, ref ComponentHandleState args)
     {
         if (args.Current is not BlobbernautComponentState state)

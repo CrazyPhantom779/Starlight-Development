@@ -13,13 +13,8 @@ public sealed partial class BlobNodeSystem : EntitySystem
     [Dependency] private IGameTiming _gameTiming = default!;
     [Dependency] private SharedMapSystem _mapSystem = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-        SubscribeLocalEvent<BlobNodeComponent, ComponentStartup>(OnStartup);
-    }
-
-    private void OnStartup(EntityUid uid, BlobNodeComponent component, ComponentStartup args)
+    [SubscribeLocalEvent]
+    private static void OnStartup(EntityUid uid, BlobNodeComponent component, ComponentStartup args)
     {
     }
 

@@ -2,15 +2,9 @@
 
 namespace Content.Shared.Blob;
 
-public abstract class SharedBlobObserverSystem: EntitySystem
+public abstract partial class SharedBlobObserverSystem: EntitySystem
 {
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        SubscribeLocalEvent<BlobObserverComponent, UpdateCanMoveEvent>(OnUpdateCanMove);
-    }
-
+    [SubscribeLocalEvent]
     private void OnUpdateCanMove(EntityUid uid, BlobObserverComponent component, UpdateCanMoveEvent args)
     {
         if (component.CanMove)

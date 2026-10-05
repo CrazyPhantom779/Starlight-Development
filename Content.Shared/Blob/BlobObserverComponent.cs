@@ -27,16 +27,10 @@ public sealed class BlobChemSwapComponentState : ComponentState
 }
 
 [Serializable, NetSerializable]
-public sealed class BlobChemSwapBoundUserInterfaceState : BoundUserInterfaceState
+public sealed class BlobChemSwapBoundUserInterfaceState(Dictionary<BlobChemType, Color> chemList, BlobChemType selectedId) : BoundUserInterfaceState
 {
-    public readonly Dictionary<BlobChemType, Color> ChemList;
-    public readonly BlobChemType SelectedChem;
-
-    public BlobChemSwapBoundUserInterfaceState(Dictionary<BlobChemType, Color> chemList, BlobChemType selectedId)
-    {
-        ChemList = chemList;
-        SelectedChem = selectedId;
-    }
+    public readonly Dictionary<BlobChemType, Color> ChemList = chemList;
+    public readonly BlobChemType SelectedChem = selectedId;
 }
 
 [Serializable, NetSerializable]

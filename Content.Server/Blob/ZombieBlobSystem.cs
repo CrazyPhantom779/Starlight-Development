@@ -35,15 +35,6 @@ public sealed partial class ZombieBlobSystem : EntitySystem
 
     private const int ClimbingCollisionGroup = (int)CollisionGroup.BlobImpassable;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        SubscribeLocalEvent<ZombieBlobComponent, MobStateChangedEvent>(OnMobStateChanged);
-        SubscribeLocalEvent<ZombieBlobComponent, ComponentStartup>(OnStartup);
-        SubscribeLocalEvent<ZombieBlobComponent, ComponentShutdown>(OnShutdown);
-    }
-
     /// <summary>
     /// Replaces the current fixtures with non-climbing collidable versions so that climb end can be detected
     /// </summary>
@@ -67,6 +58,7 @@ public sealed partial class ZombieBlobSystem : EntitySystem
         }
     }
 
+    [SubscribeLocalEvent]
     private void OnStartup(EntityUid uid, ZombieBlobComponent component, ComponentStartup args)
     {
         EnsureComp<BlobMobComponent>(uid);
@@ -119,6 +111,7 @@ public sealed partial class ZombieBlobSystem : EntitySystem
         _npc.WakeNPC(uid, htn);
     }
 
+    [SubscribeLocalEvent]
     private void OnShutdown(EntityUid uid, ZombieBlobComponent component, ComponentShutdown args)
     {
         RemComp<BlobMobComponent>(uid);
@@ -162,6 +155,7 @@ public sealed partial class ZombieBlobSystem : EntitySystem
         }
     }
 
+    [SubscribeLocalEvent]
     private void OnMobStateChanged(EntityUid uid, ZombieBlobComponent component, MobStateChangedEvent args)
     {
         if (args.NewMobState == MobState.Dead)

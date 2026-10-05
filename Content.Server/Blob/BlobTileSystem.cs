@@ -29,18 +29,7 @@ public sealed partial class BlobTileSystem : SharedBlobTileSystem
     [Dependency] private EmpSystem _empSystem = default!;
     [Dependency] private SharedMapSystem _mapSystem = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        SubscribeLocalEvent<BlobTileComponent, DestructionEventArgs>(OnDestruction);
-        SubscribeLocalEvent<BlobTileComponent, BlobTileGetPulseEvent>(OnPulsed);
-        SubscribeLocalEvent<BlobTileComponent, GetVerbsEvent<AlternativeVerb>>(AddUpgradeVerb);
-        SubscribeLocalEvent<BlobTileComponent, GetVerbsEvent<Verb>>(AddRemoveVerb);
-        SubscribeLocalEvent<BlobTileComponent, ComponentGetState>(OnGetState);
-        SubscribeLocalEvent<BlobTileComponent, FlashAttemptEvent>(OnFlashAttempt);
-    }
-
+    [SubscribeLocalEvent]
     private void OnFlashAttempt(EntityUid uid, BlobTileComponent component, FlashAttemptEvent args)
     {
         if (args.Used == null || MetaData(args.Used.Value).EntityPrototype?.ID != "GrenadeFlashBang")
@@ -50,6 +39,7 @@ public sealed partial class BlobTileSystem : SharedBlobTileSystem
             _damageableSystem.TryChangeDamage(uid, component.FlashDamage);
     }
 
+    [SubscribeLocalEvent]
     private void OnDestruction(EntityUid uid, BlobTileComponent component, DestructionEventArgs args)
     {
         if (component.Core == null || !TryComp(component.Core.Value, out BlobCoreComponent? blobCoreComponent))
@@ -64,6 +54,7 @@ public sealed partial class BlobTileSystem : SharedBlobTileSystem
         }
     }
 
+    [SubscribeLocalEvent]
     private void AddRemoveVerb(EntityUid uid, BlobTileComponent component, GetVerbsEvent<Verb> args)
     {
         if (!TryComp(args.User, out BlobObserverComponent? ghostBlobComponent))
@@ -127,12 +118,14 @@ public sealed partial class BlobTileSystem : SharedBlobTileSystem
         }
     }
 
+    [SubscribeLocalEvent]
     private void OnGetState(EntityUid uid, BlobTileComponent component, ref ComponentGetState args)
     => args.State = new BlobTileComponentState
     {
         Color = component.Color
     };
 
+    [SubscribeLocalEvent]
     private void OnPulsed(EntityUid uid, BlobTileComponent component, BlobTileGetPulseEvent args)
     {
         if (!TryComp(uid, out BlobTileComponent? blobTileComponent) || blobTileComponent.Core == null ||
@@ -233,6 +226,7 @@ public sealed partial class BlobTileSystem : SharedBlobTileSystem
         }
     }
 
+    [SubscribeLocalEvent]
     private void AddUpgradeVerb(EntityUid uid, BlobTileComponent component, GetVerbsEvent<AlternativeVerb> args)
     {
         if (!TryComp(args.User, out BlobObserverComponent? ghostBlobComponent))

@@ -11,7 +11,7 @@ public sealed partial class BlobCaptureCondition
     private EntityUid? _mind;
     private int _target;
 
-    public BlobCaptureCondition GetAssigned(EntityUid mind) =>
+    public static BlobCaptureCondition GetAssigned(EntityUid mind) =>
         new()
         {
         _mind = mind,

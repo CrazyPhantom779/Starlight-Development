@@ -33,15 +33,7 @@ public sealed partial class BlobCoreSystem : EntitySystem
     [Dependency] private DamageableSystem _damageable = default!;
     [Dependency] private IPlayerManager _playerManager = default!;
     [Dependency] private MapSystem _mapSystem = default!;
-
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        SubscribeLocalEvent<BlobCoreComponent, ComponentStartup>(OnStartup);
-        SubscribeLocalEvent<BlobCoreComponent, DestructionEventArgs>(OnDestruction);
-        SubscribeLocalEvent<BlobCoreComponent, DamageChangedEvent>(OnDamaged);
-    }
+    public string BlobGamerule = "Blob";
 
     /// <summary>
     /// Creates the player blob controller
@@ -57,7 +49,7 @@ public sealed partial class BlobCoreSystem : EntitySystem
 
         if (blobRule == null)
         {
-            _gameTicker.StartGameRule("Blob", out var ruleEntity);
+            _gameTicker.StartGameRule(BlobGamerule, out var ruleEntity);
             blobRule = Comp<BlobRuleComponent>(ruleEntity);
         }
 
@@ -107,6 +99,7 @@ public sealed partial class BlobCoreSystem : EntitySystem
             _chatManager.DispatchServerMessage(session, Loc.GetString("blob-role-greeting"));
     }
 
+    [SubscribeLocalEvent]
     private void OnDamaged(EntityUid uid, BlobCoreComponent component, DamageChangedEvent args)
     {
         var maxHealth = component.CoreBlobTotalHealth;
@@ -119,6 +112,7 @@ public sealed partial class BlobCoreSystem : EntitySystem
         }
     }
 
+    [SubscribeLocalEvent]
     private void OnStartup(EntityUid uid, BlobCoreComponent component, ComponentStartup args)
     {
         ChangeBlobPoint(uid, 0, component);
@@ -157,6 +151,7 @@ public sealed partial class BlobCoreSystem : EntitySystem
         }
     }
 
+    [SubscribeLocalEvent]
     private void OnDestruction(EntityUid uid, BlobCoreComponent component, DestructionEventArgs args)
     {
         if (component.Observer != null)

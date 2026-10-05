@@ -5,7 +5,7 @@ namespace Content.Server.Blob;
 [RegisterComponent]
 public sealed partial class ZombieBlobComponent : Component
 {
-    public List<string> OldFactions = new();
+    public List<string> OldFactions = [];
 
     public EntityUid BlobPodUid = default!;
 

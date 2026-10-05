@@ -1,6 +1,8 @@
 using Content.Shared.Blob;
 using Content.Shared.Damage;
+using Content.Shared.Damage.Prototypes;
 using Content.Shared.FixedPoint;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server.Blob;
 
@@ -16,7 +18,7 @@ public sealed partial class BlobbernautComponent : SharedBlobbernautComponent
     [ViewVariables(VVAccess.ReadOnly), DataField]
     public DamageSpecifier Damage = new()
     {
-        DamageDict = new Dictionary<string, FixedPoint2>
+        DamageDict = new Dictionary<ProtoId<DamageTypePrototype>, FixedPoint2>
         {
             { "Piercing", 25 },
         }

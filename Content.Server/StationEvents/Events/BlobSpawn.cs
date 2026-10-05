@@ -14,6 +14,7 @@ public sealed partial class BlobSpawnRule : StationEventSystem<BlobSpawnRuleComp
 {
     [Dependency] private IRobustRandom _random = default!;
     [Dependency] private IPlayerManager _playerManager = default!;
+    public string BlobGamerule = "Blob";
 
     protected override void Started(EntityUid uid, BlobSpawnRuleComponent component, GameRuleComponent gameRule,
         GameRuleStartedEvent args)
@@ -56,6 +57,6 @@ public sealed partial class BlobSpawnRule : StationEventSystem<BlobSpawnRuleComp
         }
 
         // start blob rule incase it isn't, for the sweet greentext
-        GameTicker.StartGameRule("Blob");
+        GameTicker.StartGameRule(BlobGamerule);
     }
 }

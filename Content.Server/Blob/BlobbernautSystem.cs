@@ -26,15 +26,7 @@ public sealed partial class BlobbernautSystem : EntitySystem
     [Dependency] private TransformSystem _transformSystem = default!;
     [Dependency] private MapSystem _mapSystem = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        SubscribeLocalEvent<BlobbernautComponent, MobStateChangedEvent>(OnMobStateChanged);
-        SubscribeLocalEvent<BlobbernautComponent, ComponentGetState>(OnGetState);
-        SubscribeLocalEvent<BlobbernautComponent, MeleeHitEvent>(OnMeleeHit);
-    }
-
+    [SubscribeLocalEvent]
     private void OnMeleeHit(EntityUid uid, BlobbernautComponent component, MeleeHitEvent args)
     {
         if (args.HitEntities.Count < 1)
@@ -68,12 +60,14 @@ public sealed partial class BlobbernautSystem : EntitySystem
         }
     }
 
+    [SubscribeLocalEvent]
     private void OnGetState(EntityUid uid, BlobbernautComponent component, ref ComponentGetState args) =>
         args.State = new BlobbernautComponentState()
         {
             Color = component.Color
         };
 
+    [SubscribeLocalEvent]
     private void OnMobStateChanged(EntityUid uid, BlobbernautComponent component, MobStateChangedEvent args) =>
         component.IsDead = args.NewMobState switch
         {

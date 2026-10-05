@@ -11,7 +11,7 @@ public sealed partial class BlobObserverSystem : SharedBlobObserverSystem
     [Dependency] private ILightManager _lightManager = default!;
 
     [SubscribeLocalEvent]
-    private void HandleState(EntityUid uid, BlobObserverComponent component, ref ComponentHandleState args)
+    private static void HandleState(EntityUid uid, BlobObserverComponent component, ref ComponentHandleState args)
     {
         if (args.Current is not BlobChemSwapComponentState state)
             return;

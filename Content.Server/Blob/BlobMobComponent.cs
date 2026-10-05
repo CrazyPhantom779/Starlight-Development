@@ -1,15 +1,17 @@
 using Content.Shared.Damage;
+using Content.Shared.Damage.Prototypes;
 using Content.Shared.FixedPoint;
+using Robust.Shared.Prototypes;
 
 namespace Content.Server.Blob;
 
 [RegisterComponent]
 public sealed partial class BlobMobComponent : Component
 {
-    [ViewVariables(VVAccess.ReadOnly), DataField("healthOfPulse")]
+    [ViewVariables(VVAccess.ReadOnly), DataField]
     public DamageSpecifier HealthOfPulse = new()
     {
-        DamageDict = new Dictionary<string, FixedPoint2>
+        DamageDict = new Dictionary<ProtoId<DamageTypePrototype>, FixedPoint2>
         {
             { "Blunt", -4 },
             { "Slash", -4 },

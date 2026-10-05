@@ -19,29 +19,19 @@ public sealed partial class BlobCarrierSystem : EntitySystem
     [Dependency] private SharedPopupSystem _popup = default!;
     [Dependency] private IGameTiming _gameTiming = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        SubscribeLocalEvent<BlobCarrierComponent, MobStateChangedEvent>(OnMobStateChanged);
-        SubscribeLocalEvent<BlobCarrierComponent, TransformToBlobActionEvent>(OnTransformToBlobChanged);
-
-        SubscribeLocalEvent<BlobCarrierComponent, ComponentStartup>(OnStartup);
-        SubscribeLocalEvent<BlobCarrierComponent, ComponentShutdown>(OnShutdown);
-
-        SubscribeLocalEvent<BlobCarrierComponent, MindAddedMessage>(OnMindAdded);
-        SubscribeLocalEvent<BlobCarrierComponent, MindRemovedMessage>(OnMindRemove);
-    }
-
-    private void OnMindAdded(EntityUid uid, BlobCarrierComponent component, MindAddedMessage args)
+    [SubscribeLocalEvent]
+    private static void OnMindAdded(EntityUid uid, BlobCarrierComponent component, MindAddedMessage args)
         => component.HasMind = true;
 
-    private void OnMindRemove(EntityUid uid, BlobCarrierComponent component, MindRemovedMessage args)
+    [SubscribeLocalEvent]
+    private static void OnMindRemove(EntityUid uid, BlobCarrierComponent component, MindRemovedMessage args)
         => component.HasMind = false;
 
+    [SubscribeLocalEvent]
     private void OnTransformToBlobChanged(EntityUid uid, BlobCarrierComponent component, TransformToBlobActionEvent args)
         => TransformToBlob(uid, component);
 
+    [SubscribeLocalEvent]
     private void OnStartup(EntityUid uid, BlobCarrierComponent component, ComponentStartup args)
     {
         _action.AddAction(uid, TransformToBlobActionId);
@@ -54,10 +44,12 @@ public sealed partial class BlobCarrierSystem : EntitySystem
         ghostRole.RoleRules = Loc.GetString("blob-carrier-role-rules");
     }
 
-    private void OnShutdown(EntityUid uid, BlobCarrierComponent component, ComponentShutdown args)
+    [SubscribeLocalEvent]
+    private static void OnShutdown(EntityUid uid, BlobCarrierComponent component, ComponentShutdown args)
     {
     }
 
+    [SubscribeLocalEvent]
     private void OnMobStateChanged(EntityUid uid, BlobCarrierComponent component, MobStateChangedEvent args)
     {
         if (args.NewMobState == MobState.Dead)

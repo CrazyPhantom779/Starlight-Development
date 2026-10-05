@@ -11,20 +11,12 @@ public sealed partial class BlobFactorySystem : EntitySystem
 {
     [Dependency] private IGameTiming _gameTiming = default!;
 
-    public override void Initialize()
-    {
-        base.Initialize();
-
-        SubscribeLocalEvent<BlobFactoryComponent, ComponentStartup>(OnStartup);
-        SubscribeLocalEvent<BlobFactoryComponent, BlobTileGetPulseEvent>(OnPulsed);
-        SubscribeLocalEvent<BlobFactoryComponent, ProduceBlobbernautEvent>(OnProduceBlobbernaut);
-        SubscribeLocalEvent<BlobFactoryComponent, DestructionEventArgs>(OnDestruction);
-    }
-
-    private void OnStartup(EntityUid uid, BlobFactoryComponent component, ComponentStartup args)
+    [SubscribeLocalEvent]
+    private static void OnStartup(EntityUid uid, BlobFactoryComponent component, ComponentStartup args)
     {
     }
 
+    [SubscribeLocalEvent]
     private void OnDestruction(EntityUid uid, BlobFactoryComponent component, DestructionEventArgs args)
     {
         if (TryComp<BlobbernautComponent>(component.Blobbernaut, out var blobbernautComponent))
@@ -33,6 +25,7 @@ public sealed partial class BlobFactorySystem : EntitySystem
         }
     }
 
+    [SubscribeLocalEvent]
     private void OnProduceBlobbernaut(EntityUid uid, BlobFactoryComponent component, ProduceBlobbernautEvent args)
     {
         if (component.Blobbernaut != null)
@@ -70,6 +63,7 @@ public sealed partial class BlobFactorySystem : EntitySystem
         }
     }
 
+    [SubscribeLocalEvent]
     private void OnPulsed(EntityUid uid, BlobFactoryComponent component, BlobTileGetPulseEvent args)
     {
         if (!TryComp<BlobTileComponent>(uid, out var blobTileComponent) || blobTileComponent.Core == null)
