@@ -1,3 +1,4 @@
+using Content.Shared._Starlight.Wizard.Casting;
 using Robust.Shared.GameStates;
 using Robust.Shared.Prototypes;
 
@@ -21,7 +22,19 @@ public sealed partial class SpellcraftComponent : Component
     [DataField, AutoNetworkedField]
     public int MaxSpells = 5;
 
-    /// <summary>Admin/debug: ignore <see cref="Glyphs"/> and allow every glyph.</summary>
+    /// <summary>Schools this caster is attuned to. Glyphs of an attuned school cost less.</summary>
+    [DataField, AutoNetworkedField]
+    public HashSet<string> Schools = [];
+
+    /// <summary>Ways of working magic this caster has mastered.</summary>
+    [DataField, AutoNetworkedField]
+    public HashSet<SpellDiscipline> Disciplines = [SpellDiscipline.Rote, SpellDiscipline.Glyphwork];
+
+    /// <summary>Prepared spells this caster knows.</summary>
+    [DataField, AutoNetworkedField]
+    public HashSet<ProtoId<RoteSpellPrototype>> Rotes = [];
+
+    /// <summary>Admin/debug: ignore <see cref="Glyphs"/>, <see cref="Disciplines"/> and <see cref="Rotes"/> and allow everything.</summary>
     [DataField, AutoNetworkedField]
     public bool Unrestricted;
 }

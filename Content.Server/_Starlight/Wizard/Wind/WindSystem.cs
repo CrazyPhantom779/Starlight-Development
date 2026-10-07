@@ -44,6 +44,32 @@ public sealed partial class WindSystem : SharedWindSystem
         }
     }
 
+    /// <summary>
+    /// Spends Wind for something that isn't an action (wands, enchanted items, rituals).
+    /// Casters without Wind pay nothing. Returns false if the cost cannot be afforded.
+    /// </summary>
+    public bool TrySpend(EntityUid performer, float baseCost)
+    {
+        if (!TryComp<WindComponent>(performer, out var wind))
+            return true;
+
+        var ent = new Entity<WindComponent>(performer, wind);
+        if (!CanAfford(ent, baseCost))
+            return false;
+
+        var value = GetWind(ent) - GetCost(ent, baseCost);
+        SetWind(ent, value);
+        UpdateAlert(ent);
+
+        if (value < 0f)
+        {
+            var ev = new WindOverdrawnEvent(performer, -value);
+            RaiseLocalEvent(performer, ref ev);
+        }
+
+        return true;
+    }
+
     private void UpdateAlert(Entity<WindComponent> ent)
     {
         var fraction = Math.Clamp(GetWind(ent) / MathF.Max(1f, ent.Comp.Max), 0f, 1f);

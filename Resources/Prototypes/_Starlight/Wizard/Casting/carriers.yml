@@ -1,0 +1,69 @@
+# What a woven spell flies as (bolts and orbs) or lies as (runes). The spell itself is attached at cast time.
+- type: entity
+  parent: BaseBulletTrigger
+  id: SpellBolt
+  name: arcane bolt
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Projectiles/magic.rsi
+    layers:
+    - state: magicm
+      shader: unshaded
+  - type: PointLight
+    radius: 2
+    energy: 2
+    color: "#b07cff"
+    castShadows: false
+  - type: TriggerOnCollide
+    fixtureID: projectile
+    maxTriggers: null
+  - type: Projectile
+    damage:
+      types:
+        Blunt: 0
+  - type: TimedDespawn
+    lifetime: 6
+  - type: SpellBolt
+
+- type: entity
+  parent: SpellBolt
+  id: SpellOrb
+  name: arcane orb
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: Sprite
+    scale: 1.8, 1.8
+    sprite: Objects/Weapons/Guns/Projectiles/magic.rsi
+    layers:
+    - state: magicm_cyan
+      shader: unshaded
+  - type: PointLight
+    radius: 3.5
+    energy: 3
+    color: "#7fd6ff"
+    castShadows: false
+  - type: TimedDespawn
+    lifetime: 10
+
+- type: entity
+  parent: CollideRune
+  id: SpellRune
+  name: arcane rune
+  categories: [ HideSpawnMenu ]
+  components:
+  - type: TriggerOnCollide
+    fixtureID: rune
+  - type: Sprite
+    sprite: Structures/Magic/Cult/rune.rsi
+    layers:
+    - state: cult2
+      color: "#b07cff"
+  - type: PointLight
+    radius: 1.5
+    energy: 1.2
+    color: "#b07cff"
+    castShadows: false
+  - type: TimedDespawn
+    lifetime: 180
+  - type: SpellRune

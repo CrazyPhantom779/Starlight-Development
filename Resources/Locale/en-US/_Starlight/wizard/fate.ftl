@@ -19,3 +19,6 @@ aspect-collector-name = Collector
 aspect-collector-desc = You can keep many more woven spells, but your reserves are smaller.
 aspect-unmoored-name = Unmoored
 aspect-unmoored-desc = The Winds slip often, but you recover quickly.
+
+fate-announce-kit = You work magic through: {$disciplines}.
+    You are attuned to: {$schools}. Glyphs of those schools cost you less.

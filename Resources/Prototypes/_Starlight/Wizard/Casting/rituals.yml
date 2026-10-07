@@ -1,0 +1,143 @@
+# Rites: items offered on a ritual circle become something else. Many cost no Wind, the offerings pay.
+- type: ritual
+  id: RiteOfTheWand
+  name: rite-wand-name
+  description: rite-wand-desc
+  seconds: 8
+  offerings:
+  - label: rite-offer-material
+    whitelist: { components: [ Stack, Material ], requireAll: true }
+  - label: rite-offer-battery
+    whitelist: { components: [ Battery ] }
+  result: !type:SpawnRitualResult
+    prototypes: [ SpellWandBlank ]
+
+- type: ritual
+  id: RiteOfClarity
+  name: rite-clarity-name
+  description: rite-clarity-desc
+  offerings:
+  - label: rite-offer-paper
+    count: 3
+    whitelist: { components: [ Paper ] }
+  result: !type:LearnGlyphRitualResult
+    count: 1
+
+- type: ritual
+  id: RiteOfRecollection
+  name: rite-recollection-name
+  description: rite-recollection-desc
+  offerings:
+  - label: rite-offer-paper
+    count: 2
+    whitelist: { components: [ Paper ] }
+  result: !type:LearnRoteRitualResult
+    count: 2
+
+- type: ritual
+  id: RiteOfAttunement
+  name: rite-attunement-name
+  description: rite-attunement-desc
+  offerings:
+  - label: rite-offer-produce
+    count: 2
+    whitelist: { components: [ Produce ] }
+  - label: rite-offer-bulb
+    whitelist: { components: [ LightBulb ] }
+  result: !type:AttuneRitualResult
+
+- type: ritual
+  id: RiteOfTheRoad
+  name: rite-road-name
+  description: rite-road-desc
+  seconds: 10
+  offerings:
+  - label: rite-offer-organ
+    whitelist: { components: [ Organ ] }
+  - label: rite-offer-paper
+    whitelist: { components: [ Paper ] }
+  result: !type:LearnDisciplineRitualResult
+
+- type: ritual
+  id: RiteOfRefilling
+  name: rite-refilling-name
+  description: rite-refilling-desc
+  seconds: 4
+  offerings:
+  - label: rite-offer-battery
+    count: 2
+    whitelist: { components: [ Battery ] }
+  result: !type:RestoreWindRitualResult
+    amount: 70
+
+- type: ritual
+  id: RiteOfTheDeck
+  name: rite-deck-name
+  description: rite-deck-desc
+  offerings:
+  - label: rite-offer-paper
+    count: 2
+    whitelist: { components: [ Paper ] }
+  result: !type:TarotRitualResult
+    count: 3
+
+- type: ritual
+  id: RiteOfLight
+  name: rite-light-name
+  description: rite-light-desc
+  seconds: 4
+  offerings:
+  - label: rite-offer-bulb
+    count: 2
+    whitelist: { components: [ LightBulb ] }
+  result: !type:SpawnRitualResult
+    prototypes: [ ElfLuminousOrb ]
+    amount: 3
+
+- type: ritual
+  id: RiteOfStorm
+  name: rite-storm-name
+  description: rite-storm-desc
+  seconds: 10
+  offerings:
+  - label: rite-offer-core
+    whitelist: { components: [ AnomalyCore ] }
+  result: !type:CastRitualResult
+    chain: [ FormNova, EffectStormcall, AugmentAmplify, AugmentWiden ]
+
+- type: ritual
+  id: RiteOfFire
+  name: rite-fire-name
+  description: rite-fire-desc
+  seconds: 8
+  offerings:
+  - label: rite-offer-produce
+    count: 3
+    whitelist: { components: [ Produce ] }
+  result: !type:CastRitualResult
+    chain: [ FormNova, EffectInferno, AugmentWiden, AugmentWiden ]
+
+- type: ritual
+  id: RiteOfMending
+  name: rite-mending-name
+  description: rite-mending-desc
+  seconds: 8
+  offerings:
+  - label: rite-offer-produce
+    count: 2
+    whitelist: { components: [ Produce ] }
+  - label: rite-offer-paper
+    whitelist: { components: [ Paper ] }
+  result: !type:CastRitualResult
+    chain: [ FormNova, EffectWideMend, AugmentAmplify, AugmentWiden ]
+
+- type: ritual
+  id: RiteOfCarp
+  name: rite-carp-name
+  description: rite-carp-desc
+  seconds: 8
+  offerings:
+  - label: rite-offer-organ
+    whitelist: { components: [ Organ ] }
+  result: !type:CastRitualResult
+    chain: [ FormBurst, EffectMagicarp, AugmentAmplify, AugmentAmplify ]

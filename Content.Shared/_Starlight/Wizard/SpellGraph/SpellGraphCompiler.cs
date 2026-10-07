@@ -1,5 +1,5 @@
-using System.Linq;
 using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Starlight.Wizard.SpellGraph;
@@ -8,8 +8,18 @@ public sealed class SpellStep
 {
     public SpellGlyphPrototype Glyph = default!;
     public int Repeats;
+    public float RepeatInterval = SpellGraphCompiler.RepeatIntervalSeconds;
     public float Delay;
     public float Cost;
+
+    /// <summary>Multiplies the strength of the effect.</summary>
+    public float Magnitude = 1f;
+
+    /// <summary>Extra tiles of area.</summary>
+    public float RadiusBonus;
+
+    /// <summary>How many more creatures the effect jumps to.</summary>
+    public int ChainJumps;
 }
 
 /// <summary>The validated, ready-to-run form of a <see cref="SpellGraph"/>.</summary>
@@ -19,27 +29,57 @@ public sealed class SpellGraphPlan
     public List<SpellStep> Steps = [];
     public float Cost;
     public string Name = string.Empty;
+    public int ProjectileCount = 1;
+    public float CooldownMultiplier = 1f;
+
+    /// <summary>Items that must be held and are consumed when this spell is cast.</summary>
+    public List<SpellGlyphPrototype> Reagents = [];
+
+    /// <summary>Every school any glyph in this spell belongs to.</summary>
+    public HashSet<string> Schools = [];
+
+    public SpellDelivery Delivery => Form.Delivery;
     public SpellTargetMode TargetMode => Form.TargetMode;
 }
 
 /// <summary>
 /// Validates a <see cref="SpellGraph"/> and turns it into a <see cref="SpellGraphPlan"/> with a cost.
-/// Pure and shared, so the client editor can preview exactly what the server will accept.
+/// Pure and shared, so the client editors can preview exactly what the server will accept.
 /// The server always recompiles; it never trusts a client-supplied cost.
 /// </summary>
 public static class SpellGraphCompiler
 {
     public const int MaxEffects = 4;
     public const int MaxRepeatsPerEffect = 3;
+    public const int MaxAmplifyPerEffect = 3;
+    public const int MaxChainJumps = 4;
+    public const int MaxExtraBolts = 4;
     public const float MaxDelaySeconds = 8f;
     public const float RepeatIntervalSeconds = 0.35f;
+    public const float LingerIntervalSeconds = 1f;
     public const float RepeatCostFactor = 0.9f;
+    public const float AmplifyStrength = 0.5f;
+    public const float AmplifyCostFactor = 0.35f;
+    public const float WidenCostFactor = 0.25f;
+    public const float ChainCostPerJump = 5f;
+    public const float SplitCostFactor = 0.6f;
     public const float MinCostMultiplier = 0.4f;
+    public const float AffinityDiscount = 0.85f;
+    public const float MaxCooldownReduction = 0.6f;
 
     public static bool TryCompile(IPrototypeManager protos,
         SpellGraph graph,
         int maxNodes,
         IReadOnlyCollection<ProtoId<SpellGlyphPrototype>>? known,
+        [NotNullWhen(true)] out SpellGraphPlan? plan,
+        [NotNullWhen(false)] out string? error)
+        => TryCompile(protos, graph, maxNodes, known, null, out plan, out error);
+
+    public static bool TryCompile(IPrototypeManager protos,
+        SpellGraph graph,
+        int maxNodes,
+        IReadOnlyCollection<ProtoId<SpellGlyphPrototype>>? known,
+        IReadOnlyCollection<string>? affinities,
         [NotNullWhen(true)] out SpellGraphPlan? plan,
         [NotNullWhen(false)] out string? error)
     {
@@ -98,7 +138,7 @@ public static class SpellGraphCompiler
                 return Fail("spellcraft-error-bad-link", out error);
 
             if (!children.TryGetValue(link.From, out var list))
-                children[link.From] = list = new List<int>();
+                children[link.From] = list = [];
 
             list.Add(link.To);
             hasParent.Add(link.To);
@@ -120,18 +160,14 @@ public static class SpellGraphCompiler
         if (effectIds.Count > MaxEffects)
             return Fail("spellcraft-error-too-many-effects", out error);
 
-        // Effects must be fed by the form.
-        var formChildren = children.GetValueOrDefault(formId) ?? new List<int>();
+        // Effects must be fed by the form, and must work with how the form delivers them.
+        var formChildren = children.GetValueOrDefault(formId) ?? [];
         foreach (var id in effectIds)
         {
             if (!formChildren.Contains(id))
                 return Fail("spellcraft-error-orphan", out error);
 
-            var effect = nodes[id];
-            var supported = form.TargetMode == SpellTargetMode.World
-                ? effect.WorldEvent != null
-                : effect.InstantEvent != null;
-            if (!supported)
+            if (!nodes[id].SupportsDelivery(form.Delivery))
                 return Fail("spellcraft-error-incompatible", out error);
         }
 
@@ -140,7 +176,11 @@ public static class SpellGraphCompiler
             steps[id] = new SpellStep { Glyph = nodes[id] };
 
         var costMultiplier = 1f;
+        var cooldownReduction = 0f;
+        var extraBolts = 0;
         var flatCost = form.Cost;
+        var amplifyCount = new Dictionary<SpellStep, int>();
+        var widenCount = new Dictionary<SpellStep, int>();
 
         foreach (var id in order)
         {
@@ -161,10 +201,20 @@ public static class SpellGraphCompiler
                     targets.Add(steps[effectId]);
             }
 
-            if (glyph.Augment == AugmentKind.Cheaper)
+            switch (glyph.Augment)
             {
-                costMultiplier *= glyph.Value;
-                continue;
+                case AugmentKind.Cheaper:
+                    costMultiplier *= glyph.Value;
+                    continue;
+                case AugmentKind.Quicken:
+                    cooldownReduction += glyph.Value;
+                    continue;
+                case AugmentKind.Split:
+                    if (form.Delivery != SpellDelivery.Bolt)
+                        return Fail("spellcraft-error-needs-bolt", out error);
+
+                    extraBolts += (int) MathF.Round(glyph.Value);
+                    continue;
             }
 
             foreach (var step in targets.Distinct())
@@ -174,14 +224,44 @@ public static class SpellGraphCompiler
                     case AugmentKind.Repeat:
                         step.Repeats += (int) MathF.Round(glyph.Value);
                         break;
+                    case AugmentKind.Linger:
+                        step.Repeats += (int) MathF.Round(glyph.Value);
+                        step.RepeatInterval = LingerIntervalSeconds;
+                        break;
                     case AugmentKind.Delay:
                         step.Delay += glyph.Value;
+                        break;
+                    case AugmentKind.Amplify:
+                        step.Magnitude += AmplifyStrength * glyph.Value;
+                        amplifyCount[step] = amplifyCount.GetValueOrDefault(step) + 1;
+                        break;
+                    case AugmentKind.Widen:
+                        step.RadiusBonus += glyph.Value;
+                        widenCount[step] = widenCount.GetValueOrDefault(step) + 1;
+                        break;
+                    case AugmentKind.Chain:
+                        step.ChainJumps += (int) MathF.Round(glyph.Value);
                         break;
                 }
             }
         }
 
+        if (extraBolts > MaxExtraBolts)
+            return Fail("spellcraft-error-too-many-bolts", out error);
+
         var total = flatCost;
+        var schools = new HashSet<string>();
+        var reagents = new List<SpellGlyphPrototype>();
+
+        foreach (var glyph in nodes.Values)
+        {
+            foreach (var school in glyph.Schools)
+                schools.Add(school);
+
+            if (glyph.Reagent != null && !reagents.Contains(glyph))
+                reagents.Add(glyph);
+        }
+
         foreach (var id in effectIds)
         {
             var step = steps[id];
@@ -191,9 +271,26 @@ public static class SpellGraphCompiler
             if (step.Delay > MaxDelaySeconds)
                 return Fail("spellcraft-error-too-slow", out error);
 
-            step.Cost = step.Glyph.Cost * (1f + (step.Repeats * RepeatCostFactor));
-            total += step.Cost;
+            if (amplifyCount.GetValueOrDefault(step) > MaxAmplifyPerEffect)
+                return Fail("spellcraft-error-too-strong", out error);
+
+            if (step.ChainJumps > MaxChainJumps)
+                return Fail("spellcraft-error-too-many-jumps", out error);
+
+            var cost = step.Glyph.Cost * (1f + (step.Repeats * RepeatCostFactor));
+            cost *= 1f + (amplifyCount.GetValueOrDefault(step) * AmplifyCostFactor);
+            cost *= 1f + (widenCount.GetValueOrDefault(step) * WidenCostFactor);
+            cost += step.ChainJumps * ChainCostPerJump;
+
+            if (affinities != null && step.Glyph.Schools.Any(affinities.Contains))
+                cost *= AffinityDiscount;
+
+            step.Cost = cost;
+            total += cost;
         }
+
+        if (extraBolts > 0)
+            total += form.Cost * SplitCostFactor * extraBolts;
 
         total = MathF.Max(1f, total * MathF.Max(MinCostMultiplier, costMultiplier));
 
@@ -202,6 +299,10 @@ public static class SpellGraphCompiler
             Form = form,
             Cost = MathF.Round(total, 1),
             Name = string.Join(" + ", effectIds.Select(id => Loc.GetString(nodes[id].Name))),
+            ProjectileCount = 1 + extraBolts,
+            CooldownMultiplier = 1f - MathF.Min(MaxCooldownReduction, cooldownReduction),
+            Reagents = reagents,
+            Schools = schools,
         };
         foreach (var id in effectIds)
             plan.Steps.Add(steps[id]);

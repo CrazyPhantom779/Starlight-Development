@@ -1,183 +1,192 @@
 using System.Linq;
 using System.Numerics;
+using Content.Client._Starlight.Wizard.SpellGraph.Controls;
+using Content.Client.UserInterface.Controls;
+using Content.Shared._Starlight.Wizard.Casting;
 using Content.Shared._Starlight.Wizard.SpellGraph;
+using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
-using Robust.Client.UserInterface.CustomControls;
-using Robust.Shared.Prototypes;
+using SpellGraphData = Content.Shared._Starlight.Wizard.SpellGraph.SpellGraph;
 
 namespace Content.Client._Starlight.Wizard.SpellGraph;
 
 /// <summary>
-/// Glyphwork editor: pick glyphs from the palette to build an ordered chain (Form, then Effects, with Augments
-/// applying to the Effect before them), see the live cost, then weave it into a spell.
-/// All validation is done by the shared <see cref="SpellGraphCompiler"/>; the server re-checks everything.
+/// The spellweaving window: one tab per discipline the wizard has mastered, a Wind meter, the schools they are
+/// attuned to, and the list of spells they currently hold.
 /// </summary>
-public sealed partial class SpellcraftWindow : DefaultWindow
+public sealed class SpellcraftWindow : FancyWindow
 {
-    [Dependency] private IPrototypeManager _proto = default!;
-
-    public event Action<List<string>>? OnWeave;
+    public event Action<SpellGraphData, SpellDiscipline, SpellOutput>? OnWeave;
+    public event Action<string>? OnRote;
     public event Action<NetEntity>? OnForget;
+    public event Action? OnDrawCard;
+    public event Action? OnCircle;
+    public event Action<string>? OnRite;
+    public event Action? OnRefresh;
 
-    private readonly BoxContainer _palette = new() { Orientation = BoxContainer.LayoutOrientation.Vertical };
-    private readonly BoxContainer _chainBox = new() { Orientation = BoxContainer.LayoutOrientation.Horizontal, SeparationOverride = 4 };
-    private readonly Label _preview = new() { Text = string.Empty };
-    private readonly Label _error = new() { Modulate = Color.OrangeRed };
-    private readonly Label _wind = new();
-    private readonly Button _weave = new() { Text = Loc.GetString("spellcraft-ui-weave"), Disabled = true };
-    private readonly Button _clear = new() { Text = Loc.GetString("spellcraft-ui-clear") };
-    private readonly BoxContainer _spellList = new() { Orientation = BoxContainer.LayoutOrientation.Vertical };
+    private readonly WindBar _wind = new() { HorizontalExpand = true };
+    private readonly BoxContainer _schools = ArcaneUi.Row(8);
+    private readonly BoxContainer _tabs = ArcaneUi.Row(2);
+    private readonly Control _body = new() { VerticalExpand = true, HorizontalExpand = true };
+    private readonly BoxContainer _spellList = ArcaneUi.Column(2);
+    private readonly Label _note = new() { FontColorOverride = ArcaneTheme.TextDim };
 
-    private readonly List<string> _chain = [];
+    private readonly Dictionary<SpellDiscipline, Control> _views = [];
+    private readonly Dictionary<SpellDiscipline, ArcaneButton> _tabButtons = [];
+    private SpellDiscipline? _active;
     private SpellcraftBuiState? _state;
+    private List<SpellDiscipline> _tabOrder = [];
 
     public SpellcraftWindow()
     {
-        IoCManager.InjectDependencies(this);
-
         Title = Loc.GetString("spellcraft-ui-title");
-        MinSize = new Vector2(620, 460);
-        SetSize = new Vector2(700, 520);
+        MinSize = new Vector2(780, 560);
+        SetSize = new Vector2(900, 660);
 
-        var root = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Vertical, VerticalExpand = true, HorizontalExpand = true, SeparationOverride = 6 };
+        var root = ArcaneUi.Column(6);
 
-        root.AddChild(_wind);
-        root.AddChild(new Label { Text = Loc.GetString("spellcraft-ui-palette") });
-        root.AddChild(new ScrollContainer { MinHeight = 170, HScrollEnabled = false, Children = { _palette } });
+        var header = ArcaneUi.Row(12);
+        header.AddChild(_wind);
+        header.AddChild(_schools);
+        root.AddChild(new ArcanePanel(raised: true, margin: 4f) { Children = { header } });
 
-        root.AddChild(new Label { Text = Loc.GetString("spellcraft-ui-chain") });
-        root.AddChild(new ScrollContainer { MinHeight = 44, VScrollEnabled = false, Children = { _chainBox } });
-        root.AddChild(_preview);
-        root.AddChild(_error);
+        root.AddChild(_tabs);
+        root.AddChild(new ArcanePanel(margin: 8f) { VerticalExpand = true, HorizontalExpand = true, Children = { _body } });
 
-        var buttons = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, SeparationOverride = 6 };
-        buttons.AddChild(_weave);
-        buttons.AddChild(_clear);
-        root.AddChild(buttons);
-
-        root.AddChild(new Label { Text = Loc.GetString("spellcraft-ui-spells") });
-        root.AddChild(new ScrollContainer { MinHeight = 90, VerticalExpand = true, HScrollEnabled = false, Children = { _spellList } });
-
-        Contents.AddChild(root);
-
-        _weave.OnPressed += _ => OnWeave?.Invoke([.. _chain]);
-        _clear.OnPressed += _ =>
+        root.AddChild(ArcaneUi.Heading(Loc.GetString("spellcraft-ui-spells")));
+        root.AddChild(new ArcanePanel(margin: 4f)
         {
-            _chain.Clear();
-            RefreshChain();
-        };
+            Children = { new ScrollContainer { MinHeight = 74, MaxHeight = 110, HScrollEnabled = false, Children = { _spellList } } },
+        });
+        root.AddChild(_note);
+
+        ContentsContainer.AddChild(new ArcanePanel(margin: 8f)
+        {
+            VerticalExpand = true,
+            HorizontalExpand = true,
+            PanelOverride = ArcaneTheme.Box(ArcaneTheme.Background, ArcaneTheme.Border, 0f, 8f),
+            Children = { root },
+        });
     }
+
+    // Used by the editors and views.
+    public void Weave(SpellGraphData graph, SpellDiscipline discipline, SpellOutput output) => OnWeave?.Invoke(graph, discipline, output);
+    public void SendRote(string id) => OnRote?.Invoke(id);
+    public void SendDrawCard() => OnDrawCard?.Invoke();
+    public void SendCircle() => OnCircle?.Invoke();
+    public void SendRite(string id) => OnRite?.Invoke(id);
+    public void SendRefresh() => OnRefresh?.Invoke();
 
     public void UpdateState(SpellcraftBuiState state)
     {
         _state = state;
-        _wind.Text = Loc.GetString("spellcraft-ui-wind", ("wind", MathF.Round(state.Wind)), ("max", MathF.Round(state.WindMax)));
+        _wind.Set(state.Wind, state.WindMax);
 
-        BuildPalette();
-        BuildSpellList();
-        RefreshChain();
+        _schools.RemoveAllChildren();
+        _schools.AddChild(new Label { Text = Loc.GetString("spellcraft-ui-attuned"), FontColorOverride = ArcaneTheme.TextDim, VerticalAlignment = VAlignment.Center });
+        if (state.Schools.Count == 0)
+            _schools.AddChild(new Label { Text = Loc.GetString("spellcraft-ui-attuned-none"), FontColorOverride = ArcaneTheme.TextDim, VerticalAlignment = VAlignment.Center });
+
+        foreach (var school in state.Schools.OrderBy(s => s))
+        {
+            _schools.AddChild(new Label
+            {
+                Text = Loc.GetString($"spellcraft-school-{school.ToLowerInvariant()}"),
+                FontColorOverride = ArcaneTheme.SchoolColor(school),
+                VerticalAlignment = VAlignment.Center,
+            });
+        }
+
+        BuildTabs(state);
+        BuildSpellList(state);
+
+        foreach (var (discipline, view) in _views)
+        {
+            if (view is ISpellcraftView updatable)
+                updatable.UpdateState(state);
+        }
     }
 
-    private void BuildPalette()
+    private Control CreateView(SpellDiscipline discipline)
+        => discipline switch
+        {
+            SpellDiscipline.Rote => new RoteView(this),
+            SpellDiscipline.Glyphwork => new ChainEditor(this, SpellDiscipline.Glyphwork, ChainInput.Palette, SpellOutput.Action),
+            SpellDiscipline.Sigil => new ChainEditor(this, SpellDiscipline.Sigil, ChainInput.Sigil, SpellOutput.Action),
+            SpellDiscipline.Circuit => new GraphEditor(this),
+            SpellDiscipline.Wandwright => new ObjectView(this, SpellDiscipline.Wandwright),
+            SpellDiscipline.Artifice => new ObjectView(this, SpellDiscipline.Artifice),
+            SpellDiscipline.Tarot => new TarotView(this),
+            _ => new RitualView(this),
+    };
+
+    private void BuildTabs(SpellcraftBuiState state)
     {
-        _palette.RemoveAllChildren();
-        if (_state == null)
+        var order = state.Disciplines.Distinct().OrderBy(d => (int) d).ToList();
+        if (order.SequenceEqual(_tabOrder))
             return;
 
-        var glyphs = _state.Glyphs
-            .Select(id => _proto.TryIndex<SpellGlyphPrototype>(id, out var g) ? g : null)
-            .Where(g => g != null)
-            .Select(g => g!)
-            .ToList();
+        _tabOrder = order;
+        _tabs.RemoveAllChildren();
+        _tabButtons.Clear();
 
-        foreach (var category in new[] { GlyphCategory.Form, GlyphCategory.Effect, GlyphCategory.Augment })
+        foreach (var discipline in order)
         {
-            var row = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Vertical };
-            row.AddChild(new Label { Text = Loc.GetString($"spellcraft-ui-category-{category.ToString().ToLowerInvariant()}"), Modulate = Color.LightGray });
-
-            var wrap = new WrapContainer();
-            foreach (var glyph in glyphs.Where(g => g.Category == category).OrderBy(g => Loc.GetString(g.Name)))
+            if (!_views.ContainsKey(discipline))
             {
-                var id = glyph.ID;
-                var button = new Button
-                {
-                    Text = $"{Loc.GetString(glyph.Name)} ({glyph.Cost})",
-                    ToolTip = glyph.Description is { } desc ? Loc.GetString(desc) : null,
-                    MinWidth = 90,
-                };
-                button.OnPressed += _ =>
-                {
-                    _chain.Add(id);
-                    RefreshChain();
-                };
-                wrap.AddChild(button);
+                var view = CreateView(discipline);
+                view.Visible = false;
+                _views[discipline] = view;
+                _body.AddChild(view);
             }
 
-            row.AddChild(wrap);
-            _palette.AddChild(row);
-        }
-    }
-
-    private void RefreshChain()
-    {
-        _chainBox.RemoveAllChildren();
-
-        for (var i = 0; i < _chain.Count; i++)
-        {
-            var index = i;
-            var name = _proto.TryIndex<SpellGlyphPrototype>(_chain[i], out var g) ? Loc.GetString(g.Name) : _chain[i];
-            var button = new Button { Text = name, ToolTip = Loc.GetString("spellcraft-ui-remove-tip") };
-            button.OnPressed += _ =>
+            var button = new ArcaneButton(Loc.GetString($"spellcraft-discipline-{discipline.ToString().ToLowerInvariant()}"), toggle: true)
             {
-                _chain.RemoveAt(index);
-                RefreshChain();
+                ToolTip = Loc.GetString($"spellcraft-discipline-{discipline.ToString().ToLowerInvariant()}-desc"),
+                MinSize = new Vector2(92, 30),
             };
-            _chainBox.AddChild(button);
+            var target = discipline;
+            button.OnPressed += _ => Select(target);
+            _tabs.AddChild(button);
+            _tabButtons[discipline] = button;
         }
 
-        UpdatePreview();
+        Select(_active is { } current && order.Contains(current) ? current : order.FirstOrDefault());
     }
 
-    private void UpdatePreview()
+    private void Select(SpellDiscipline discipline)
     {
-        _preview.Text = string.Empty;
-        _error.Text = string.Empty;
-        _weave.Disabled = true;
+        _active = discipline;
+        foreach (var (key, view) in _views)
+            view.Visible = key == discipline;
 
-        if (_state == null || _chain.Count == 0)
-            return;
+        foreach (var (key, button) in _tabButtons)
+            button.Pressed = key == discipline;
 
-        var known = _state.Glyphs.Select(id => new ProtoId<SpellGlyphPrototype>(id)).ToList();
-        var ids = _chain.Select(id => new ProtoId<SpellGlyphPrototype>(id));
-        if (!SpellGraphCompiler.TryBuildChain(_proto, ids, out var graph, out var error)
-            || !SpellGraphCompiler.TryCompile(_proto, graph, _state.MaxNodes, known, out var plan, out error))
-        {
-            _error.Text = error ?? string.Empty;
-            return;
-        }
-
-        _preview.Text = Loc.GetString("spellcraft-ui-preview", ("name", plan.Name), ("cost", plan.Cost));
-        _weave.Disabled = _state.Spells.Count >= _state.MaxSpells;
-        if (_weave.Disabled)
-            _error.Text = Loc.GetString("spellcraft-error-too-many-spells");
+        _note.Text = Loc.GetString($"spellcraft-discipline-{discipline.ToString().ToLowerInvariant()}-desc");
     }
 
-    private void BuildSpellList()
+    private void BuildSpellList(SpellcraftBuiState state)
     {
         _spellList.RemoveAllChildren();
-        if (_state == null)
-            return;
+        if (state.Spells.Count == 0)
+            _spellList.AddChild(ArcaneUi.Dim(Loc.GetString("spellcraft-ui-spells-none")));
 
-        foreach (var spell in _state.Spells)
+        foreach (var spell in state.Spells)
         {
-            var row = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, SeparationOverride = 6 };
-            row.AddChild(new Label { Text = $"{spell.Name} ({spell.Cost})", HorizontalExpand = true });
+            var row = ArcaneUi.Row(6);
+            row.AddChild(new Label
+            {
+                Text = $"{spell.Name} ({spell.Cost:0.#})",
+                FontColorOverride = ArcaneTheme.Text,
+                HorizontalExpand = true,
+                ClipText = true,
+            });
 
-            var forget = new Button { Text = Loc.GetString("spellcraft-ui-forget") };
+            var forget = new ArcaneButton(Loc.GetString("spellcraft-ui-forget")) { MinSize = new Vector2(70, 22) };
             var action = spell.Action;
             forget.OnPressed += _ => OnForget?.Invoke(action);
             row.AddChild(forget);
-
             _spellList.AddChild(row);
         }
     }

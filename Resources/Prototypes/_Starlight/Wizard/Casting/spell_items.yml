@@ -1,0 +1,92 @@
+# Objects that hold woven spells. See SpellItemComponent: wands, scrolls and cards differ only in slots and charges.
+- type: entity
+  parent: BaseItem
+  id: SpellWandBlank
+  name: wand
+  description: A slender wand. A wandwright can bind a few spells into it, and it casts them for whoever holds it.
+  components:
+  - type: Sprite
+    sprite: Objects/Weapons/Guns/Basic/staves.rsi
+    layers:
+    - state: nothing
+    - state: nothing-unshaded
+      shader: unshaded
+  - type: Item
+    size: Normal
+    inhandVisuals:
+      left:
+      - state: staff-inhand-left
+      - state: staff-inhand-left-unshaded
+        shader: unshaded
+      right:
+      - state: staff-inhand-right
+      - state: staff-inhand-right-unshaded
+        shader: unshaded
+  - type: PointLight
+    enabled: true
+    radius: 1.6
+    energy: 1.2
+    color: "#b07cff"
+  - type: SpellItem
+    kind: Wand
+    slots: 3
+    payWind: true
+    cooldownSeconds: 1
+
+- type: entity
+  parent: BaseItem
+  id: SpellScrollBlank
+  name: spell scroll
+  description: A scroll inscribed with a single spell. It crumbles after use.
+  components:
+  - type: Sprite
+    sprite: Objects/Misc/bureaucracy.rsi
+    state: paper_talisman
+  - type: Item
+    size: Tiny
+  - type: SpellItem
+    kind: Scroll
+    slots: 1
+    charges: 1
+    consumeWhenEmpty: true
+    cooldownSeconds: 0.5
+
+- type: entity
+  parent: BaseItem
+  id: TarotSpellCardBase
+  abstract: true
+  name: tarot card
+  description: A card from a deck that was never printed.
+  components:
+  - type: Sprite
+    sprite: _Moffstation/Objects/Misc/Cards/card_tarot.rsi
+    state: singlecard_down_tarot
+  - type: Item
+    size: Tiny
+  - type: SpellItem
+    kind: Card
+    slots: 1
+    charges: 1
+    consumeWhenEmpty: true
+    cooldownSeconds: 0.5
+
+- type: entity
+  parent: BaseRune
+  id: RitualCircle
+  name: ritual circle
+  description: A circle of lines that do not sit flat. Things laid inside it are noticed.
+  components:
+  - type: Sprite
+    sprite: Structures/Magic/Cult/rune.rsi
+    scale: 2.2, 2.2
+    layers:
+    - state: cult5
+      color: "#b07cff"
+  - type: PointLight
+    radius: 2.5
+    energy: 1.5
+    color: "#b07cff"
+    castShadows: false
+  - type: TimedDespawn
+    lifetime: 900
+  - type: RitualCircle

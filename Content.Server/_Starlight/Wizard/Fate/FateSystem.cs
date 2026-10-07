@@ -1,6 +1,7 @@
 using System.Linq;
 using Content.Server.Chat.Managers;
 using Content.Server._Starlight.Wizard.SpellGraph;
+using Content.Shared._Starlight.Wizard.Casting;
 using Content.Shared._Starlight.Wizard.Fate;
 using Content.Shared._Starlight.Wizard.SpellGraph;
 using Content.Shared._Starlight.Wizard.Wind;
@@ -31,8 +32,16 @@ public sealed partial class FateSystem : EntitySystem
     [Dependency] private SpellGraphSystem _spells = default!;
 
     private static readonly EntProtoId _tome = "SpellweaverTome";
+    private static readonly EntProtoId _wand = "SpellWandBlank";
+
+    private static readonly string[] _basicForms = ["FormAimed", "FormSelf", "FormBolt", "FormTouch", "FormBurst"];
     private const int AspectCount = 2;
-    private const int StartingEffects = 4;
+    private const int StartingSchools = 2;
+    private const int StartingSchoolEffects = 4;
+    private const int StartingOtherEffects = 3;
+    private const int StartingDisciplines = 2;
+    private const int StartingRotes = 5;
+    private const int StartingPrimer = 2;
     private const int StartingAugments = 2;
 
     [SubscribeLocalEvent]
@@ -143,12 +152,27 @@ public sealed partial class FateSystem : EntitySystem
         var craft = EnsureComp<SpellcraftComponent>(body);
         var glyphs = _proto.EnumeratePrototypes<SpellGlyphPrototype>().ToList();
 
-        foreach (var form in glyphs.Where(g => g.Category == GlyphCategory.Form))
-            craft.Glyphs.Add(form.ID);
+        // Everyone learns the basic Forms. One extra, rarer Form is rolled.
+        foreach (var form in _basicForms)
+            craft.Glyphs.Add(form);
 
+        var extraForms = glyphs.Where(g => g.Category == GlyphCategory.Form && !craft.Glyphs.Contains(g.ID)).ToList();
+        if (extraForms.Count > 0)
+            craft.Glyphs.Add(_random.Pick(extraForms).ID);
+
+        // Two schools they are attuned to: glyphs of these cost less.
+        var schools = glyphs.SelectMany(g => g.Schools).Distinct().ToList();
+        _random.Shuffle(schools);
+        foreach (var school in schools.Take(StartingSchools))
+            craft.Schools.Add(school);
+
+        // Effects: a few from their schools, a few from anywhere.
         var effects = glyphs.Where(g => g.Category == GlyphCategory.Effect).ToList();
         _random.Shuffle(effects);
-        foreach (var effect in effects.Take(StartingEffects))
+        foreach (var effect in effects.Where(e => e.Schools.Any(craft.Schools.Contains)).Take(StartingSchoolEffects))
+            craft.Glyphs.Add(effect.ID);
+
+        foreach (var effect in effects.Where(e => !craft.Glyphs.Contains(e.ID)).Take(StartingOtherEffects))
             craft.Glyphs.Add(effect.ID);
 
         var augments = glyphs.Where(g => g.Category == GlyphCategory.Augment).ToList();
@@ -156,42 +180,55 @@ public sealed partial class FateSystem : EntitySystem
         foreach (var augment in augments.Take(StartingAugments))
             craft.Glyphs.Add(augment.ID);
 
+        // Two ways of working magic beyond the basics.
+        var disciplines = Enum.GetValues<SpellDiscipline>().Where(d => !craft.Disciplines.Contains(d)).ToList();
+        _random.Shuffle(disciplines);
+        foreach (var discipline in disciplines.Take(StartingDisciplines))
+            craft.Disciplines.Add(discipline);
+
+        // Prepared spells.
+        var rotes = _proto.EnumeratePrototypes<RoteSpellPrototype>().ToList();
+        _random.Shuffle(rotes);
+        foreach (var rote in rotes.Take(StartingRotes))
+            craft.Rotes.Add(rote.ID);
+
         Dirty(body, craft);
 
         var tome = Spawn(_tome, Transform(body).Coordinates);
         _hands.TryPickupAnyHand(body, tome);
+
+        if (craft.Disciplines.Contains(SpellDiscipline.Wandwright))
+            _hands.TryPickupAnyHand(body, Spawn(_wand, Transform(body).Coordinates));
 
         WeavePrimer(body, craft);
     }
 
     /// <summary>
     /// Gives a couple of ready-to-use spells so a new wizard can cast immediately without opening the tome.
-    /// Built from the glyphs they were just granted: one aimed spell and, if possible, one self-centred one.
+    /// These are two of their prepared spells.
     /// </summary>
     private void WeavePrimer(EntityUid body, SpellcraftComponent craft)
     {
-        var known = craft.Glyphs.Select(id => _proto.Index(id)).ToList();
+        var known = craft.Rotes.Select(id => _proto.Index(id)).ToList();
+        _random.Shuffle(known);
 
-        WeaveOne(body, known, "FormAimed", g => g.WorldEvent != null);
-        WeaveOne(body, known, "FormSelf", g => g.InstantEvent != null);
-    }
-
-    private void WeaveOne(EntityUid body, List<SpellGlyphPrototype> known, string form, Func<SpellGlyphPrototype, bool> effectFilter)
-    {
-        var effects = known.Where(g => g.Category == GlyphCategory.Effect && effectFilter(g)).ToList();
-        if (effects.Count == 0 || known.All(g => g.ID != form))
-            return;
-
-        var effect = _random.Pick(effects);
-        var chain = new List<ProtoId<SpellGlyphPrototype>> { form, effect.ID };
-        if (SpellGraphCompiler.TryBuildChain(_proto, chain, out var graph, out _))
-            _spells.TryCreateSpell(body, graph, out _, out _);
+        foreach (var rote in known.Take(StartingPrimer))
+        {
+            if (SpellGraphCompiler.TryBuildChain(_proto, rote.Chain, out var graph, out _))
+                _spells.TryCreateSpell(body, graph, SpellDiscipline.Rote, ignoreKnown: true, out _, out _);
+        }
     }
 
     private void Announce(EntityUid body, List<AspectPrototype> aspects, int instability)
     {
         var lines = aspects.Select(a => $"- {Loc.GetString(a.Name)}: {Loc.GetString(a.Description)}");
         var message = Loc.GetString("fate-announce", ("instability", instability), ("aspects", string.Join("\n", lines)));
+        if (TryComp<SpellcraftComponent>(body, out var craft))
+        {
+            var disciplines = string.Join(", ", craft.Disciplines.Select(d => Loc.GetString($"spellcraft-discipline-{d.ToString().ToLowerInvariant()}")));
+            var schools = string.Join(", ", craft.Schools.Select(s => Loc.GetString($"spellcraft-school-{s.ToLowerInvariant()}")));
+            message += "\n" + Loc.GetString("fate-announce-kit", ("disciplines", disciplines), ("schools", schools));
+        }
 
         _popup.PopupEntity(Loc.GetString("fate-popup"), body, body, PopupType.LargeCaution);
         if (TryComp<ActorComponent>(body, out var actor))

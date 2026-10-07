@@ -1,0 +1,218 @@
+{
+  "version": 1,
+  "license": "CC0-1.0",
+  "copyright": "Generated for the Starlight wizard rework.",
+  "size": {
+    "x": 48,
+    "y": 48
+  },
+  "states": [
+    {
+      "name": "FormAimed"
+    },
+    {
+      "name": "FormSelf"
+    },
+    {
+      "name": "FormBolt"
+    },
+    {
+      "name": "FormOrb"
+    },
+    {
+      "name": "FormLance"
+    },
+    {
+      "name": "FormTouch"
+    },
+    {
+      "name": "FormBurst"
+    },
+    {
+      "name": "FormNova"
+    },
+    {
+      "name": "FormRune"
+    },
+    {
+      "name": "AugmentEcho"
+    },
+    {
+      "name": "AugmentReverb"
+    },
+    {
+      "name": "AugmentDelay"
+    },
+    {
+      "name": "AugmentSlowFuse"
+    },
+    {
+      "name": "AugmentFrugal"
+    },
+    {
+      "name": "AugmentMiser"
+    },
+    {
+      "name": "AugmentAmplify"
+    },
+    {
+      "name": "AugmentWiden"
+    },
+    {
+      "name": "AugmentFork"
+    },
+    {
+      "name": "AugmentTwin"
+    },
+    {
+      "name": "AugmentChain"
+    },
+    {
+      "name": "AugmentLinger"
+    },
+    {
+      "name": "AugmentQuicken"
+    },
+    {
+      "name": "EffectFlame"
+    },
+    {
+      "name": "EffectScorch"
+    },
+    {
+      "name": "EffectInferno"
+    },
+    {
+      "name": "EffectBlast"
+    },
+    {
+      "name": "EffectFlameRune"
+    },
+    {
+      "name": "EffectPowderRune"
+    },
+    {
+      "name": "EffectEruption"
+    },
+    {
+      "name": "EffectFirebolt"
+    },
+    {
+      "name": "EffectFireball"
+    },
+    {
+      "name": "EffectFireOrb"
+    },
+    {
+      "name": "EffectFireArrows"
+    },
+    {
+      "name": "EffectChill"
+    },
+    {
+      "name": "EffectFrostbite"
+    },
+    {
+      "name": "EffectFreezeRune"
+    },
+    {
+      "name": "EffectIcePillars"
+    },
+    {
+      "name": "EffectSummonIce"
+    },
+    {
+      "name": "EffectIceShard"
+    },
+    {
+      "name": "EffectIceOrb"
+    },
+    {
+      "name": "EffectIceStorm"
+    },
+    {
+      "name": "EffectArcticGlare"
+    },
+    {
+      "name": "EffectShock"
+    },
+    {
+      "name": "EffectStatic"
+    },
+    {
+      "name": "EffectStormcall"
+    },
+    {
+      "name": "EffectStunRune"
+    },
+    {
+      "name": "EffectMend"
+    },
+    {
+      "name": "EffectRenew"
+    },
+    {
+      "name": "EffectWideMend"
+    },
+    {
+      "name": "EffectFlashRune"
+    },
+    {
+      "name": "EffectWisp"
+    },
+    {
+      "name": "EffectCleansingSmoke"
+    },
+    {
+      "name": "EffectHaemostatic"
+    },
+    {
+      "name": "EffectImpact"
+    },
+    {
+      "name": "EffectShove"
+    },
+    {
+      "name": "EffectPull"
+    },
+    {
+      "name": "EffectForceWall"
+    },
+    {
+      "name": "EffectSmoke"
+    },
+    {
+      "name": "EffectKnock"
+    },
+    {
+      "name": "EffectRepulse"
+    },
+    {
+      "name": "EffectBlink"
+    },
+    {
+      "name": "EffectStep"
+    },
+    {
+      "name": "EffectFold"
+    },
+    {
+      "name": "EffectVenom"
+    },
+    {
+      "name": "EffectMagicarp"
+    },
+    {
+      "name": "EffectDrain"
+    },
+    {
+      "name": "EffectDecay"
+    },
+    {
+      "name": "EffectSiphonWind"
+    },
+    {
+      "name": "EffectReplenish"
+    }
+  ]
+}

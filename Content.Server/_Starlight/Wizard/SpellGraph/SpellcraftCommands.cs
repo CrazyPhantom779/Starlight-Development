@@ -24,8 +24,8 @@ public sealed partial class SpellcraftGlyphsCommand : LocalizedEntityCommands
         {
             var detail = glyph.Category switch
             {
-                GlyphCategory.Form => glyph.TargetMode.ToString(),
-                GlyphCategory.Effect => (glyph.WorldEvent != null ? "world " : "") + (glyph.InstantEvent != null ? "self" : ""),
+                GlyphCategory.Form => glyph.Delivery.ToString(),
+                GlyphCategory.Effect => glyph.Effects.Count > 0 ? "universal" : (glyph.WorldEvent != null ? "aimed only" : "self/burst only"),
                 _ => $"{glyph.Augment} {glyph.Value}",
             };
             shell.WriteLine($"{glyph.Category,-8} {glyph.ID,-24} cost {glyph.Cost,5}  {detail}");
