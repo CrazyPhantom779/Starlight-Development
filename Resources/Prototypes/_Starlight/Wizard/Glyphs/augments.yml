@@ -133,6 +133,17 @@
   value: 3
 
 - type: spellGlyph
+  id: AugmentSwift
+  category: Augment
+  name: glyph-augmentswift-name
+  description: glyph-augmentswift-desc
+  cost: 6
+  sigil: "3-0-4-7-8"
+  icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: AugmentSwift }
+  augment: Quicken
+  value: 0.5
+
+- type: spellGlyph
   id: AugmentQuicken
   category: Augment
   name: glyph-augmentquicken-name

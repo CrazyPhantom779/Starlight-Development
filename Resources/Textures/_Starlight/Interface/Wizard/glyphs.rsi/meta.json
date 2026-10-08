@@ -32,6 +32,9 @@
       "name": "FormNova"
     },
     {
+      "name": "FormBeam"
+    },
+    {
       "name": "FormRune"
     },
     {
@@ -69,6 +72,9 @@
     },
     {
       "name": "AugmentLinger"
+    },
+    {
+      "name": "AugmentSwift"
     },
     {
       "name": "AugmentQuicken"
@@ -213,6 +219,45 @@
     },
     {
       "name": "EffectReplenish"
+    },
+    {
+      "name": "EffectBrand"
+    },
+    {
+      "name": "EffectMire"
+    },
+    {
+      "name": "EffectJolt"
+    },
+    {
+      "name": "EffectSmite"
+    },
+    {
+      "name": "EffectQuickening"
+    },
+    {
+      "name": "EffectPurge"
+    },
+    {
+      "name": "EffectLeap"
+    },
+    {
+      "name": "EffectSlam"
+    },
+    {
+      "name": "EffectGale"
+    },
+    {
+      "name": "EffectBanana"
+    },
+    {
+      "name": "EffectWeb"
+    },
+    {
+      "name": "EffectHex"
+    },
+    {
+      "name": "EffectWither"
     }
   ]
 }

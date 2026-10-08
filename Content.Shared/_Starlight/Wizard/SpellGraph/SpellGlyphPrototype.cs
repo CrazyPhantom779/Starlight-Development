@@ -47,6 +47,9 @@ public enum SpellDelivery : byte
 
     /// <summary>A rune placed at the clicked point that triggers when something steps on it.</summary>
     Rune,
+
+    /// <summary>A line of effect from the caster toward the clicked point, stopped by walls.</summary>
+    Line,
 }
 
 public enum AugmentKind : byte

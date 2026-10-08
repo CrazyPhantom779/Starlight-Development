@@ -76,7 +76,13 @@ public sealed class SpellcraftBuiState(
     float tarotCost,
     float circleCost,
     bool circleNearby,
-    List<RitualInfo> rituals) : BoundUserInterfaceState
+    List<RitualInfo> rituals,
+    Dictionary<string, float> tides,
+    float regen,
+    bool hurt,
+    int power,
+    int maxPower,
+    List<ErrandInfo> errands) : BoundUserInterfaceState
 {
     public readonly List<string> Glyphs = glyphs;
     public readonly List<SpellDiscipline> Disciplines = disciplines;
@@ -102,6 +108,14 @@ public sealed class SpellcraftBuiState(
     public readonly float CircleCost = circleCost;
     public readonly bool CircleNearby = circleNearby;
     public readonly List<RitualInfo> Rituals = rituals;
+
+    // Randomisation and growth
+    public readonly Dictionary<string, float> Tides = tides;
+    public readonly float Regen = regen;
+    public readonly bool Hurt = hurt;
+    public readonly int Power = power;
+    public readonly int MaxPower = maxPower;
+    public readonly List<ErrandInfo> Errands = errands;
 }
 
 /// <summary>Weave a graph with a given discipline and put the result somewhere.</summary>

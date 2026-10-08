@@ -90,6 +90,17 @@
   radius: 4.5
 
 - type: spellGlyph
+  id: FormBeam
+  category: Form
+  name: glyph-formbeam-name
+  description: glyph-formbeam-desc
+  cost: 8
+  sigil: "5-4-3-7-6"
+  icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: FormBeam }
+  delivery: Line
+  range: 9
+
+- type: spellGlyph
   id: FormRune
   category: Form
   name: glyph-formrune-name

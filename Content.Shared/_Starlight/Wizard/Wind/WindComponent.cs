@@ -21,7 +21,7 @@ public sealed partial class WindComponent : Component
 
     /// <summary>Wind regained per second.</summary>
     [DataField, AutoNetworkedField]
-    public float RegenPerSecond = 2f;
+    public float RegenPerSecond = 1.6f;
 
     /// <summary>
     /// How far below zero Wind may be pushed ("overcasting"). Overcasting can trigger Gusts.
@@ -36,6 +36,13 @@ public sealed partial class WindComponent : Component
     /// <summary>Multiplies regeneration. Used by Aspects.</summary>
     [DataField, AutoNetworkedField]
     public float RegenMultiplier = 1f;
+
+    /// <summary>
+    /// Wounds slow Wind recovery. 1 means unhurt; it falls toward <c>0.2</c> as the wizard nears critical condition.
+    /// Kept up to date by the server when damage changes.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public float HurtFactor = 1f;
 
     /// <summary>Multiplies the chance of a Gust when overcasting. Used by Aspects.</summary>
     [DataField, AutoNetworkedField]

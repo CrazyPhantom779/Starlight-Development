@@ -76,3 +76,12 @@ spellcraft-school-ender = Ender
 spellcraft-school-nature = Nature
 spellcraft-school-blood = Blood
 spellcraft-school-eldritch = Eldritch
+
+tide-hot = The winds of {$school} run hot. Its glyphs cost more for a while.
+tide-cool = The winds of {$school} run cool. Its glyphs cost less for a while.
+spellcraft-ui-tides = Tides
+spellcraft-ui-tides-tip = How hard each school is to cast from right now. Below 1.0 is cheaper, above is dearer. They drift every few minutes.
+spellcraft-ui-regen = Recovering {$rate} Wind per second
+spellcraft-ui-regen-hurt = Recovering {$rate} Wind per second (your wounds are slowing it)
+spellcraft-ui-power = Mastery {$power}
+spellcraft-delivery-line = A line of effect from you toward the point

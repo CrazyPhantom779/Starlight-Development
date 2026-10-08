@@ -11,11 +11,13 @@ using SpellGraphData = Content.Shared._Starlight.Wizard.SpellGraph.SpellGraph;
 namespace Content.Client._Starlight.Wizard.SpellGraph;
 
 /// <summary>
-/// The spellweaving window: one tab per discipline the wizard has mastered, a Wind meter, the schools they are
-/// attuned to, and the list of spells they currently hold.
+/// The spellweaving window: one tab per discipline the wizard has mastered plus Errands, a Wind meter, the
+/// schools they are attuned to with this moment's tides, and the list of spells they currently hold.
 /// </summary>
 public sealed class SpellcraftWindow : FancyWindow
 {
+    private const string ErrandsKey = "Errands";
+
     public event Action<SpellGraphData, SpellDiscipline, SpellOutput>? OnWeave;
     public event Action<string>? OnRote;
     public event Action<NetEntity>? OnForget;
@@ -25,39 +27,56 @@ public sealed class SpellcraftWindow : FancyWindow
     public event Action? OnRefresh;
 
     private readonly WindBar _wind = new() { HorizontalExpand = true };
+    private readonly Label _mastery = new() { FontColorOverride = ArcaneTheme.Gold, VerticalAlignment = VAlignment.Center };
     private readonly BoxContainer _schools = ArcaneUi.Row(8);
+    private readonly WrapContainer _tides = new() { HorizontalExpand = true };
     private readonly BoxContainer _tabs = ArcaneUi.Row(2);
     private readonly Control _body = new() { VerticalExpand = true, HorizontalExpand = true };
     private readonly BoxContainer _spellList = ArcaneUi.Column(2);
+    private readonly KeptScroll _spellScroll = new() { MinHeight = 56, MaxHeight = 96 };
     private readonly Label _note = new() { FontColorOverride = ArcaneTheme.TextDim };
 
-    private readonly Dictionary<SpellDiscipline, Control> _views = [];
-    private readonly Dictionary<SpellDiscipline, ArcaneButton> _tabButtons = [];
-    private SpellDiscipline? _active;
-    private SpellcraftBuiState? _state;
-    private List<SpellDiscipline> _tabOrder = [];
+    private readonly Dictionary<string, Control> _views = [];
+    private readonly Dictionary<string, ArcaneButton> _tabButtons = [];
+    private string? _active;
+    private string _spellSignature = string.Empty;
+    private List<string> _tabOrder = [];
 
     public SpellcraftWindow()
     {
         Title = Loc.GetString("spellcraft-ui-title");
-        MinSize = new Vector2(780, 560);
-        SetSize = new Vector2(900, 660);
+
+        // Small enough for modest screens; everything inside scrolls.
+        MinSize = new Vector2(700, 480);
+        SetSize = new Vector2(860, 620);
 
         var root = ArcaneUi.Column(6);
 
-        var header = ArcaneUi.Row(12);
-        header.AddChild(_wind);
-        header.AddChild(_schools);
+        var header = ArcaneUi.Column(4);
+        var top = ArcaneUi.Row(12);
+        top.AddChild(_wind);
+        top.AddChild(_mastery);
+        top.AddChild(_schools);
+        header.AddChild(top);
+
+        var tideRow = ArcaneUi.Row(8);
+        tideRow.AddChild(new Label
+        {
+            Text = Loc.GetString("spellcraft-ui-tides"),
+            FontColorOverride = ArcaneTheme.TextDim,
+            VerticalAlignment = VAlignment.Center,
+            ToolTip = Loc.GetString("spellcraft-ui-tides-tip"),
+        });
+        tideRow.AddChild(_tides);
+        header.AddChild(tideRow);
         root.AddChild(new ArcanePanel(raised: true, margin: 4f) { Children = { header } });
 
-        root.AddChild(_tabs);
+        root.AddChild(new ScrollContainer { VScrollEnabled = false, Children = { _tabs } });
         root.AddChild(new ArcanePanel(margin: 8f) { VerticalExpand = true, HorizontalExpand = true, Children = { _body } });
 
         root.AddChild(ArcaneUi.Heading(Loc.GetString("spellcraft-ui-spells")));
-        root.AddChild(new ArcanePanel(margin: 4f)
-        {
-            Children = { new ScrollContainer { MinHeight = 74, MaxHeight = 110, HScrollEnabled = false, Children = { _spellList } } },
-        });
+        _spellScroll.AddChild(_spellList);
+        root.AddChild(new ArcanePanel(margin: 4f) { Children = { _spellScroll } });
         root.AddChild(_note);
 
         ContentsContainer.AddChild(new ArcanePanel(margin: 8f)
@@ -79,9 +98,24 @@ public sealed class SpellcraftWindow : FancyWindow
 
     public void UpdateState(SpellcraftBuiState state)
     {
-        _state = state;
         _wind.Set(state.Wind, state.WindMax);
+        _wind.ToolTip = Loc.GetString(state.Hurt ? "spellcraft-ui-regen-hurt" : "spellcraft-ui-regen", ("rate", MathF.Round(state.Regen, 2)));
+        _mastery.Text = Loc.GetString("spellcraft-ui-power", ("power", state.Power));
 
+        BuildSchools(state);
+        BuildTides(state);
+        BuildTabs(state);
+        BuildSpellList(state);
+
+        foreach (var view in _views.Values)
+        {
+            if (view is ISpellcraftView updatable)
+                updatable.UpdateState(state);
+        }
+    }
+
+    private void BuildSchools(SpellcraftBuiState state)
+    {
         _schools.RemoveAllChildren();
         _schools.AddChild(new Label { Text = Loc.GetString("spellcraft-ui-attuned"), FontColorOverride = ArcaneTheme.TextDim, VerticalAlignment = VAlignment.Center });
         if (state.Schools.Count == 0)
@@ -96,19 +130,28 @@ public sealed class SpellcraftWindow : FancyWindow
                 VerticalAlignment = VAlignment.Center,
             });
         }
+    }
 
-        BuildTabs(state);
-        BuildSpellList(state);
-
-        foreach (var (discipline, view) in _views)
+    private void BuildTides(SpellcraftBuiState state)
+    {
+        _tides.RemoveAllChildren();
+        foreach (var (school, tide) in state.Tides.OrderBy(t => t.Key))
         {
-            if (view is ISpellcraftView updatable)
-                updatable.UpdateState(state);
+            // Below 1 is cheaper to cast from right now, above 1 is dearer.
+            var tint = tide < 0.97f ? ArcaneTheme.Good : tide > 1.03f ? ArcaneTheme.Bad : ArcaneTheme.TextDim;
+            var chip = new BoxContainer { Orientation = BoxContainer.LayoutOrientation.Horizontal, Margin = new Thickness(0, 0, 10, 0) };
+            chip.AddChild(new Label { Text = Loc.GetString($"spellcraft-school-{school.ToLowerInvariant()}") + " ", FontColorOverride = ArcaneTheme.SchoolColor(school) });
+            chip.AddChild(new Label { Text = $"x{tide:0.00}", FontColorOverride = tint });
+            _tides.AddChild(chip);
         }
     }
 
-    private Control CreateView(SpellDiscipline discipline)
-        => discipline switch
+    private Control CreateView(string key)
+    {
+        if (key == ErrandsKey)
+            return new ErrandView();
+
+        return Enum.Parse<SpellDiscipline>(key) switch
         {
             SpellDiscipline.Rote => new RoteView(this),
             SpellDiscipline.Glyphwork => new ChainEditor(this, SpellDiscipline.Glyphwork, ChainInput.Palette, SpellOutput.Action),
@@ -118,11 +161,12 @@ public sealed class SpellcraftWindow : FancyWindow
             SpellDiscipline.Artifice => new ObjectView(this, SpellDiscipline.Artifice),
             SpellDiscipline.Tarot => new TarotView(this),
             _ => new RitualView(this),
-    };
+        };
+    }
 
     private void BuildTabs(SpellcraftBuiState state)
     {
-        var order = state.Disciplines.Distinct().OrderBy(d => (int) d).ToList();
+        List<string> order = [.. state.Disciplines.Distinct().OrderBy(d => (int) d).Select(d => d.ToString()), ErrandsKey];
         if (order.SequenceEqual(_tabOrder))
             return;
 
@@ -130,64 +174,82 @@ public sealed class SpellcraftWindow : FancyWindow
         _tabs.RemoveAllChildren();
         _tabButtons.Clear();
 
-        foreach (var discipline in order)
+        foreach (var key in order)
         {
-            if (!_views.ContainsKey(discipline))
+            if (!_views.ContainsKey(key))
             {
-                var view = CreateView(discipline);
+                var view = CreateView(key);
                 view.Visible = false;
-                _views[discipline] = view;
+                _views[key] = view;
                 _body.AddChild(view);
             }
 
-            var button = new ArcaneButton(Loc.GetString($"spellcraft-discipline-{discipline.ToString().ToLowerInvariant()}"), toggle: true)
+            var button = new ArcaneButton(TabTitle(key), toggle: true)
             {
-                ToolTip = Loc.GetString($"spellcraft-discipline-{discipline.ToString().ToLowerInvariant()}-desc"),
+                ToolTip = TabDescription(key),
                 MinSize = new Vector2(92, 30),
             };
-            var target = discipline;
+            var target = key;
             button.OnPressed += _ => Select(target);
             _tabs.AddChild(button);
-            _tabButtons[discipline] = button;
+            _tabButtons[key] = button;
         }
 
-        Select(_active is { } current && order.Contains(current) ? current : order.FirstOrDefault());
+        Select(_active is { } current && order.Contains(current) ? current : order[0]);
     }
 
-    private void Select(SpellDiscipline discipline)
+    private static string TabTitle(string key)
+        => key == ErrandsKey
+            ? Loc.GetString("spellcraft-ui-errands")
+            : Loc.GetString($"spellcraft-discipline-{key.ToLowerInvariant()}");
+
+    private static string TabDescription(string key)
+        => key == ErrandsKey
+            ? Loc.GetString("spellcraft-ui-errands-help")
+            : Loc.GetString($"spellcraft-discipline-{key.ToLowerInvariant()}-desc");
+
+    private void Select(string key)
     {
-        _active = discipline;
-        foreach (var (key, view) in _views)
-            view.Visible = key == discipline;
+        _active = key;
+        foreach (var (name, view) in _views)
+            view.Visible = name == key;
 
-        foreach (var (key, button) in _tabButtons)
-            button.Pressed = key == discipline;
+        foreach (var (name, button) in _tabButtons)
+            button.Pressed = name == key;
 
-        _note.Text = Loc.GetString($"spellcraft-discipline-{discipline.ToString().ToLowerInvariant()}-desc");
+        _note.Text = TabDescription(key);
     }
 
     private void BuildSpellList(SpellcraftBuiState state)
     {
-        _spellList.RemoveAllChildren();
-        if (state.Spells.Count == 0)
-            _spellList.AddChild(ArcaneUi.Dim(Loc.GetString("spellcraft-ui-spells-none")));
+        var signature = string.Join(';', state.Spells.Select(sp => $"{sp.Action}{sp.Name}{sp.Cost}"));
+        if (signature == _spellSignature)
+            return;
 
-        foreach (var spell in state.Spells)
+        _spellSignature = signature;
+        _spellScroll.Rebuild(() =>
         {
-            var row = ArcaneUi.Row(6);
-            row.AddChild(new Label
-            {
-                Text = $"{spell.Name} ({spell.Cost:0.#})",
-                FontColorOverride = ArcaneTheme.Text,
-                HorizontalExpand = true,
-                ClipText = true,
-            });
+            _spellList.RemoveAllChildren();
+            if (state.Spells.Count == 0)
+                _spellList.AddChild(ArcaneUi.Dim(Loc.GetString("spellcraft-ui-spells-none")));
 
-            var forget = new ArcaneButton(Loc.GetString("spellcraft-ui-forget")) { MinSize = new Vector2(70, 22) };
-            var action = spell.Action;
-            forget.OnPressed += _ => OnForget?.Invoke(action);
-            row.AddChild(forget);
-            _spellList.AddChild(row);
-        }
+            foreach (var spell in state.Spells)
+            {
+                var row = ArcaneUi.Row(6);
+                row.AddChild(new Label
+                {
+                    Text = $"{spell.Name} ({spell.Cost:0.#})",
+                    FontColorOverride = ArcaneTheme.Text,
+                    HorizontalExpand = true,
+                    ClipText = true,
+                });
+
+                var forget = new ArcaneButton(Loc.GetString("spellcraft-ui-forget")) { MinSize = new Vector2(70, 22) };
+                var action = spell.Action;
+                forget.OnPressed += _ => OnForget?.Invoke(action);
+                row.AddChild(forget);
+                _spellList.AddChild(row);
+            }
+        });
     }
 }

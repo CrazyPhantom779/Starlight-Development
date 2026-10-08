@@ -1,4 +1,5 @@
 using System.Diagnostics.CodeAnalysis;
+using Content.Server._Starlight.Wizard.Casting;
 using Content.Server._Starlight.Wizard.SpellGraph;
 using Content.Server._Starlight.Wizard.Wind;
 using Content.Shared._Starlight.Wizard.SpellGraph;
@@ -139,6 +140,13 @@ public sealed partial class SpellItemSystem : EntitySystem
             if (comp.Charges <= 0 && comp.ConsumeWhenEmpty)
             {
                 _popup.PopupEntity(Loc.GetString("spellitem-spent", ("item", Name(ent))), user, user);
+
+                if (comp.Kind is SpellItemKind.Card or SpellItemKind.Scroll)
+                {
+                    var used = new SpellItemUsedEvent(user, comp.Kind == SpellItemKind.Card);
+                    RaiseLocalEvent(user, ref used);
+                }
+
                 QueueDel(ent);
             }
         }

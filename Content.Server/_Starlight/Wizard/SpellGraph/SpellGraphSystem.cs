@@ -2,6 +2,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Numerics;
 using Content.Server._Starlight.Wizard.Casting;
 using Content.Shared._Starlight.Wizard.Casting;
+using Content.Shared._Starlight.Wizard.Fate;
 using Content.Shared._Starlight.Wizard.SpellGraph;
 using Content.Shared._Starlight.Wizard.Wind;
 using Content.Shared.Actions;
@@ -11,10 +12,12 @@ using Content.Shared.Interaction;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
 using Content.Shared.Popups;
+using Content.Shared.Physics;
 using Content.Shared.Weapons.Ranged.Systems;
 using Content.Shared.Whitelist;
 using Robust.Shared.Map;
 using Robust.Shared.Prototypes;
+using Robust.Shared.Random;
 using Robust.Shared.Timing;
 using SpellGraphData = Content.Shared._Starlight.Wizard.SpellGraph.SpellGraph;
 
@@ -29,6 +32,7 @@ namespace Content.Server._Starlight.Wizard.SpellGraph;
 public sealed partial class SpellGraphSystem : EntitySystem
 {
     [Dependency] private IPrototypeManager _proto = default!;
+    [Dependency] private IRobustRandom _random = default!;
     [Dependency] private SharedActionsSystem _actions = default!;
     [Dependency] private MetaDataSystem _meta = default!;
     [Dependency] private GlyphEffectSystem _effects = default!;
@@ -54,6 +58,9 @@ public sealed partial class SpellGraphSystem : EntitySystem
     private const float FanSpreadDegrees = 12f;
     private const float MaxRuneRange = 7f;
     private const float ChainRange = 6f;
+    private const float BaseVariance = 0.06f;
+    private const float VariancePerInstability = 0.04f;
+    private const float MaxVariance = 0.3f;
 
     private readonly HashSet<Entity<MobStateComponent>> _nearby = [];
 
@@ -72,11 +79,13 @@ public sealed partial class SpellGraphSystem : EntitySystem
         var maxNodes = DefaultMaxNodes;
         IReadOnlyCollection<ProtoId<SpellGlyphPrototype>>? known = null;
         IReadOnlyCollection<string>? affinities = null;
+        IReadOnlyDictionary<string, float>? tides = null;
 
         if (TryComp<SpellcraftComponent>(caster, out var craft))
         {
             maxNodes = craft.MaxNodes;
             affinities = craft.Schools;
+            tides = craft.Tides;
             if (!craft.Unrestricted && !ignoreKnown)
                 known = craft.Glyphs;
         }
@@ -87,7 +96,7 @@ public sealed partial class SpellGraphSystem : EntitySystem
         if (ignoreKnown)
             maxNodes = Math.Max(maxNodes, 16);
 
-        if (!SpellGraphCompiler.TryCompile(_proto, graph, maxNodes, known, affinities, out plan, out error))
+        if (!SpellGraphCompiler.TryCompile(_proto, graph, maxNodes, known, affinities, tides, out plan, out error))
             return false;
 
         if (discipline == SpellDiscipline.Sigil)
@@ -155,6 +164,7 @@ public sealed partial class SpellGraphSystem : EntitySystem
         var graphComp = EnsureComp<SpellGraphActionComponent>(actionId.Value);
         graphComp.Graph = graph;
         graphComp.Plan = plan;
+        graphComp.Discipline = discipline;
 
         var cost = EnsureComp<WindCostComponent>(actionId.Value);
         cost.Cost = plan.Cost;
@@ -164,11 +174,50 @@ public sealed partial class SpellGraphSystem : EntitySystem
         _meta.SetEntityDescription(actionId.Value, Loc.GetString("spellcraft-action-description", ("cost", plan.Cost)));
 
         // Bigger spells take longer to recover from.
-        _actions.SetUseDelay(actionId.Value, TimeSpan.FromSeconds(Math.Clamp(plan.Cost * 0.1f * plan.CooldownMultiplier, 1f, 20f)));
+        _actions.SetUseDelay(actionId.Value, GetCooldown(plan));
 
         action = actionId;
         error = null;
         return true;
+    }
+
+    /// <summary>Bigger spells take longer to recover from.</summary>
+    private static TimeSpan GetCooldown(SpellGraphPlan plan)
+        => TimeSpan.FromSeconds(Math.Clamp(plan.Cost * 0.12f * plan.CooldownMultiplier, 1.5f, 24f));
+
+    /// <summary>How widely a caster's spells vary in strength. Unstable wizards are wilder.</summary>
+    private float GetVariance(EntityUid caster)
+    {
+        var instability = TryComp<FateComponent>(caster, out var fate) ? fate.Instability : 0;
+        return Math.Min(MaxVariance, BaseVariance + (VariancePerInstability * Math.Max(0, instability)));
+    }
+
+    /// <summary>
+    /// Recompiles every woven spell a caster holds, so their Wind costs follow the tides as they shift.
+    /// </summary>
+    public void RefreshActions(EntityUid caster)
+    {
+        if (!TryComp<SpellcraftComponent>(caster, out var craft))
+            return;
+
+        foreach (var action in _actions.GetActions(caster))
+        {
+            if (!TryComp<SpellGraphActionComponent>(action, out var woven)
+                || !SpellGraphCompiler.TryCompile(_proto, woven.Graph, int.MaxValue, null, craft.Schools, craft.Tides, out var plan, out _))
+                continue;
+
+            if (woven.Discipline == SpellDiscipline.Sigil)
+                plan.Cost = MathF.Max(1f, MathF.Round(plan.Cost * SigilCostFactor, 1));
+
+            woven.Plan = plan;
+            if (TryComp<WindCostComponent>(action, out var cost))
+            {
+                cost.Cost = plan.Cost;
+                Dirty(action.Owner, cost);
+            }
+
+            _meta.SetEntityDescription(action.Owner, Loc.GetString("spellcraft-action-description", ("cost", plan.Cost)));
+        }
     }
 
     private SpellGraphPlan? GetPlan(EntityUid action)
@@ -230,6 +279,7 @@ public sealed partial class SpellGraphSystem : EntitySystem
             Action = action,
             Target = targetEntity,
             Point = target,
+            Variance = GetVariance(caster),
         };
 
         var cast = false;
@@ -266,12 +316,18 @@ public sealed partial class SpellGraphSystem : EntitySystem
             case SpellDelivery.Rune:
                 cast = PlaceRune(plan, ctx);
                 break;
+            case SpellDelivery.Line:
+                cast = FireLine(plan, ctx);
+                break;
         }
 
         if (cast)
         {
             foreach (var item in reagents)
                 QueueDel(item);
+
+            var castEvent = new SpellCastEvent(caster, plan, ctx);
+            RaiseLocalEvent(caster, ref castEvent);
         }
 
         return cast;
@@ -295,6 +351,9 @@ public sealed partial class SpellGraphSystem : EntitySystem
                 Timer.Spawn(TimeSpan.FromSeconds(delay), () => RunStep(current, ctx));
             }
         }
+
+        var hit = new SpellHitEvent(ctx.Caster, ctx.Hit);
+        RaiseLocalEvent(ctx.Caster, ref hit);
     }
 
     private void RunStep(SpellStep step, SpellCastContext ctx)
@@ -303,6 +362,7 @@ public sealed partial class SpellGraphSystem : EntitySystem
         if (TerminatingOrDeleted(ctx.Caster) || (ctx.Action is { } action && TerminatingOrDeleted(action)))
             return;
 
+        ctx.Jitter = 1f + _random.NextFloat(-ctx.Variance, ctx.Variance);
         _effects.Apply(step, ctx);
 
         var last = ctx;
@@ -318,10 +378,12 @@ public sealed partial class SpellGraphSystem : EntitySystem
                 Target = next,
                 Point = Transform(next).Coordinates,
                 Hit = ctx.Hit,
+                Jitter = ctx.Jitter,
+                Variance = ctx.Variance,
             };
 
             ctx.Hit.Add(next);
-            _effects.Apply(step, jump);
+            _effects.Apply(step.Scaled(MathF.Pow(SpellGraphCompiler.ChainDecay, i + 1)), jump);
             last = jump;
         }
     }
@@ -443,6 +505,44 @@ public sealed partial class SpellGraphSystem : EntitySystem
         return true;
     }
 
+    /// <summary>
+    /// A line of effect: the spell takes effect at each tile along the way from the caster toward the aim, until a wall.
+    /// Creatures are never affected twice by the same line.
+    /// </summary>
+    private bool FireLine(SpellGraphPlan plan, SpellCastContext ctx)
+    {
+        var caster = ctx.Caster;
+        var from = _xform.ToMapCoordinates(Transform(caster).Coordinates);
+        var aim = _xform.ToMapCoordinates(ctx.Point);
+        var direction = aim.Position - from.Position;
+        if (direction.LengthSquared() < 0.01f)
+            direction = _xform.GetWorldRotation(caster).ToWorldVec();
+
+        direction = direction.Normalized();
+        var range = plan.Form.Range;
+        var hit = new HashSet<EntityUid>();
+
+        for (var i = 1; i <= (int) range; i++)
+        {
+            var point = _xform.ToCoordinates(new MapCoordinates(from.Position + (direction * i), from.MapId));
+            if (!_interaction.InRangeUnobstructed(caster, point, range: range + 1f, collisionMask: CollisionGroup.Opaque, popup: false))
+                break;
+
+            RunPlan(plan,
+                new SpellCastContext
+                {
+                    Caster = caster,
+                    Action = ctx.Action,
+                    Point = point,
+                    Variance = ctx.Variance,
+                    DedupeHits = true,
+                    Hit = hit,
+                });
+        }
+
+        return true;
+    }
+
     private bool PlaceRune(SpellGraphPlan plan, SpellCastContext ctx)
     {
         if (plan.Form.Rune is not { } proto)
@@ -470,6 +570,7 @@ public sealed partial class SpellGraphSystem : EntitySystem
             Point = point,
             Target = target,
             FromProjectile = true,
+            Variance = GetVariance(caster),
         };
         RunPlan(plan, ctx);
     }

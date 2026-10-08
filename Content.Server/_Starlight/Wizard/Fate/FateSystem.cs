@@ -1,5 +1,6 @@
 using System.Linq;
 using Content.Server.Chat.Managers;
+using Content.Server._Starlight.Wizard.Casting;
 using Content.Server._Starlight.Wizard.SpellGraph;
 using Content.Shared._Starlight.Wizard.Casting;
 using Content.Shared._Starlight.Wizard.Fate;
@@ -30,12 +31,16 @@ public sealed partial class FateSystem : EntitySystem
     [Dependency] private SharedHandsSystem _hands = default!;
     [Dependency] private SharedWindSystem _wind = default!;
     [Dependency] private SpellGraphSystem _spells = default!;
+    [Dependency] private TideSystem _tides = default!;
+    [Dependency] private ErrandSystem _errands = default!;
 
     private static readonly EntProtoId _tome = "SpellweaverTome";
     private static readonly EntProtoId _wand = "SpellWandBlank";
 
     private static readonly string[] _basicForms = ["FormAimed", "FormSelf", "FormBolt", "FormTouch", "FormBurst"];
     private const int AspectCount = 2;
+    // The strongest effects are earned, through rites and errands, not handed out.
+    private const float StartingMaxCost = 20f;
     private const int StartingSchools = 2;
     private const int StartingSchoolEffects = 4;
     private const int StartingOtherEffects = 3;
@@ -167,7 +172,7 @@ public sealed partial class FateSystem : EntitySystem
             craft.Schools.Add(school);
 
         // Effects: a few from their schools, a few from anywhere.
-        var effects = glyphs.Where(g => g.Category == GlyphCategory.Effect).ToList();
+        var effects = glyphs.Where(g => g.Category == GlyphCategory.Effect && g.Cost <= StartingMaxCost).ToList();
         _random.Shuffle(effects);
         foreach (var effect in effects.Where(e => e.Schools.Any(craft.Schools.Contains)).Take(StartingSchoolEffects))
             craft.Glyphs.Add(effect.ID);
@@ -192,6 +197,8 @@ public sealed partial class FateSystem : EntitySystem
         foreach (var rote in rotes.Take(StartingRotes))
             craft.Rotes.Add(rote.ID);
 
+        _tides.EnsureTides(body, craft);
+        _errands.EnsureErrands(body);
         Dirty(body, craft);
 
         var tome = Spawn(_tome, Transform(body).Coordinates);
@@ -228,6 +235,7 @@ public sealed partial class FateSystem : EntitySystem
             var disciplines = string.Join(", ", craft.Disciplines.Select(d => Loc.GetString($"spellcraft-discipline-{d.ToString().ToLowerInvariant()}")));
             var schools = string.Join(", ", craft.Schools.Select(s => Loc.GetString($"spellcraft-school-{s.ToLowerInvariant()}")));
             message += "\n" + Loc.GetString("fate-announce-kit", ("disciplines", disciplines), ("schools", schools));
+            message += "\n" + Loc.GetString("fate-announce-errands");
         }
 
         _popup.PopupEntity(Loc.GetString("fate-popup"), body, body, PopupType.LargeCaution);

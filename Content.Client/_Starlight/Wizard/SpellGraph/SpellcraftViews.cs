@@ -23,6 +23,7 @@ public sealed partial class RoteView : BoxContainer, ISpellcraftView
 
     private readonly SpellcraftWindow _window;
     private readonly BoxContainer _list = ArcaneUi.Column(6);
+    private readonly KeptScroll _scroll = new();
 
     public RoteView(SpellcraftWindow window)
     {
@@ -32,10 +33,23 @@ public sealed partial class RoteView : BoxContainer, ISpellcraftView
         VerticalExpand = true;
         HorizontalExpand = true;
         AddChild(ArcaneUi.Dim(Loc.GetString("spellcraft-ui-rote-help")));
-        AddChild(new ScrollContainer { VerticalExpand = true, HScrollEnabled = false, Children = { _list } });
+        _scroll.AddChild(_list);
+        AddChild(_scroll);
     }
 
+    private string _signature = string.Empty;
+
     public void UpdateState(SpellcraftBuiState state)
+    {
+        var signature = string.Join(',', state.Rotes) + "|" + (state.Spells.Count >= state.MaxSpells) + "|" + string.Join(',', state.Tides.Select(t => $"{t.Key}{t.Value:0.00}")) + "|" + string.Join(',', state.Schools);
+        if (signature == _signature)
+            return;
+
+        _signature = signature;
+        _scroll.Rebuild(() => Build(state));
+    }
+
+    private void Build(SpellcraftBuiState state)
     {
         _list.RemoveAllChildren();
         var sprites = _entMan.System<SpriteSystem>();
@@ -80,7 +94,7 @@ public sealed partial class RoteView : BoxContainer, ISpellcraftView
 
             var cost = "?";
             if (SpellGraphCompiler.TryBuildChain(_proto, rote.Chain, out var graph, out _)
-                && SpellGraphCompiler.TryCompile(_proto, graph, int.MaxValue, null, state.Schools, out var plan, out _))
+                && SpellGraphCompiler.TryCompile(_proto, graph, int.MaxValue, null, state.Schools, state.Tides, out var plan, out _))
                 cost = $"{plan.Cost:0.#}";
 
             row.AddChild(new Label { Text = Loc.GetString("spellcraft-ui-cost", ("cost", cost)), FontColorOverride = ArcaneTheme.TextDim, VerticalAlignment = VAlignment.Center });
@@ -183,13 +197,16 @@ public sealed partial class TarotView : BoxContainer, ISpellcraftView
         _draw.OnPressed += _ => _window.SendDrawCard();
         AddChild(_draw);
         AddChild(ArcaneUi.Heading(Loc.GetString("spellcraft-ui-arcana")));
-        AddChild(new ScrollContainer { VerticalExpand = true, HScrollEnabled = false, Children = { _codex } });
+        AddChild(new KeptScroll { Children = { _codex } });
     }
 
     public void UpdateState(SpellcraftBuiState state)
     {
         _draw.Text = Loc.GetString("spellcraft-ui-tarot-draw", ("cost", state.TarotCost));
-        _codex.RemoveAllChildren();
+
+        // The arcana never change, so the codex is built once.
+        if (_codex.ChildCount > 0)
+            return;
 
         string Names(IEnumerable<ProtoId<SpellGlyphPrototype>> chain)
             => string.Join(" + ", chain
@@ -216,6 +233,7 @@ public sealed class RitualView : BoxContainer, ISpellcraftView
 {
     private readonly SpellcraftWindow _window;
     private readonly Label _status = new();
+    private readonly KeptScroll _scroll = new();
     private readonly ArcaneButton _circle = new(string.Empty);
     private readonly BoxContainer _list = ArcaneUi.Column(6);
 
@@ -239,7 +257,8 @@ public sealed class RitualView : BoxContainer, ISpellcraftView
         top.AddChild(_status);
         AddChild(top);
 
-        AddChild(new ScrollContainer { VerticalExpand = true, HScrollEnabled = false, Children = { _list } });
+        _scroll.AddChild(_list);
+        AddChild(_scroll);
     }
 
     public void UpdateState(SpellcraftBuiState state)
@@ -248,6 +267,18 @@ public sealed class RitualView : BoxContainer, ISpellcraftView
         _status.Text = Loc.GetString(state.CircleNearby ? "spellcraft-ui-circle-near" : "spellcraft-ui-circle-far");
         _status.FontColorOverride = state.CircleNearby ? ArcaneTheme.Good : ArcaneTheme.Bad;
 
+        var signature = string.Join(';', state.Rituals.Select(r => r.Id + r.Satisfied + string.Join(',', r.Offerings.Select(o => o.Have)))) + state.CircleNearby;
+        if (signature == _signature)
+            return;
+
+        _signature = signature;
+        _scroll.Rebuild(() => BuildRites(state));
+    }
+
+    private string _signature = string.Empty;
+
+    private void BuildRites(SpellcraftBuiState state)
+    {
         _list.RemoveAllChildren();
         foreach (var rite in state.Rituals)
         {

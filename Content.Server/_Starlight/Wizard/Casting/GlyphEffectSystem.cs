@@ -3,6 +3,8 @@ using System.Linq;
 using Content.Server._Starlight.Wizard.Wind;
 using Content.Server.Atmos.EntitySystems;
 using Content.Server.Explosion.EntitySystems;
+using Content.Server.Lightning;
+using Content.Server.Polymorph.Systems;
 using Content.Shared._Starlight.Wizard.Casting;
 using Content.Shared._Starlight.Wizard.SpellGraph;
 using Content.Shared._Starlight.Wizard.Wind;
@@ -16,6 +18,7 @@ using Content.Shared.Interaction;
 using Content.Shared.Item;
 using Content.Shared.Mobs.Components;
 using Content.Shared.Mobs.Systems;
+using Content.Shared.Movement.Systems;
 using Content.Shared.Physics;
 using Content.Shared.Stunnable;
 using Content.Shared.Throwing;
@@ -44,6 +47,9 @@ public sealed partial class GlyphEffectSystem : EntitySystem
     [Dependency] private ExplosionSystem _explosion = default!;
     [Dependency] private MobStateSystem _mobState = default!;
     [Dependency] private WindSystem _wind = default!;
+    [Dependency] private LightningSystem _lightning = default!;
+    [Dependency] private PolymorphSystem _polymorph = default!;
+    [Dependency] private MovementModStatusSystem _movement = default!;
 
     private static readonly ProtoId<DamageTypePrototype> _blunt = "Blunt";
     private static readonly ProtoId<DamageTypePrototype> _heat = "Heat";
@@ -73,6 +79,11 @@ public sealed partial class GlyphEffectSystem : EntitySystem
                 case DrainGlyphEffect e: Drain(e, step, ctx); break;
                 case WindGlyphEffect e: MoveWind(e, step, ctx); break;
                 case ExplodeGlyphEffect e: Explode(e, step, ctx); break;
+                case LightningGlyphEffect e: Lightning(e, step, ctx); break;
+                case PolymorphGlyphEffect e: Polymorph(e, step, ctx); break;
+                case LeapGlyphEffect e: Leap(e, step, ctx); break;
+                case SlowGlyphEffect e: Slow(e, step, ctx); break;
+                case HasteGlyphEffect e: Haste(e, step, ctx); break;
             }
         }
 
@@ -111,6 +122,10 @@ public sealed partial class GlyphEffectSystem : EntitySystem
         return false;
     }
 
+    /// <summary>The step's strength this time: as woven, plus the caster's random variation.</summary>
+    private static float Strength(SpellStep step, SpellCastContext ctx)
+        => step.Magnitude * ctx.Jitter;
+
     private float Area(float radius, SpellStep step, SpellCastContext ctx)
         => radius + step.RadiusBonus + ctx.FormRadius;
 
@@ -124,12 +139,15 @@ public sealed partial class GlyphEffectSystem : EntitySystem
 
         if (!includeDead)
             _creatures.RemoveWhere(e => _mobState.IsDead(e.Owner, e.Comp));
+
+        if (ctx.DedupeHits)
+            _creatures.RemoveWhere(e => ctx.Hit.Contains(e.Owner));
     }
 
     private void Damage(DamageGlyphEffect e, SpellStep step, SpellCastContext ctx)
     {
         FindCreatures(ctx, Area(e.Radius, step, ctx), e.AffectCaster);
-        var damage = e.Damage * step.Magnitude;
+        var damage = e.Damage * Strength(step, ctx);
         foreach (var creature in _creatures.ToList())
         {
             _damageable.TryChangeDamage(creature.Owner, damage, e.IgnoreResistances, origin: ctx.Caster);
@@ -140,7 +158,7 @@ public sealed partial class GlyphEffectSystem : EntitySystem
     private void Heal(HealGlyphEffect e, SpellStep step, SpellCastContext ctx)
     {
         FindCreatures(ctx, Area(e.Radius, step, ctx), e.AffectCaster, includeDead: true);
-        var heal = e.Heal * step.Magnitude;
+        var heal = e.Heal * Strength(step, ctx);
         foreach (var creature in _creatures.ToList())
         {
             _damageable.TryChangeDamage(creature.Owner, heal, ignoreResistances: true, origin: ctx.Caster);
@@ -153,7 +171,7 @@ public sealed partial class GlyphEffectSystem : EntitySystem
         FindCreatures(ctx, Area(e.Radius, step, ctx), e.AffectCaster);
         foreach (var creature in _creatures.ToList())
         {
-            _flammable.AdjustFireStacks(creature.Owner, e.FireStacks * step.Magnitude, ignite: true);
+            _flammable.AdjustFireStacks(creature.Owner, e.FireStacks * Strength(step, ctx), ignite: true);
             ctx.Hit.Add(creature.Owner);
         }
     }
@@ -161,7 +179,7 @@ public sealed partial class GlyphEffectSystem : EntitySystem
     private void Stun(StunGlyphEffect e, SpellStep step, SpellCastContext ctx)
     {
         FindCreatures(ctx, Area(e.Radius, step, ctx), e.AffectCaster);
-        var time = TimeSpan.FromSeconds(e.Seconds * step.Magnitude);
+        var time = TimeSpan.FromSeconds(e.Seconds * Strength(step, ctx));
         foreach (var creature in _creatures.ToList())
         {
             if (e.KnockdownOnly)
@@ -198,13 +216,13 @@ public sealed partial class GlyphEffectSystem : EntitySystem
                 ? -direction
                 : direction.Normalized() * Math.Max(1f, radius - direction.Length());
 
-            _throwing.TryThrow(target, throwDirection, e.Strength * step.Magnitude, ctx.Caster, recoil: false, compensateFriction: true);
+            _throwing.TryThrow(target, throwDirection, e.Strength * Strength(step, ctx), ctx.Caster, recoil: false, compensateFriction: true);
         }
     }
 
     private void SpawnThings(SpawnGlyphEffect e, SpellStep step, SpellCastContext ctx)
     {
-        var amount = Math.Max(1, (int) MathF.Round(e.Amount * step.Magnitude));
+        var amount = Math.Max(1, (int) MathF.Round(e.Amount * Strength(step, ctx)));
         var scatter = e.Scatter + (step.RadiusBonus * 0.5f);
 
         for (var i = 0; i < amount; i++)
@@ -284,7 +302,7 @@ public sealed partial class GlyphEffectSystem : EntitySystem
     private void Drain(DrainGlyphEffect e, SpellStep step, SpellCastContext ctx)
     {
         FindCreatures(ctx, Area(e.Radius, step, ctx), includeCaster: false);
-        var damage = e.Damage * step.Magnitude;
+        var damage = e.Damage * Strength(step, ctx);
         var dealt = FixedPoint2.Zero;
 
         foreach (var creature in _creatures.ToList())
@@ -307,8 +325,8 @@ public sealed partial class GlyphEffectSystem : EntitySystem
 
     private void MoveWind(WindGlyphEffect e, SpellStep step, SpellCastContext ctx)
     {
-        var amount = e.Amount * step.Magnitude;
-        FindCreatures(ctx, Area(e.Radius, step, ctx), includeCaster: amount > 0f, includeDead: true);
+        var amount = e.Amount * Strength(step, ctx);
+        FindCreatures(ctx, Area(e.Radius, step, ctx), includeCaster: amount > 0f && e.AffectCaster, includeDead: true);
 
         foreach (var creature in _creatures.ToList())
         {
@@ -335,9 +353,78 @@ public sealed partial class GlyphEffectSystem : EntitySystem
     private void Explode(ExplodeGlyphEffect e, SpellStep step, SpellCastContext ctx)
         => _explosion.QueueExplosion(_xform.ToMapCoordinates(ctx.Point),
             e.ExplosionType,
-            e.TotalIntensity * step.Magnitude,
+            e.TotalIntensity * Strength(step, ctx),
             e.Slope,
             e.MaxIntensity,
             ctx.Caster,
             maxTileBreak: 0);
+
+    private EntityUid? Nearest(SpellCastContext ctx)
+    {
+        EntityUid? best = null;
+        var bestDistance = float.MaxValue;
+        foreach (var creature in _creatures)
+        {
+            if (!ctx.Point.TryDistance(EntityManager, Transform(creature.Owner).Coordinates, out var distance) || distance >= bestDistance)
+                continue;
+
+            best = creature.Owner;
+            bestDistance = distance;
+        }
+
+        return best;
+    }
+
+    private void Lightning(LightningGlyphEffect e, SpellStep step, SpellCastContext ctx)
+    {
+        FindCreatures(ctx, Area(e.Range, step, ctx), includeCaster: false);
+        if (Nearest(ctx) is not { } target)
+            return;
+
+        _lightning.ShootLightning(ctx.Caster, target, e.Prototype);
+        ctx.Hit.Add(target);
+    }
+
+    private void Polymorph(PolymorphGlyphEffect e, SpellStep step, SpellCastContext ctx)
+    {
+        FindCreatures(ctx, Area(e.Radius, step, ctx), includeCaster: false);
+        if (e.Options.Count == 0 || Nearest(ctx) is not { } target)
+            return;
+
+        _polymorph.PolymorphEntity(target, _random.Pick(e.Options));
+        ctx.Hit.Add(target);
+    }
+
+    private void Leap(LeapGlyphEffect e, SpellStep step, SpellCastContext ctx)
+    {
+        var caster = ctx.Caster;
+        var direction = _xform.ToMapCoordinates(ctx.Point).Position - _xform.GetWorldPosition(caster);
+        if (direction.LengthSquared() < 0.01f)
+            return;
+
+        var length = MathF.Min(direction.Length(), e.MaxDistance + step.RadiusBonus);
+        _throwing.TryThrow(caster, direction.Normalized() * length, e.Strength, caster, recoil: false, compensateFriction: true);
+    }
+
+    private void Slow(SlowGlyphEffect e, SpellStep step, SpellCastContext ctx)
+    {
+        FindCreatures(ctx, Area(e.Radius, step, ctx), e.AffectCaster);
+        var time = TimeSpan.FromSeconds(e.Seconds * Strength(step, ctx));
+        foreach (var creature in _creatures.ToList())
+        {
+            _movement.TryAddMovementSpeedModDuration(creature.Owner, MovementModStatusSystem.FlashSlowdown, time, e.Multiplier);
+            ctx.Hit.Add(creature.Owner);
+        }
+    }
+
+    private void Haste(HasteGlyphEffect e, SpellStep step, SpellCastContext ctx)
+    {
+        FindCreatures(ctx, Area(e.Radius, step, ctx), includeCaster: true);
+        var time = TimeSpan.FromSeconds(e.Seconds * Strength(step, ctx));
+        foreach (var creature in _creatures.ToList())
+        {
+            _movement.TryAddMovementSpeedModDuration(creature.Owner, MovementModStatusSystem.ReagentSpeed, time, e.Multiplier);
+            ctx.Hit.Add(creature.Owner);
+        }
+    }
 }

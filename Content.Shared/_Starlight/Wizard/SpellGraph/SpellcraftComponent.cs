@@ -26,6 +26,17 @@ public sealed partial class SpellcraftComponent : Component
     [DataField, AutoNetworkedField]
     public HashSet<string> Schools = [];
 
+    /// <summary>
+    /// This caster's personal tides: a cost multiplier per school that drifts over the round.
+    /// A school running hot costs more, one running cool costs less.
+    /// </summary>
+    [DataField, AutoNetworkedField]
+    public Dictionary<string, float> Tides = [];
+
+    /// <summary>How much mastery the caster has earned from errands. Each point makes them a little stronger.</summary>
+    [DataField, AutoNetworkedField]
+    public int Power;
+
     /// <summary>Ways of working magic this caster has mastered.</summary>
     [DataField, AutoNetworkedField]
     public HashSet<SpellDiscipline> Disciplines = [SpellDiscipline.Rote, SpellDiscipline.Glyphwork];

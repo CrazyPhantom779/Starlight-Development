@@ -20,6 +20,20 @@ public sealed class SpellStep
 
     /// <summary>How many more creatures the effect jumps to.</summary>
     public int ChainJumps;
+
+    /// <summary>A copy of this step at a different strength. Used for chained jumps, which weaken each time.</summary>
+    public SpellStep Scaled(float factor)
+        => new()
+        {
+            Glyph = Glyph,
+            Repeats = Repeats,
+            RepeatInterval = RepeatInterval,
+            Delay = Delay,
+            Cost = Cost,
+            Magnitude = Magnitude * factor,
+            RadiusBonus = RadiusBonus,
+            ChainJumps = 0,
+        };
 }
 
 /// <summary>The validated, ready-to-run form of a <see cref="SpellGraph"/>.</summary>
@@ -61,7 +75,9 @@ public static class SpellGraphCompiler
     public const float AmplifyStrength = 0.5f;
     public const float AmplifyCostFactor = 0.35f;
     public const float WidenCostFactor = 0.25f;
-    public const float ChainCostPerJump = 5f;
+    public const float ChainCostPerJump = 3f;
+    public const float ChainCostFactor = 0.3f;
+    public const float ChainDecay = 0.75f;
     public const float SplitCostFactor = 0.6f;
     public const float MinCostMultiplier = 0.4f;
     public const float AffinityDiscount = 0.85f;
@@ -80,6 +96,16 @@ public static class SpellGraphCompiler
         int maxNodes,
         IReadOnlyCollection<ProtoId<SpellGlyphPrototype>>? known,
         IReadOnlyCollection<string>? affinities,
+        [NotNullWhen(true)] out SpellGraphPlan? plan,
+        [NotNullWhen(false)] out string? error)
+        => TryCompile(protos, graph, maxNodes, known, affinities, null, out plan, out error);
+
+    public static bool TryCompile(IPrototypeManager protos,
+        SpellGraph graph,
+        int maxNodes,
+        IReadOnlyCollection<ProtoId<SpellGlyphPrototype>>? known,
+        IReadOnlyCollection<string>? affinities,
+        IReadOnlyDictionary<string, float>? tides,
         [NotNullWhen(true)] out SpellGraphPlan? plan,
         [NotNullWhen(false)] out string? error)
     {
@@ -280,10 +306,12 @@ public static class SpellGraphCompiler
             var cost = step.Glyph.Cost * (1f + (step.Repeats * RepeatCostFactor));
             cost *= 1f + (amplifyCount.GetValueOrDefault(step) * AmplifyCostFactor);
             cost *= 1f + (widenCount.GetValueOrDefault(step) * WidenCostFactor);
-            cost += step.ChainJumps * ChainCostPerJump;
+            cost += step.ChainJumps * (ChainCostPerJump + (ChainCostFactor * step.Glyph.Cost));
 
             if (affinities != null && step.Glyph.Schools.Any(affinities.Contains))
                 cost *= AffinityDiscount;
+
+            cost *= TideFor(step.Glyph, tides);
 
             step.Cost = cost;
             total += cost;
@@ -362,6 +390,19 @@ public static class SpellGraphCompiler
         graph = result;
         error = null;
         return true;
+    }
+
+    /// <summary>The cost multiplier a glyph's schools are running at right now (the average, if it has several).</summary>
+    public static float TideFor(SpellGlyphPrototype glyph, IReadOnlyDictionary<string, float>? tides)
+    {
+        if (tides == null || glyph.Schools.Count == 0)
+            return 1f;
+
+        var total = 0f;
+        foreach (var school in glyph.Schools)
+            total += tides.GetValueOrDefault(school, 1f);
+
+        return total / glyph.Schools.Count;
     }
 
     private static bool Fail(string locId, out string? error)

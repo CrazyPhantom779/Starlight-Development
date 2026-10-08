@@ -23,6 +23,15 @@ public sealed class SpellCastContext
     /// <summary>True when the point is where a bolt or rune triggered (it may be inside a wall).</summary>
     public bool FromProjectile;
 
+    /// <summary>Random strength variation for this step. 1 is exactly as woven.</summary>
+    public float Jitter = 1f;
+
+    /// <summary>How wide the variation is, from the caster's Fate. Set once per cast.</summary>
+    public float Variance;
+
+    /// <summary>When set, creatures already in <see cref="Hit"/> are skipped, so a line never hits anyone twice.</summary>
+    public bool DedupeHits;
+
     /// <summary>Creatures already affected by this cast, so Chain never hits the same one twice.</summary>
     public HashSet<EntityUid> Hit = [];
 }

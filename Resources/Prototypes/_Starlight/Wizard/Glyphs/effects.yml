@@ -19,15 +19,15 @@
   category: Effect
   name: glyph-effectscorch-name
   description: glyph-effectscorch-desc
-  cost: 9
+  cost: 10
   schools: [ Fire ]
-  sigil: "3-0-4-8"
+  sigil: "3-0-4-8-5"
   icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectScorch }
   effects:
   - !type:DamageGlyphEffect
     damage:
       types:
-        Heat: 14
+        Heat: 12
     radius: 1.0
 
 - type: spellGlyph
@@ -35,7 +35,7 @@
   category: Effect
   name: glyph-effectinferno-name
   description: glyph-effectinferno-desc
-  cost: 20
+  cost: 24
   schools: [ Fire ]
   sigil: "2-1-0-3"
   icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectInferno }
@@ -54,7 +54,7 @@
   category: Effect
   name: glyph-effectblast-name
   description: glyph-effectblast-desc
-  cost: 26
+  cost: 30
   schools: [ Fire, Evocation ]
   sigil: "3-1-0-4-8"
   icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectBlast }
@@ -159,7 +159,7 @@
   category: Effect
   name: glyph-effectchill-name
   description: glyph-effectchill-desc
-  cost: 8
+  cost: 9
   schools: [ Ice ]
   sigil: "0-4-3-1"
   icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectChill }
@@ -167,7 +167,7 @@
   - !type:DamageGlyphEffect
     damage:
       types:
-        Cold: 12
+        Cold: 11
     radius: 1.2
 
 - type: spellGlyph
@@ -175,7 +175,7 @@
   category: Effect
   name: glyph-effectfrostbite-name
   description: glyph-effectfrostbite-desc
-  cost: 18
+  cost: 20
   schools: [ Ice ]
   sigil: "1-5-8-7"
   icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectFrostbite }
@@ -286,7 +286,7 @@
   category: Effect
   name: glyph-effectshock-name
   description: glyph-effectshock-desc
-  cost: 10
+  cost: 11
   schools: [ Lightning ]
   sigil: "1-3-4-8-7"
   icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectShock }
@@ -294,7 +294,7 @@
   - !type:DamageGlyphEffect
     damage:
       types:
-        Shock: 16
+        Shock: 14
     radius: 1.0
 
 - type: spellGlyph
@@ -302,13 +302,13 @@
   category: Effect
   name: glyph-effectstatic-name
   description: glyph-effectstatic-desc
-  cost: 14
+  cost: 18
   schools: [ Lightning ]
   sigil: "5-1-3-6-7"
   icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectStatic }
   effects:
   - !type:StunGlyphEffect
-    seconds: 3
+    seconds: 2.2
     knockdownOnly: false
     radius: 2.0
 
@@ -317,7 +317,7 @@
   category: Effect
   name: glyph-effectstormcall-name
   description: glyph-effectstormcall-desc
-  cost: 24
+  cost: 28
   schools: [ Lightning ]
   sigil: "2-5-8-4-6"
   icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectStormcall }
@@ -349,7 +349,7 @@
   category: Effect
   name: glyph-effectmend-name
   description: glyph-effectmend-desc
-  cost: 12
+  cost: 14
   schools: [ Holy ]
   sigil: "3-1-2-4-8"
   icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectMend }
@@ -387,7 +387,7 @@
   category: Effect
   name: glyph-effectwidemend-name
   description: glyph-effectwidemend-desc
-  cost: 22
+  cost: 26
   schools: [ Holy ]
   sigil: "4-6-3-7"
   icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectWideMend }
@@ -603,7 +603,7 @@
   - !type:DamageGlyphEffect
     damage:
       types:
-        Poison: 14
+        Poison: 12
     radius: 1.2
 
 - type: spellGlyph
@@ -627,7 +627,7 @@
   category: Effect
   name: glyph-effectdrain-name
   description: glyph-effectdrain-desc
-  cost: 16
+  cost: 18
   schools: [ Blood ]
   sigil: "5-1-0-4-7"
   icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectDrain }
@@ -652,7 +652,7 @@
   - !type:DamageGlyphEffect
     damage:
       types:
-        Cellular: 14
+        Cellular: 12
     radius: 1.0
 
 - type: spellGlyph
@@ -674,11 +674,220 @@
   category: Effect
   name: glyph-effectreplenish-name
   description: glyph-effectreplenish-desc
-  cost: 10
+  cost: 14
   schools: [ Eldritch ]
   sigil: "5-1-4-7-6"
   icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectReplenish }
   effects:
   - !type:WindGlyphEffect
-    amount: 25
+    amount: 20
     radius: 1.2
+
+- type: spellGlyph
+  id: EffectBrand
+  category: Effect
+  name: glyph-effectbrand-name
+  description: glyph-effectbrand-desc
+  cost: 12
+  schools: [ Fire ]
+  sigil: "2-5-1-3-4"
+  icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectBrand }
+  effects:
+  - !type:DamageGlyphEffect
+    damage:
+      types:
+        Heat: 6
+    radius: 0.8
+  - !type:IgniteGlyphEffect
+    fireStacks: 4
+    radius: 0.8
+
+- type: spellGlyph
+  id: EffectMire
+  category: Effect
+  name: glyph-effectmire-name
+  description: glyph-effectmire-desc
+  cost: 9
+  schools: [ Ice, Evocation ]
+  sigil: "3-0-4-8"
+  icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectMire }
+  effects:
+  - !type:SlowGlyphEffect
+    seconds: 5
+    multiplier: 0.5
+    radius: 2.5
+
+- type: spellGlyph
+  id: EffectJolt
+  category: Effect
+  name: glyph-effectjolt-name
+  description: glyph-effectjolt-desc
+  cost: 12
+  schools: [ Lightning ]
+  sigil: "0-3-6-4-2"
+  icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectJolt }
+  effects:
+  - !type:DamageGlyphEffect
+    damage:
+      types:
+        Shock: 8
+    radius: 1.5
+  - !type:StunGlyphEffect
+    seconds: 0.8
+    radius: 1.5
+
+- type: spellGlyph
+  id: EffectSmite
+  category: Effect
+  name: glyph-effectsmite-name
+  description: glyph-effectsmite-desc
+  cost: 22
+  schools: [ Lightning ]
+  sigil: "2-4-6-3"
+  icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectSmite }
+  effects:
+  - !type:LightningGlyphEffect
+    range: 6
+
+- type: spellGlyph
+  id: EffectQuickening
+  category: Effect
+  name: glyph-effectquickening-name
+  description: glyph-effectquickening-desc
+  cost: 14
+  schools: [ Holy ]
+  sigil: "1-0-4-8-5"
+  icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectQuickening }
+  effects:
+  - !type:HasteGlyphEffect
+    seconds: 8
+    multiplier: 1.4
+    radius: 2.5
+
+- type: spellGlyph
+  id: EffectPurge
+  category: Effect
+  name: glyph-effectpurge-name
+  description: glyph-effectpurge-desc
+  cost: 11
+  schools: [ Holy ]
+  sigil: "2-1-4-6-3"
+  icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectPurge }
+  effects:
+  - !type:HealGlyphEffect
+    heal:
+      types:
+        Poison: -14
+        Cellular: -14
+    radius: 1.2
+
+- type: spellGlyph
+  id: EffectLeap
+  category: Effect
+  name: glyph-effectleap-name
+  description: glyph-effectleap-desc
+  cost: 8
+  schools: [ Evocation, Ender ]
+  sigil: "1-0-4-3-6"
+  icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectLeap }
+  effects:
+  - !type:LeapGlyphEffect
+    strength: 12
+    maxDistance: 10
+
+- type: spellGlyph
+  id: EffectSlam
+  category: Effect
+  name: glyph-effectslam-name
+  description: glyph-effectslam-desc
+  cost: 22
+  schools: [ Evocation ]
+  sigil: "1-0-3-6-7"
+  icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectSlam }
+  effects:
+  - !type:DamageGlyphEffect
+    damage:
+      types:
+        Blunt: 18
+    radius: 1.6
+  - !type:StunGlyphEffect
+    seconds: 2
+    radius: 1.6
+
+- type: spellGlyph
+  id: EffectGale
+  category: Effect
+  name: glyph-effectgale-name
+  description: glyph-effectgale-desc
+  cost: 14
+  schools: [ Evocation ]
+  sigil: "4-7-5-8"
+  icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectGale }
+  effects:
+  - !type:PushGlyphEffect
+    strength: 14
+    radius: 4.5
+
+- type: spellGlyph
+  id: EffectBanana
+  category: Effect
+  name: glyph-effectbanana-name
+  description: glyph-effectbanana-desc
+  cost: 6
+  schools: [ Nature ]
+  sigil: "1-4-7-5"
+  icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectBanana }
+  effects:
+  - !type:SpawnGlyphEffect
+    prototypes: [ TrashBananaPeel ]
+    amount: 3
+    scatter: 1.2
+
+- type: spellGlyph
+  id: EffectWeb
+  category: Effect
+  name: glyph-effectweb-name
+  description: glyph-effectweb-desc
+  cost: 9
+  schools: [ Nature ]
+  sigil: "1-4-7-5-2"
+  icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectWeb }
+  effects:
+  - !type:SpawnGlyphEffect
+    prototypes: [ SpiderWeb ]
+    amount: 3
+    scatter: 1.4
+
+- type: spellGlyph
+  id: EffectHex
+  category: Effect
+  name: glyph-effecthex-name
+  description: glyph-effecthex-desc
+  cost: 30
+  schools: [ Eldritch ]
+  sigil: "0-3-7-8-5"
+  icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectHex }
+  effects:
+  - !type:PolymorphGlyphEffect
+    options: [ Mouse, WizardForcedMonkey ]
+    radius: 1.2
+
+- type: spellGlyph
+  id: EffectWither
+  category: Effect
+  name: glyph-effectwither-name
+  description: glyph-effectwither-desc
+  cost: 16
+  schools: [ Blood ]
+  sigil: "3-1-5-4-6"
+  icon: { sprite: _Starlight/Interface/Wizard/glyphs.rsi, state: EffectWither }
+  effects:
+  - !type:DamageGlyphEffect
+    damage:
+      types:
+        Cellular: 6
+    radius: 2.2
+  - !type:SlowGlyphEffect
+    seconds: 5
+    multiplier: 0.6
+    radius: 2.2

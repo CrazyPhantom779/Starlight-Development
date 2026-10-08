@@ -31,6 +31,8 @@ public sealed partial class SpellweaverTomeSystem : EntitySystem
     [Dependency] private WindSystem _wind = default!;
     [Dependency] private TarotSystem _tarot = default!;
     [Dependency] private RitualSystem _ritual = default!;
+    [Dependency] private TideSystem _tides = default!;
+    [Dependency] private ErrandSystem _errands = default!;
 
     private static readonly EntProtoId _scrollProto = "SpellScrollBlank";
 
@@ -44,11 +46,17 @@ public sealed partial class SpellweaverTomeSystem : EntitySystem
     private const float ScrollFactor = 1.2f;
     private const int EnchantCharges = 3;
 
+    private static readonly TimeSpan _refreshInterval = TimeSpan.FromSeconds(1.5);
     private const float TarotCost = 12f;
     private const float CircleCost = 10f;
     private static readonly TimeSpan _tarotCooldown = TimeSpan.FromSeconds(20);
 
     private readonly Dictionary<EntityUid, TimeSpan> _nextDraw = [];
+
+    // Tomes whose window is open, and who is looking at them. Their state is refreshed every couple of seconds so
+    // Wind and errand progress stay live.
+    private readonly Dictionary<EntityUid, EntityUid> _open = [];
+    private TimeSpan _nextRefresh;
 
     public override void Initialize()
     {
@@ -57,6 +65,7 @@ public sealed partial class SpellweaverTomeSystem : EntitySystem
         Subs.BuiEvents<SpellweaverTomeComponent>(SpellcraftUiKey.Key, subs =>
         {
             subs.Event<BoundUIOpenedEvent>(OnOpened);
+            subs.Event<BoundUIClosedEvent>(OnClosed);
             subs.Event<SpellcraftWeaveMessage>(OnWeave);
             subs.Event<SpellcraftRoteMessage>(OnRote);
             subs.Event<SpellcraftForgetMessage>(OnForget);
@@ -79,10 +88,36 @@ public sealed partial class SpellweaverTomeSystem : EntitySystem
         foreach (var glyph in ent.Comp.Glyphs)
             craft.Glyphs.Add(glyph);
 
+        _tides.EnsureTides(actor, craft);
         Dirty(actor, craft);
         EnsureComp<WindComponent>(actor);
+        _errands.EnsureErrands(actor);
 
+        _open[ent.Owner] = actor;
         SendState(ent, actor);
+    }
+
+    private void OnClosed(Entity<SpellweaverTomeComponent> ent, ref BoundUIClosedEvent args)
+        => _open.Remove(ent.Owner);
+
+    public override void Update(float frameTime)
+    {
+        base.Update(frameTime);
+
+        if (_timing.CurTime < _nextRefresh || _open.Count == 0)
+            return;
+
+        _nextRefresh = _timing.CurTime + _refreshInterval;
+        foreach (var (tome, actor) in _open.ToList())
+        {
+            if (TerminatingOrDeleted(tome) || TerminatingOrDeleted(actor) || !TryComp<SpellweaverTomeComponent>(tome, out var comp))
+            {
+                _open.Remove(tome);
+                continue;
+            }
+
+            SendState((tome, comp), actor);
+        }
     }
 
     private void OnRefresh(Entity<SpellweaverTomeComponent> ent, ref SpellcraftRefreshMessage args)
@@ -140,6 +175,21 @@ public sealed partial class SpellweaverTomeSystem : EntitySystem
     }
 
     private bool TryPutInObject(Entity<SpellweaverTomeComponent> tome,
+        EntityUid actor,
+        SpellOutput output,
+        SpellGraphData graph,
+        SpellGraphPlan plan,
+        out string? error)
+    {
+        if (!TryStoreInObject(tome, actor, output, graph, plan, out error))
+            return false;
+
+        var stored = new SpellStoredEvent(actor);
+        RaiseLocalEvent(actor, ref stored);
+        return true;
+    }
+
+    private bool TryStoreInObject(Entity<SpellweaverTomeComponent> tome,
         EntityUid actor,
         SpellOutput output,
         SpellGraphData graph,
@@ -367,10 +417,14 @@ public sealed partial class SpellweaverTomeSystem : EntitySystem
 
         var wind = 0f;
         var windMax = 0f;
+        var regen = 0f;
+        var hurt = false;
         if (TryComp<WindComponent>(actor, out var windComp))
         {
             wind = _wind.GetWind((actor, windComp));
             windMax = windComp.Max;
+            regen = SharedWindSystem.GetRegen(windComp);
+            hurt = windComp.HurtFactor < 0.95f;
         }
 
         var spells = new List<WovenSpellInfo>();
@@ -417,7 +471,13 @@ public sealed partial class SpellweaverTomeSystem : EntitySystem
             TarotCost,
             CircleCost,
             circleNearby,
-            rituals);
+            rituals,
+            new Dictionary<string, float>(craft.Tides),
+            regen,
+            hurt,
+            craft.Power,
+            ErrandSystem.MaxPower,
+            _errands.GetInfos(actor));
         _ui.SetUiState(ent.Owner, SpellcraftUiKey.Key, state);
     }
 }

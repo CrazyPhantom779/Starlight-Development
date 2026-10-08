@@ -1,4 +1,5 @@
 using Content.Shared.Damage;
+using Content.Shared.Polymorph;
 using Robust.Shared.Prototypes;
 
 namespace Content.Shared._Starlight.Wizard.Casting;
@@ -152,6 +153,10 @@ public sealed partial class WindGlyphEffect : GlyphEffect
     /// <summary>When draining, the caster receives what was taken.</summary>
     [DataField]
     public bool ToCaster = true;
+
+    /// <summary>Whether giving Wind also reaches the caster. Off by default, so it can never refill yourself.</summary>
+    [DataField]
+    public bool AffectCaster;
 }
 
 /// <summary>A small explosion at the point.</summary>
@@ -168,4 +173,64 @@ public sealed partial class ExplodeGlyphEffect : GlyphEffect
 
     [DataField]
     public float MaxIntensity = 10f;
+}
+
+/// <summary>A bolt of lightning from the caster to the nearest creature to the point.</summary>
+public sealed partial class LightningGlyphEffect : GlyphEffect
+{
+    [DataField]
+    public float Range = 6f;
+
+    [DataField]
+    public string Prototype = "Lightning";
+}
+
+/// <summary>Briefly turns the nearest creature to the point into something else. They change back on their own.</summary>
+public sealed partial class PolymorphGlyphEffect : GlyphEffect
+{
+    [DataField(required: true)]
+    public List<ProtoId<PolymorphPrototype>> Options = [];
+
+    [DataField]
+    public float Radius = 1.2f;
+}
+
+/// <summary>The caster is thrown toward the point.</summary>
+public sealed partial class LeapGlyphEffect : GlyphEffect
+{
+    [DataField]
+    public float Strength = 12f;
+
+    [DataField]
+    public float MaxDistance = 10f;
+}
+
+/// <summary>Slows everything around the point.</summary>
+public sealed partial class SlowGlyphEffect : GlyphEffect
+{
+    [DataField]
+    public float Seconds = 5f;
+
+    /// <summary>Speed multiplier. Lower is slower.</summary>
+    [DataField]
+    public float Multiplier = 0.5f;
+
+    [DataField]
+    public float Radius = 2f;
+
+    [DataField]
+    public bool AffectCaster;
+}
+
+/// <summary>Quickens everyone around the point, the caster included.</summary>
+public sealed partial class HasteGlyphEffect : GlyphEffect
+{
+    [DataField]
+    public float Seconds = 8f;
+
+    [DataField]
+    public float Multiplier = 1.4f;
+
+    [DataField]
+    public float Radius = 2f;
 }

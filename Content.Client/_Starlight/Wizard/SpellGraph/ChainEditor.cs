@@ -4,7 +4,6 @@ using Content.Client._Starlight.Wizard.SpellGraph.Controls;
 using Content.Shared._Starlight.Wizard.Casting;
 using Content.Shared._Starlight.Wizard.SpellGraph;
 using Robust.Client.GameObjects;
-using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
 using Robust.Shared.Prototypes;
 
@@ -34,6 +33,7 @@ public sealed partial class ChainEditor : BoxContainer
     private readonly List<(SpellOutput Output, ArcaneButton Button)> _outputs = [];
 
     private readonly BoxContainer _palette = ArcaneUi.Column(6);
+    private readonly KeptScroll _paletteScroll = new();
     private readonly BoxContainer _chainBox = ArcaneUi.Row(4);
     private readonly Label _preview = new() { FontColorOverride = ArcaneTheme.Text };
     private readonly Label _detail = new() { FontColorOverride = ArcaneTheme.TextDim };
@@ -44,6 +44,7 @@ public sealed partial class ChainEditor : BoxContainer
     private readonly List<string> _chain = [];
     private string? _school;
     private SpellcraftBuiState? _state;
+    private string _signature = string.Empty;
 
     public ChainEditor(SpellcraftWindow window, SpellDiscipline discipline, ChainInput input, params SpellOutput[] outputs)
     {
@@ -68,19 +69,24 @@ public sealed partial class ChainEditor : BoxContainer
             var legend = ArcaneUi.Column(4);
             legend.AddChild(ArcaneUi.Heading(Loc.GetString("spellcraft-ui-sigil-legend")));
             legend.AddChild(ArcaneUi.Dim(Loc.GetString("spellcraft-ui-sigil-help")));
-            legend.AddChild(new ScrollContainer { VerticalExpand = true, HorizontalExpand = true, HScrollEnabled = false, Children = { _palette } });
+            _paletteScroll.HorizontalExpand = true;
+            _paletteScroll.AddChild(_palette);
+            legend.AddChild(_paletteScroll);
             padRow.AddChild(legend);
             legend.HorizontalExpand = true;
-            AddChild(new Control { VerticalExpand = true, Children = { padRow } });
+            legend.VerticalExpand = true;
+            padRow.VerticalExpand = true;
+            AddChild(padRow);
         }
         else
         {
             AddChild(_schoolFilter);
-            AddChild(new ScrollContainer { VerticalExpand = true, HScrollEnabled = false, Children = { _palette } });
+            _paletteScroll.AddChild(_palette);
+            AddChild(_paletteScroll);
         }
 
         AddChild(ArcaneUi.Heading(Loc.GetString("spellcraft-ui-chain")));
-        AddChild(new ScrollContainer { MinHeight = 82, VScrollEnabled = false, Children = { _chainBox } });
+        AddChild(new ScrollContainer { MinHeight = 96, VScrollEnabled = false, Children = { _chainBox } });
 
         AddChild(_preview);
         AddChild(_detail);
@@ -129,9 +135,18 @@ public sealed partial class ChainEditor : BoxContainer
     public void UpdateState(SpellcraftBuiState state)
     {
         _state = state;
-        BuildFilter();
-        BuildPalette();
-        Refresh();
+
+        // The server refreshes this window every couple of seconds. Only rebuild the palette when what you know changed,
+        // otherwise buttons would be replaced under your cursor mid-click.
+        var signature = string.Join(',', state.Glyphs) + "|" + string.Join(',', state.Schools);
+        if (signature != _signature)
+        {
+            _signature = signature;
+            BuildFilter();
+            BuildPalette();
+        }
+
+        UpdatePreview();
     }
 
     private void BuildFilter()
@@ -176,6 +191,9 @@ public sealed partial class ChainEditor : BoxContainer
     }
 
     private void BuildPalette()
+        => _paletteScroll.Rebuild(BuildPaletteContents);
+
+    private void BuildPaletteContents()
     {
         _palette.RemoveAllChildren();
         if (_state == null)
@@ -261,7 +279,7 @@ public sealed partial class ChainEditor : BoxContainer
         var known = _state.Glyphs.Select(id => new ProtoId<SpellGlyphPrototype>(id)).ToList();
         var ids = _chain.Select(id => new ProtoId<SpellGlyphPrototype>(id));
         if (!SpellGraphCompiler.TryBuildChain(_proto, ids, out var graph, out var error)
-            || !SpellGraphCompiler.TryCompile(_proto, graph, _state.MaxNodes, known, _state.Schools, out var plan, out error))
+            || !SpellGraphCompiler.TryCompile(_proto, graph, _state.MaxNodes, known, _state.Schools, _state.Tides, out var plan, out error))
         {
             _error.Text = error ?? string.Empty;
             return;

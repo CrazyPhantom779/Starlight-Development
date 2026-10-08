@@ -18,3 +18,29 @@
   swapWithNearby: true
   spawnAtCaster:
   - EffectFlashBluespaceSimple
+
+- type: windGust
+  id: GustBanana
+  weight: 1.5
+  message: wind-gust-banana
+  spawnAtCaster:
+  - TrashBananaPeel
+
+- type: windGust
+  id: GustSmoke
+  weight: 1
+  message: wind-gust-smoke
+  spawnAtCaster:
+  - WizardSmoke
+
+- type: windGust
+  id: GustSparks
+  weight: 2
+  message: wind-gust-sparks
+  spawnAtCaster:
+  - EffectSparks
+
+- type: windGust
+  id: GustSneeze
+  weight: 2
+  message: wind-gust-sneeze

@@ -2,7 +2,7 @@ namespace Content.Server._Starlight.Wizard.Objectives;
 
 public enum WizardCounterKind : byte
 {
-    /// <summary>Any wizard spell cast.</summary>
+    /// <summary>Any spell cast.</summary>
     Cast,
 
     /// <summary>Only spells woven in the Spellweaving window.</summary>
@@ -13,6 +13,30 @@ public enum WizardCounterKind : byte
 
     /// <summary>Times the wizard overcast (pushed Wind below zero).</summary>
     Overcast,
+
+    /// <summary>Rites performed at a ritual circle.</summary>
+    Rites,
+
+    /// <summary>Tarot cards played.</summary>
+    Cards,
+
+    /// <summary>Scrolls read.</summary>
+    Scrolls,
+
+    /// <summary>Spells put into wands, objects or scrolls.</summary>
+    Stored,
+
+    /// <summary>Different creatures affected by spells.</summary>
+    Creatures,
+
+    /// <summary>Different schools of magic used.</summary>
+    Schools,
+
+    /// <summary>Errands finished.</summary>
+    Errands,
+
+    /// <summary>Reach this much maximum Wind. Not counted: read from the wizard.</summary>
+    MaxWind,
 }
 
 /// <summary>
@@ -27,7 +51,7 @@ public sealed partial class WizardCounterConditionComponent : Component
     [ViewVariables]
     public int Count;
 
-    /// <summary>Keys already counted, for <see cref="WizardCounterKind.CastDistinct"/>.</summary>
+    /// <summary>Keys already counted, for the kinds that count each thing once.</summary>
     [ViewVariables]
     public HashSet<string> Seen = [];
 }

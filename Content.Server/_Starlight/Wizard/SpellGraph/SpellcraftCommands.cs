@@ -1,4 +1,5 @@
 using System.Linq;
+using Content.Server._Starlight.Wizard.Casting;
 using Content.Server.Administration;
 using Content.Shared._Starlight.Wizard.SpellGraph;
 using Content.Shared._Starlight.Wizard.Wind;
@@ -75,5 +76,60 @@ public sealed partial class SpellcraftMakeCommand : LocalizedEntityCommands
         }
 
         shell.WriteLine($"Created {EntityManager.ToPrettyString(action.Value)}.");
+    }
+}
+
+/// <summary>Debug: finishes your first errand, to test rewards and mastery.</summary>
+[AdminCommand(AdminFlags.Debug)]
+public sealed partial class SpellcraftErrandCommand : LocalizedEntityCommands
+{
+    [Dependency] private ErrandSystem _errands = default!;
+
+    public override string Command => "spellcraft_errand_done";
+    public override string Description => "Debug: finishes your first errand.";
+    public override string Help => "spellcraft_errand_done";
+
+    public override void Execute(IConsoleShell shell, string argStr, string[] args)
+    {
+        if (shell.Player?.AttachedEntity is not { } player)
+        {
+            shell.WriteError("You need an attached entity.");
+            return;
+        }
+
+        _errands.EnsureErrands(player);
+        shell.WriteLine(_errands.CompleteFirst(player) ? "Done." : "You have no errands.");
+    }
+}
+
+/// <summary>Debug: sets one school's tide for yourself, to test costs.</summary>
+[AdminCommand(AdminFlags.Debug)]
+public sealed partial class SpellcraftTideCommand : LocalizedEntityCommands
+{
+    [Dependency] private SpellGraphSystem _spells = default!;
+
+    public override string Command => "spellcraft_tide";
+    public override string Description => "Debug: sets one school's tide for yourself.";
+    public override string Help => "spellcraft_tide <school> <multiplier>";
+
+    public override void Execute(IConsoleShell shell, string argStr, string[] args)
+    {
+        if (shell.Player?.AttachedEntity is not { } player
+            || !EntityManager.TryGetComponent<SpellcraftComponent>(player, out var craft))
+        {
+            shell.WriteError("You need an attached entity with Spellcraft (open a tome first).");
+            return;
+        }
+
+        if (args.Length != 2 || !float.TryParse(args[1], out var value))
+        {
+            shell.WriteError("Usage: spellcraft_tide <school> <multiplier>");
+            return;
+        }
+
+        craft.Tides[args[0]] = Math.Clamp(value, 0.1f, 3f);
+        EntityManager.Dirty(player, craft);
+        _spells.RefreshActions(player);
+        shell.WriteLine($"Set {args[0]} to {craft.Tides[args[0]]}.");
     }
 }

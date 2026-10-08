@@ -64,3 +64,68 @@
   regenMultiplier: 1.4
   instability: 2
   weight: 0.6
+
+- type: aspect
+  id: AspectWellspring
+  name: aspect-wellspring-name
+  description: aspect-wellspring-desc
+  maxWindMultiplier: 1.3
+  costMultiplier: 1.15
+
+- type: aspect
+  id: AspectAnchored
+  name: aspect-anchored-name
+  description: aspect-anchored-desc
+  gustChanceMultiplier: 0.4
+  regenMultiplier: 0.85
+
+- type: aspect
+  id: AspectWeaver
+  name: aspect-weaver-name
+  description: aspect-weaver-desc
+  extraNodes: 2
+  maxWindMultiplier: 0.9
+
+- type: aspect
+  id: AspectScatterbrained
+  name: aspect-scatterbrained-name
+  description: aspect-scatterbrained-desc
+  extraSpells: 3
+  extraNodes: -1
+  gustChanceMultiplier: 1.2
+
+- type: aspect
+  id: AspectFlicker
+  name: aspect-flicker-name
+  description: aspect-flicker-desc
+  regenMultiplier: 1.7
+  maxWindMultiplier: 0.7
+  gustChanceMultiplier: 1.5
+  instability: 1
+
+- type: aspect
+  id: AspectThrifty
+  name: aspect-thrifty-name
+  description: aspect-thrifty-desc
+  costMultiplier: 0.85
+  regenMultiplier: 0.85
+
+- type: aspect
+  id: AspectTempest
+  name: aspect-tempest-name
+  description: aspect-tempest-desc
+  maxWindMultiplier: 1.2
+  regenMultiplier: 1.2
+  costMultiplier: 1.25
+  gustChanceMultiplier: 1.8
+  instability: 2
+  weight: 0.5
+
+- type: aspect
+  id: AspectHollowVessel
+  name: aspect-hollowvessel-name
+  description: aspect-hollowvessel-desc
+  costMultiplier: 0.65
+  maxWindMultiplier: 0.6
+  instability: 2
+  weight: 0.5

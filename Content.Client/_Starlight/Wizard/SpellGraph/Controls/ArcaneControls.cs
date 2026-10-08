@@ -4,6 +4,7 @@ using Robust.Client.GameObjects;
 using Robust.Client.Graphics;
 using Robust.Client.UserInterface;
 using Robust.Client.UserInterface.Controls;
+using Robust.Shared.Timing;
 
 namespace Content.Client._Starlight.Wizard.SpellGraph.Controls;
 
@@ -176,4 +177,62 @@ public static class ArcaneUi
 
     public static BoxContainer Column(int separation = 4)
         => new() { Orientation = BoxContainer.LayoutOrientation.Vertical, SeparationOverride = separation };
+}
+
+/// <summary>
+/// A scroll container that keeps its place when its contents are rebuilt. The window rebuilds its lists every time the
+/// server sends new state, which would otherwise throw you back to the top after every click.
+/// </summary>
+public sealed class KeptScroll : ScrollContainer
+{
+    // Layout runs after the rebuild, so the position is reapplied for a few frames until the content has a size.
+    private const int RestoreFrames = 4;
+
+    private Vector2 _restore;
+    private int _framesLeft;
+
+    public KeptScroll()
+    {
+        HScrollEnabled = false;
+        VerticalExpand = true;
+    }
+
+    public void Rebuild(Action build)
+    {
+        var value = GetScrollValue();
+        build();
+        _restore = value;
+        _framesLeft = RestoreFrames;
+    }
+
+    protected override void FrameUpdate(FrameEventArgs args)
+    {
+        base.FrameUpdate(args);
+        if (_framesLeft <= 0)
+            return;
+
+        _framesLeft--;
+        SetScrollValue(_restore);
+    }
+}
+
+/// <summary>A thin progress bar.</summary>
+public sealed class MiniBar : Control
+{
+    public float Fraction;
+    public Color Fill = ArcaneTheme.Gold;
+
+    public MiniBar()
+    {
+        MinSize = new Vector2(60, 8);
+        HorizontalExpand = true;
+    }
+
+    protected override void Draw(DrawingHandleScreen handle)
+    {
+        var box = new UIBox2(0, 0, PixelWidth, PixelHeight);
+        handle.DrawRect(box, ArcaneTheme.Background);
+        handle.DrawRect(new UIBox2(1, 1, 1 + ((PixelWidth - 2) * Math.Clamp(Fraction, 0f, 1f)), PixelHeight - 1), Fill);
+        handle.DrawRect(box, ArcaneTheme.Border, false);
+    }
 }

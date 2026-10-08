@@ -57,6 +57,118 @@
   - type: WizardCounterCondition
     kind: Overcast
 
+- type: entity
+  parent: BaseWizardObjective
+  id: WizardRitesObjective
+  components:
+  - type: Objective
+    icon: { sprite: Objects/Magic/magicactions.rsi, state: spell_default }
+  - type: NumberObjective
+    min: 2
+    max: 4
+    title: objective-wizard-rites-title
+    description: objective-wizard-rites-desc
+  - type: WizardCounterCondition
+    kind: Rites
+
+- type: entity
+  parent: BaseWizardObjective
+  id: WizardCardsObjective
+  components:
+  - type: Objective
+    icon: { sprite: Objects/Magic/magicactions.rsi, state: spell_default }
+  - type: NumberObjective
+    min: 2
+    max: 4
+    title: objective-wizard-cards-title
+    description: objective-wizard-cards-desc
+  - type: WizardCounterCondition
+    kind: Cards
+
+- type: entity
+  parent: BaseWizardObjective
+  id: WizardScrollsObjective
+  components:
+  - type: Objective
+    icon: { sprite: Objects/Magic/magicactions.rsi, state: spell_default }
+  - type: NumberObjective
+    min: 2
+    max: 3
+    title: objective-wizard-scrolls-title
+    description: objective-wizard-scrolls-desc
+  - type: WizardCounterCondition
+    kind: Scrolls
+
+- type: entity
+  parent: BaseWizardObjective
+  id: WizardStoredObjective
+  components:
+  - type: Objective
+    icon: { sprite: Objects/Magic/magicactions.rsi, state: item_recall }
+  - type: NumberObjective
+    min: 3
+    max: 5
+    title: objective-wizard-stored-title
+    description: objective-wizard-stored-desc
+  - type: WizardCounterCondition
+    kind: Stored
+
+- type: entity
+  parent: BaseWizardObjective
+  id: WizardCreaturesObjective
+  components:
+  - type: Objective
+    icon: { sprite: Objects/Magic/magicactions.rsi, state: fireball }
+  - type: NumberObjective
+    min: 5
+    max: 9
+    title: objective-wizard-creatures-title
+    description: objective-wizard-creatures-desc
+  - type: WizardCounterCondition
+    kind: Creatures
+
+- type: entity
+  parent: BaseWizardObjective
+  id: WizardSchoolsObjective
+  components:
+  - type: Objective
+    icon: { sprite: Objects/Magic/magicactions.rsi, state: magicmissile }
+  - type: NumberObjective
+    min: 3
+    max: 5
+    title: objective-wizard-schools-title
+    description: objective-wizard-schools-desc
+  - type: WizardCounterCondition
+    kind: Schools
+
+- type: entity
+  parent: BaseWizardObjective
+  id: WizardErrandsObjective
+  components:
+  - type: Objective
+    icon: { sprite: Objects/Magic/magicactions.rsi, state: repulse }
+  - type: NumberObjective
+    min: 3
+    max: 5
+    title: objective-wizard-errands-title
+    description: objective-wizard-errands-desc
+  - type: WizardCounterCondition
+    kind: Errands
+
+- type: entity
+  parent: BaseWizardObjective
+  id: WizardWindObjective
+  components:
+  - type: Objective
+    icon: { sprite: Objects/Magic/magicactions.rsi, state: shield }
+  - type: NumberObjective
+    min: 130
+    max: 170
+    title: objective-wizard-wind-title
+    description: objective-wizard-wind-desc
+  - type: WizardCounterCondition
+    kind: MaxWind
+
 # Thefts: things worth having a wizard take.
 - type: entity
   abstract: true
@@ -96,6 +208,8 @@
     WizardObjectiveGroupSpells: 1
     WizardObjectiveGroupThefts: 0.7
     WizardObjectiveGroupShowOff: 0.5
+    WizardObjectiveGroupCraft: 0.8
+    WizardObjectiveGroupGrowth: 0.7
 
 - type: weightedRandom
   id: WizardObjectiveGroupSpells
@@ -116,3 +230,19 @@
   id: WizardObjectiveGroupShowOff
   weights:
     WizardDemonstrateObjective: 1
+
+- type: weightedRandom
+  id: WizardObjectiveGroupCraft
+  weights:
+    WizardRitesObjective: 1
+    WizardCardsObjective: 1
+    WizardScrollsObjective: 0.8
+    WizardStoredObjective: 1
+
+- type: weightedRandom
+  id: WizardObjectiveGroupGrowth
+  weights:
+    WizardCreaturesObjective: 1
+    WizardSchoolsObjective: 1
+    WizardErrandsObjective: 0.8
+    WizardWindObjective: 0.7

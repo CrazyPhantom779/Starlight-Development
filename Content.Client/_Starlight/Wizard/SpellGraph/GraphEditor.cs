@@ -27,10 +27,12 @@ public sealed partial class GraphEditor : BoxContainer
     private readonly SpellcraftWindow _window;
     private readonly GraphCanvas _canvas;
     private readonly BoxContainer _palette = ArcaneUi.Column(4);
+    private readonly KeptScroll _paletteScroll = new() { MinWidth = 180 };
     private readonly Label _preview = new() { FontColorOverride = ArcaneTheme.Text };
     private readonly Label _error = new() { FontColorOverride = ArcaneTheme.Bad };
     private readonly ArcaneButton _weave;
     private SpellcraftBuiState? _state;
+    private string _signature = string.Empty;
 
     public GraphEditor(SpellcraftWindow window)
     {
@@ -49,7 +51,8 @@ public sealed partial class GraphEditor : BoxContainer
         body.VerticalExpand = true;
         var side = ArcaneUi.Column(4);
         side.AddChild(ArcaneUi.Dim(Loc.GetString("spellcraft-ui-circuit-help")));
-        side.AddChild(new ScrollContainer { VerticalExpand = true, HScrollEnabled = false, MinWidth = 210, Children = { _palette } });
+        _paletteScroll.AddChild(_palette);
+        side.AddChild(_paletteScroll);
         body.AddChild(side);
         body.AddChild(new ArcanePanel(margin: 2f) { HorizontalExpand = true, VerticalExpand = true, Children = { _canvas } });
         AddChild(body);
@@ -73,6 +76,19 @@ public sealed partial class GraphEditor : BoxContainer
     public void UpdateState(SpellcraftBuiState state)
     {
         _state = state;
+
+        var signature = string.Join(',', state.Glyphs);
+        if (signature != _signature)
+        {
+            _signature = signature;
+            _paletteScroll.Rebuild(() => BuildPalette(state));
+        }
+
+        Refresh();
+    }
+
+    private void BuildPalette(SpellcraftBuiState state)
+    {
         _palette.RemoveAllChildren();
 
         var glyphs = state.Glyphs
@@ -95,8 +111,6 @@ public sealed partial class GraphEditor : BoxContainer
                 _palette.AddChild(button);
             }
         }
-
-        Refresh();
     }
 
     private void Refresh()
@@ -109,7 +123,7 @@ public sealed partial class GraphEditor : BoxContainer
             return;
 
         var known = _state.Glyphs.Select(id => new ProtoId<SpellGlyphPrototype>(id)).ToList();
-        if (!SpellGraphCompiler.TryCompile(_proto, _canvas.ToGraph(), _state.MaxNodes, known, _state.Schools, out var plan, out var error))
+        if (!SpellGraphCompiler.TryCompile(_proto, _canvas.ToGraph(), _state.MaxNodes, known, _state.Schools, _state.Tides, out var plan, out var error))
         {
             _error.Text = error ?? string.Empty;
             return;
@@ -165,7 +179,7 @@ public sealed class GraphCanvas : Control
     {
         _proto = proto;
         _sprites = sprites;
-        MinSize = new Vector2(420, 260);
+        MinSize = new Vector2(340, 220);
         HorizontalExpand = true;
         VerticalExpand = true;
         RectClipContent = true;

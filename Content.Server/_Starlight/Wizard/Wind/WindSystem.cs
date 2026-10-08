@@ -1,15 +1,24 @@
 using Content.Shared._Starlight.Wizard.Wind;
 using Content.Shared.Actions.Events;
 using Content.Shared.Alert;
+using Content.Shared.Damage.Systems;
+using Content.Shared.FixedPoint;
+using Content.Shared.Mobs;
+using Content.Shared.Mobs.Systems;
+using Content.Shared.Damage.Components;
 
 namespace Content.Server._Starlight.Wizard.Wind;
 
 public sealed partial class WindSystem : SharedWindSystem
 {
     [Dependency] private AlertsSystem _alerts = default!;
+    [Dependency] private MobThresholdSystem _thresholds = default!;
+    [Dependency] private DamageableSystem _damageable = default!;
 
     private static readonly TimeSpan _alertInterval = TimeSpan.FromSeconds(0.5);
     private const short MaxSeverity = 5;
+    private const float CritThreshold = 100f;
+    private const float MinHurtFactor = 0.2f;
 
     [SubscribeLocalEvent]
     private void OnMapInit(Entity<WindComponent> ent, ref MapInitEvent args)
@@ -42,6 +51,26 @@ public sealed partial class WindSystem : SharedWindSystem
             var ev = new WindOverdrawnEvent(args.Performer, -newValue);
             RaiseLocalEvent(args.Performer, ref ev);
         }
+    }
+
+    /// <summary>
+    /// Wounds slow Wind recovery. Settle what has regenerated so far at the old rate, then switch to the new one.
+    /// </summary>
+    [SubscribeLocalEvent]
+    private void OnDamageChanged(Entity<WindComponent> ent, ref DamageChangedEvent args)
+    {
+        var threshold = CritThreshold;
+        if (_thresholds.TryGetThresholdForState(ent, MobState.Critical, out var crit) && crit.Value > FixedPoint2.Zero)
+            threshold = crit.Value.Float();
+
+        var hurt = Math.Clamp(_damageable.GetTotalDamage((ent.Owner, args.Damageable)).Float() / threshold, 0f, 1f);
+        var factor = MathHelper.Lerp(1f, MinHurtFactor, hurt);
+        if (MathF.Abs(factor - ent.Comp.HurtFactor) < 0.02f)
+            return;
+
+        SetWind(ent, GetWind(ent));
+        ent.Comp.HurtFactor = factor;
+        Dirty(ent);
     }
 
     /// <summary>

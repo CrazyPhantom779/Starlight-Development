@@ -1,63 +1,60 @@
-<p align="center">
-  <img alt="Space Station 14" width="600" src="Resources/Textures/Logo/logo.png" />
-</p>
+# Wizard rework: v3
 
-<div class="header" align="center">
+Base: your **Pt2 commit f963a40c7** ("Remove scripts"). Four patches, in order. `--binary`, so the new icons are included.
+Not compiled or run (no NuGet access). Verified instead: every C# file parses; every YAML parses; every prototype id the
+wizard YAML references exists in the repo; every component name used in a whitelist exists; every locale key used in
+code or YAML exists with no duplicates; the patches reproduce the tree via `git am`. Built to your conventions
+(partial UI classes, `field`, `[SubscribeLocalEvent]`, no parentheses inside `* / %` groups, no hiding `Margin`/`Owner`).
 
-[![Discord](https://img.shields.io/discord/1272545509562777621?label=Discord&logo=discord&logoColor=white)](https://discord.com/invite/HyDhPwAmUq)
-[![Steam](https://img.shields.io/badge/Steam-SS14%20-blue)](https://store.steampowered.com/app/1255460/Space_Station_14/)
-[![Starlight Client](https://img.shields.io/badge/Starlight_Client-Download-blue)](https://github.com/ss14Starlight/Starlight.Launcher)
-[![GitHub](https://img.shields.io/github/stars/ss14Starlight/space-station-14?style=social)]([https://github.com/ss14Starlight/space-station-14])
+```
+git checkout Winds-of-Magic
+git am patches/*.patch
+```
+Or copy `files/` over the repo root (it holds every added/changed file, PNGs included).
+`tools/` regenerates glyph/rote/tarot/errand YAML, icons and locale: `python3 tools/gen_glyphs.py <repo>` and
+`python3 tools/gen_errands.py <repo>`. `BALANCE.md` lists every cost.
 
-# STARLIGHT
-<sub>Space-Station 14</sub>
+## What's new
 
-![GitHub commit activity](https://img.shields.io/github/commit-activity/y/ss14Starlight/space-station-14)
-![GitHub Issues](https://img.shields.io/github/issues/ss14Starlight/space-station-14)
-![GitHub Pull Requests](https://img.shields.io/github/issues-pr-closed/ss14Starlight/space-station-14)
+**Wounds slow Wind.** Wind recovery falls toward 20% as you near critical. The value is settled whenever damage changes, so the
+lazy regeneration stays exact. Hover the Wind bar to see your rate and whether wounds are slowing it.
 
-</div>
+**Randomisation.**
+- **Tides:** each wizard has a per-school cost multiplier (x0.8 to x1.3) that drifts every 5-9 minutes; woven spell costs follow, and you get a message when a school runs hot or cool. Shown as chips in the window.
+- **Variance:** every spell step varies in strength (±6%, wider with Instability).
+- **16 Aspects** (8 new), **8 Gusts**, the existing random starting kit, and random objectives and errands.
 
-STARLIGHT is an open source project aimed at creating unique mechanics and a pleasant game atmosphere in the game Space Station 14,
+**Errands (power separate from objectives).** Each wizard always has 3 errands, drawn at random from 26, each from a different
+group so you get sent to different places: spend time near a department's machinery (bridge console, cargo pallets, medical, science, engines,
+gardens, chemistry, vending, lathes, fax), cast near airlocks/APCs/computers, affect N different creatures, use a school, place runes / fire
+bolts / touch, perform a rite. Each one gives a reward (max Wind, regen, node/slot limits, glyph, rote, attunement) **and a point of Mastery**
+(+4 max Wind, +0.06 Wind/s), up to 12. New **Errands tab**, with progress bars. The window refreshes live.
 
-a game about survival on a space station where there are constant confrontations between the crew and antagonists created to prevent the crew from achieving their goals.
+**84 glyphs** (15 new): Lightning *Smite*, polymorph *Hex*, *Mire*/*Wither* (slow), *Quickening* (haste), *Leap*, *Slam*, *Gale*, *Brand*,
+*Jolt*, *Purge*, banana peels, webs. New **Beam** form (a line, stopped by walls, never hits anyone twice). New **Swift** augment. 44 rotes (14 new).
 
-## Starlight Documentation
-The [Starlight Developer Documentation](https://docs.starlight.network/s/d49865f5-b555-4803-b5d7-5c2fde54fbd9/doc/developer-guides-Hf0UsFaugc) contains useful documents and resources on getting started with this repository.
+**Balance.** Costs retuned (see BALANCE.md). Chain jumps now weaken (x0.75 each) and cost more. **Replenish can no longer refill its caster** (that was an
+infinite-Wind loop). Starting wizards only get effects costing 20 or less; the strongest are earned. Base regen 1.6/s.
 
-## Space-Station 14 Documentation/Wiki
+**Objectives.** 8 new random objectives: perform rites, play tarot cards, read scrolls, bind spells, affect creatures, use N schools, finish errands,
+reach a max Wind. Counters now cover everything (items, rites, bolts). Fixed overcast counting.
 
-Space-Station 14 has [docs site](https://docs.spacestation14.io/) documentation on SS14s content, engine, game design and more. We also have lots of resources for new contributors to the project.
+**UI.** Minimum size 700x480 (was 780x560); tabs scroll; lists keep their scroll position when state refreshes (KeptScroll); views only rebuild
+when their content changes (so clicks are never lost to a refresh); Sigil tab layout fixed; circuit canvas fits small windows; tooltips for tides and regen.
 
-## Project Activity
-![Alt](https://repobeats.axiom.co/api/embed/675a7780b2c40805e5266935fe9329cd0177aba3.svg "Repobeats analytics image")
+## Test guide
+- `SpellweaverTomeDebug`: everything unlocked. Errands tab shows 3 errands; `spellcraft_errand_done` finishes one.
+- **Wounds:** take damage, hover the Wind bar.
+- **Tides:** `spellcraft_tide Fire 1.3`; costs update.
+- **Beam:** Glyphwork, Beam + Chill (or Beam + Scorch + Widen).
+- **Hex:** Touch + Hex on someone. **Smite:** Aimed + Smite. **Leap:** Aimed + Leap.
+- Objectives: make a wizard and check their list (3 plain objectives + Survive).
 
----
+## Likeliest trouble spots
+- `LightningGlyphEffect`, `PolymorphGlyphEffect`, `SlowGlyphEffect`/`HasteGlyphEffect` call engine systems (`LightningSystem`, `PolymorphSystem`, `MovementModStatusSystem`) that I checked by signature only.
+- Errand proximity uses `LookupFlags.Static | Dynamic | Sundries`; if a machine isn't found, check its component name in the whitelist.
+- `KeptScroll` restores position over 4 frames; if scroll jumps, that's where to look.
+- Tide/wound popups use `PopupType.Medium`/`LargeCaution`.
 
-## License
-
-
-
-> [!NOTE]
-> **Relicensing in progress.** The Starlight Fork License (`LICENSE-Starlight.TXT`) was applied to Starlight contributions
-> from **2024-11-04** (commit `84205e38`) through **2026-02-28** (commit `01eff0f7`).
-> This license **remains in effect** for contributions made during that period until explicit relicensing
-> consent is received from the respective authors. Once consent is given, those contributions are relicensed under MIT.
-> All contributions outside of that range are licensed under MIT (`LICENSE.TXT`).
-> Relicensing requests are tracked in [issue #3499](https://github.com/ss14Starlight/space-station-14/issues/3499).
-
-### Click each banner for further information
-
----
-
-<details>
-<summary><a href="#"><img src="https://img.shields.io/badge/licence-MIT-green?style=for-the-badge" alt="MIT license"></a></summary>
-
->Some files are licensed under [MIT license](https://opensource.org/license/MIT), these files are Space Wizards Federation code.
-</details>
-
-<details>
-<summary><a href="#"><img src="https://img.shields.io/badge/licence-CC_3.0_BY--SA-lightblue?style=for-the-badge" alt="Creative Commons 3.0 BY-SA"></a></summary>
-
->All other non-code STARLIGHT Assets, including icons and sound files, are licensed under the [Creative Commons 3.0 BY-SA](https://creativecommons.org/licenses/by-sa/3.0/) license unless otherwise noted in the folder or file.
-</details>
+## Still not built
+Prep-space map and non-euclidean rooms, "Touched" status, wand-part station affinities, counterplay items and the counter-arcane ERT, Lore Fragments research, the Ascendant tier, speech scrambling.

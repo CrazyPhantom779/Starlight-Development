@@ -1,4 +1,5 @@
 using System.Linq;
+using Content.Server._Starlight.Wizard.Casting;
 using Content.Server.Objectives.Systems;
 using Content.Shared._Starlight.Wizard.SpellGraph;
 using Content.Shared._Starlight.Wizard.Wind;
@@ -10,72 +11,96 @@ using Content.Shared.Objectives.Components;
 
 namespace Content.Server._Starlight.Wizard.Objectives;
 
-/// <summary>Counts wizard spell casts and overcasts for <see cref="WizardCounterConditionComponent"/>.</summary>
+/// <summary>Counts wizard activity for <see cref="WizardCounterConditionComponent"/>.</summary>
 public sealed partial class WizardCounterConditionSystem : EntitySystem
 {
     [Dependency] private SharedMindSystem _mind = default!;
     [Dependency] private NumberObjectiveSystem _number = default!;
 
+    /// <summary>Spells from the old spellbook and other prepared actions. Woven spells are counted by <see cref="OnCast"/>.</summary>
     [SubscribeLocalEvent]
     private void OnActionPerformed(Entity<ActionComponent> ent, ref ActionPerformedEvent args)
     {
-        var woven = HasComp<SpellGraphActionComponent>(ent);
-        if (!woven && !HasComp<MagicComponent>(ent))
+        if (HasComp<SpellGraphActionComponent>(ent) || !HasComp<MagicComponent>(ent))
             return;
 
-        var key = woven ? "woven:" + SignatureOf(ent) : (MetaData(ent).EntityPrototype?.ID ?? MetaData(ent).EntityName);
-
-        ForEachCounter(args.Performer, (comp) =>
-        {
-            switch (comp.Kind)
-            {
-                case WizardCounterKind.Cast:
-                    comp.Count++;
-                    break;
-                case WizardCounterKind.CastWoven:
-                    if (woven)
-                        comp.Count++;
-                    break;
-                case WizardCounterKind.CastDistinct:
-                    if (comp.Seen.Add(key))
-                        comp.Count++;
-                    break;
-            }
-        });
+        var key = MetaData(ent).EntityPrototype?.ID ?? MetaData(ent).EntityName;
+        Count(args.Performer, WizardCounterKind.Cast);
+        CountOnce(args.Performer, WizardCounterKind.CastDistinct, key);
     }
 
     [SubscribeLocalEvent]
-    private void OnOverdrawn(ref WindOverdrawnEvent args)
-        => ForEachCounter(args.Performer, comp =>
-            {
-            if (comp.Kind == WizardCounterKind.Overcast)
-                comp.Count++;
-        });
+    private void OnCast(Entity<SpellcraftComponent> ent, ref SpellCastEvent args)
+    {
+        Count(ent, WizardCounterKind.Cast);
+        Count(ent, WizardCounterKind.CastWoven);
+        CountOnce(ent, WizardCounterKind.CastDistinct, "woven:" + string.Join(",", args.Plan.Steps.Select(s => s.Glyph.ID).OrderBy(id => id)));
+
+        foreach (var school in args.Plan.Schools)
+            CountOnce(ent, WizardCounterKind.Schools, school);
+    }
+
+    [SubscribeLocalEvent]
+    private void OnHit(Entity<SpellcraftComponent> ent, ref SpellHitEvent args)
+    {
+        foreach (var creature in args.Hit)
+            CountOnce(ent, WizardCounterKind.Creatures, creature.ToString());
+    }
+
+    [SubscribeLocalEvent]
+    private void OnWindOverdrawn(ref WindOverdrawnEvent args)
+        => Count(args.Performer, WizardCounterKind.Overcast);
+
+    [SubscribeLocalEvent]
+    private void OnRite(Entity<SpellcraftComponent> ent, ref RitePerformedEvent args)
+        => Count(ent, WizardCounterKind.Rites);
+
+    [SubscribeLocalEvent]
+    private void OnStored(Entity<SpellcraftComponent> ent, ref SpellStoredEvent args)
+        => Count(ent, WizardCounterKind.Stored);
+
+    [SubscribeLocalEvent]
+    private void OnItemUsed(Entity<SpellcraftComponent> ent, ref SpellItemUsedEvent args)
+        => Count(ent, args.IsCard ? WizardCounterKind.Cards : WizardCounterKind.Scrolls);
+
+    [SubscribeLocalEvent]
+    private void OnErrand(Entity<SpellcraftComponent> ent, ref ErrandCompletedEvent args)
+        => Count(ent, WizardCounterKind.Errands);
 
     [SubscribeLocalEvent]
     private void OnGetProgress(Entity<WizardCounterConditionComponent> ent, ref ObjectiveGetProgressEvent args)
     {
         var target = Math.Max(1, _number.GetTarget(ent));
+
+        if (ent.Comp.Kind == WizardCounterKind.MaxWind)
+        {
+            var max = args.Mind.OwnedEntity is { } body && TryComp<WindComponent>(body, out var wind) ? wind.Max : 0f;
+            args.Progress = Math.Min(1f, max / target);
+            return;
+        }
+
         args.Progress = Math.Min(1f, ent.Comp.Count / (float) target);
     }
 
-    private void ForEachCounter(EntityUid performer, Action<WizardCounterConditionComponent> apply)
+    private void Count(EntityUid performer, WizardCounterKind kind)
+        => ForEachCounter(performer, kind, comp => comp.Count++);
+
+    private void CountOnce(EntityUid performer, WizardCounterKind kind, string key)
+        => ForEachCounter(performer, kind, comp =>
+        {
+            if (comp.Seen.Add(key))
+                comp.Count++;
+        });
+
+    private void ForEachCounter(EntityUid performer, WizardCounterKind kind, Action<WizardCounterConditionComponent> apply)
     {
         if (!_mind.TryGetMind(performer, out _, out var mind))
             return;
 
         foreach (var objective in mind.Objectives)
         {
-            if (TryComp<WizardCounterConditionComponent>(objective, out var counter))
+            if (TryComp<WizardCounterConditionComponent>(objective, out var counter) && counter.Kind == kind)
                 apply(counter);
         }
-    }
-
-    private string SignatureOf(EntityUid action)
-    {
-        if (!TryComp<SpellGraphActionComponent>(action, out var woven))
-            return string.Empty;
-
-        return string.Join(",", woven.Graph.Nodes.Select(n => n.Glyph.Id).OrderBy(id => id));
     }
 }

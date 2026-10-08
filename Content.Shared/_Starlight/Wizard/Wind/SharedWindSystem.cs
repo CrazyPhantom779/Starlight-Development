@@ -20,10 +20,14 @@ public abstract partial class SharedWindSystem : EntitySystem
         var value = comp.Current;
         // Regeneration only ever fills up to Max; it never pulls a value that is above Max back down.
         if (value < comp.Max)
-            value = MathF.Min(comp.Max, value + (elapsed * comp.RegenPerSecond * comp.RegenMultiplier));
+            value = MathF.Min(comp.Max, value + (elapsed * GetRegen(comp)));
 
         return value;
     }
+
+    /// <summary>Wind regained per second right now, after Aspects and wounds.</summary>
+    public static float GetRegen(WindComponent comp)
+        => comp.RegenPerSecond * comp.RegenMultiplier * comp.HurtFactor;
 
     /// <summary>Sets Wind to an exact value (clamped to the allowed range).</summary>
     public void SetWind(Entity<WindComponent> ent, float value)

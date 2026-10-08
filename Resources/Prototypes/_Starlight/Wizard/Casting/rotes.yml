@@ -175,6 +175,90 @@
   chain: [ FormSelf, EffectRepulse ]
 
 - type: roteSpell
+  id: RoteFrostBeam
+  name: rote-rotefrostbeam-name
+  description: rote-rotefrostbeam-desc
+  chain: [ FormBeam, EffectChill ]
+
+- type: roteSpell
+  id: RoteLightningLine
+  name: rote-rotelightningline-name
+  description: rote-rotelightningline-desc
+  chain: [ FormBeam, EffectShock ]
+
+- type: roteSpell
+  id: RoteFireWall
+  name: rote-rotefirewall-name
+  description: rote-rotefirewall-desc
+  chain: [ FormBeam, EffectScorch, AugmentWiden ]
+
+- type: roteSpell
+  id: RoteSmite
+  name: rote-rotesmite-name
+  description: rote-rotesmite-desc
+  chain: [ FormAimed, EffectSmite ]
+
+- type: roteSpell
+  id: RoteLeap
+  name: rote-roteleap-name
+  description: rote-roteleap-desc
+  chain: [ FormAimed, EffectLeap ]
+
+- type: roteSpell
+  id: RoteGale
+  name: rote-rotegale-name
+  description: rote-rotegale-desc
+  chain: [ FormBurst, EffectGale ]
+
+- type: roteSpell
+  id: RoteSlam
+  name: rote-roteslam-name
+  description: rote-roteslam-desc
+  chain: [ FormTouch, EffectSlam ]
+
+- type: roteSpell
+  id: RoteHex
+  name: rote-rotehex-name
+  description: rote-rotehex-desc
+  chain: [ FormTouch, EffectHex ]
+
+- type: roteSpell
+  id: RoteBananaTrap
+  name: rote-rotebananatrap-name
+  description: rote-rotebananatrap-desc
+  chain: [ FormRune, EffectBanana ]
+
+- type: roteSpell
+  id: RoteWebTrap
+  name: rote-rotewebtrap-name
+  description: rote-rotewebtrap-desc
+  chain: [ FormRune, EffectWeb ]
+
+- type: roteSpell
+  id: RoteMireBolt
+  name: rote-rotemirebolt-name
+  description: rote-rotemirebolt-desc
+  chain: [ FormBolt, EffectMire ]
+
+- type: roteSpell
+  id: RoteQuickening
+  name: rote-rotequickening-name
+  description: rote-rotequickening-desc
+  chain: [ FormBurst, EffectQuickening ]
+
+- type: roteSpell
+  id: RoteWither
+  name: rote-rotewither-name
+  description: rote-rotewither-desc
+  chain: [ FormTouch, EffectWither ]
+
+- type: roteSpell
+  id: RoteHeatwave
+  name: rote-roteheatwave-name
+  description: rote-roteheatwave-desc
+  chain: [ FormNova, EffectBrand ]
+
+- type: roteSpell
   id: RoteLightOrb
   name: rote-rotelightorb-name
   description: rote-rotelightorb-desc

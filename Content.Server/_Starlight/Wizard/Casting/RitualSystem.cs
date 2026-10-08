@@ -234,6 +234,9 @@ public sealed partial class RitualSystem : EntitySystem
 
         Spawn(_flash, center);
         Apply(wizard, circleUid, center, ritual.Result);
+
+        var performed = new RitePerformedEvent(wizard);
+        RaiseLocalEvent(wizard, ref performed);
     }
 
     private void Apply(EntityUid wizard, EntityUid _, EntityCoordinates center, RitualResult result)
@@ -249,7 +252,7 @@ public sealed partial class RitualSystem : EntitySystem
 
                 break;
             case LearnGlyphRitualResult glyph:
-                LearnGlyphs(wizard, glyph);
+                LearnGlyphs(wizard, glyph.Count, glyph.School);
                 break;
             case LearnDisciplineRitualResult:
                 LearnDiscipline(wizard);
@@ -277,15 +280,16 @@ public sealed partial class RitualSystem : EntitySystem
         }
     }
 
-    private void LearnGlyphs(EntityUid wizard, LearnGlyphRitualResult result)
+    /// <summary>Teaches a wizard glyphs they do not know yet, optionally only from one school.</summary>
+    public void LearnGlyphs(EntityUid wizard, int count, string? school = null)
     {
         if (!TryComp<SpellcraftComponent>(wizard, out var craft))
             return;
 
-        for (var i = 0; i < result.Count; i++)
+        for (var i = 0; i < count; i++)
         {
             var pool = _proto.EnumeratePrototypes<SpellGlyphPrototype>()
-                .Where(g => !craft.Glyphs.Contains(g.ID) && (result.School == null || g.Schools.Contains(result.School)))
+                .Where(g => !craft.Glyphs.Contains(g.ID) && (school == null || g.Schools.Contains(school)))
                 .ToList();
 
             if (pool.Count == 0)
@@ -320,7 +324,8 @@ public sealed partial class RitualSystem : EntitySystem
         _popup.PopupEntity(Loc.GetString("ritual-learn-discipline", ("discipline", Loc.GetString($"spellcraft-discipline-{discipline.ToString().ToLowerInvariant()}"))), wizard, wizard, PopupType.Medium);
     }
 
-    private void Attune(EntityUid wizard)
+    /// <summary>Attunes a wizard to a school they are not attuned to yet.</summary>
+    public void Attune(EntityUid wizard)
     {
         if (!TryComp<SpellcraftComponent>(wizard, out var craft))
             return;
@@ -343,7 +348,8 @@ public sealed partial class RitualSystem : EntitySystem
         _popup.PopupEntity(Loc.GetString("ritual-attune", ("school", Loc.GetString($"spellcraft-school-{school.ToLowerInvariant()}"))), wizard, wizard, PopupType.Medium);
     }
 
-    private void LearnRotes(EntityUid wizard, int count)
+    /// <summary>Teaches a wizard prepared spells they do not know yet.</summary>
+    public void LearnRotes(EntityUid wizard, int count)
     {
         if (!TryComp<SpellcraftComponent>(wizard, out var craft))
             return;
