@@ -41,6 +41,8 @@ namespace Content.Client.Input
             common.AddFunction(ContentKeyFunctions.InspectServerComponent);
             common.AddFunction(ContentKeyFunctions.InspectClientComponent);
             common.AddFunction(ContentKeyFunctions.ToggleRoundEndSummaryWindow);
+            common.AddFunction(ContentKeyFunctions.ToggleVoxelView);
+            common.AddFunction(ContentKeyFunctions.ToggleVoxelMouseLook);
 
             // Not in engine, because engine cannot check for sanbox/admin status before starting placement.
             common.AddFunction(ContentKeyFunctions.EditorCopyObject);
