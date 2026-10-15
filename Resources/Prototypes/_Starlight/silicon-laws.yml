@@ -646,7 +646,6 @@
   - RogueDrone3
   obeysTo: laws-owner-beings
 
-
 # Hologram
 - type: siliconLaw
   id: Hologram1
