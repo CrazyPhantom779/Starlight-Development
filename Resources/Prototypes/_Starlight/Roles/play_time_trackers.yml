@@ -101,6 +101,9 @@
   id: JobMakeshiftID
 
 - type: playTimeTracker
+  id: JobDrone
+
+- type: playTimeTracker
   id: JobHologram
 
 # Other ghosts
